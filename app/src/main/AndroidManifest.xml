@@ -26,7 +26,7 @@
             android:name=".applicant.ApplicantListActivity"
             android:exported="false"/>
         <activity
-            android:name=".team.TeamSynergyScoreActivity"
+            android:name=".recruitment.TeamSynergyScoreActivity"
             android:exported="false"/>
         <activity
             android:name=".personality.MainPersonalityTestActivity"

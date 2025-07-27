@@ -1,4 +1,4 @@
-package com.example.teamup.team;
+package com.example.teamup.recruitment;
 
 import android.content.Intent;
 import android.os.Bundle;
