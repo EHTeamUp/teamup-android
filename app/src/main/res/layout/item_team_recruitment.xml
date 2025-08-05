@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="12dp"
+    android:elevation="4dp"
+    android:background="@android:color/white">
+
+    <LinearLayout
+    android:orientation="vertical"
+    android:padding="12dp"
+    android:layout_width="match_parent"
+    android:radius="25dp"
+    android:layout_height="wrap_content">
+
+        <!-- 상단 제목, D-day, 화살표 -->
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/titleText"
+                android:text="배리어프리 앱 개발 콘테스트"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/dDayText"
+                android:text="D-10"
+                android:textStyle="bold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="6dp"/>
+
+            <ImageView
+                android:id="@+id/iv_arrow_right"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:src="@drawable/ic_arrow_right"
+                android:contentDescription="View details" />
+        </LinearLayout>
+
+        <!-- 모집 인원 + 모집자 (한 줄에) -->
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:gravity="start">
+
+            <TextView
+                android:id="@+id/peopleText"
+                android:text="모집 인원: 2 / 6"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="12dp"/>
+
+            <TextView
+                android:id="@+id/organizerText"
+                android:text="모집자: hong_gil"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+        <!-- 상금 -->
+        <TextView
+            android:id="@+id/prizeText"
+            android:text="상금: 100만원"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <!-- 태그 영역 -->
+        <LinearLayout
+            android:id="@+id/tagsLayout"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="start"
+            android:layout_gravity="start">
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>
