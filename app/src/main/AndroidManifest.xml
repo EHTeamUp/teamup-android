@@ -23,6 +23,12 @@
             android:name=".auth.LoginActivity"
             android:exported="false" />
         <activity
+            android:name=".auth.SignupActivity"
+            android:exported="false" />
+        <activity
+            android:name=".auth.SignupInterestActivity"
+            android:exported="false" />
+        <activity
             android:name=".applicant.ApplicantListActivity"
             android:exported="false"/>
         <activity
