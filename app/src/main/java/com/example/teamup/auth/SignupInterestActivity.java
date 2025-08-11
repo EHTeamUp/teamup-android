@@ -108,14 +108,14 @@ public class SignupInterestActivity extends AppCompatActivity {
                     List<String> selectedRoles = getSelectedRoles();
                     
                     // TODO: 다음 액티비티로 이동 (예: SignupExperienceActivity)
-                    // Intent intent = new Intent(SignupInterestActivity.this, SignupExperienceActivity.class);
-                    // intent.putExtra("id", userId);
-                    // intent.putExtra("password", userPassword);
-                    // intent.putExtra("name", userName);
-                    // intent.putExtra("email", userEmail);
-                    // intent.putStringArrayListExtra("languages", new ArrayList<>(selectedLanguages));
-                    // intent.putStringArrayListExtra("roles", new ArrayList<>(selectedRoles));
-                    // startActivity(intent);
+                    Intent intent = new Intent(SignupInterestActivity.this, SignupTestActivity.class);
+                    intent.putExtra("id", userId);
+                    intent.putExtra("password", userPassword);
+                    intent.putExtra("name", userName);
+                    intent.putExtra("email", userEmail);
+                    intent.putStringArrayListExtra("languages", new ArrayList<>(selectedLanguages));
+                    intent.putStringArrayListExtra("roles", new ArrayList<>(selectedRoles));
+                    startActivity(intent);
                     
                     Toast.makeText(SignupInterestActivity.this, "관심사가 저장되었습니다.", Toast.LENGTH_SHORT).show();
                 }
@@ -124,15 +124,16 @@ public class SignupInterestActivity extends AppCompatActivity {
     }
 
     private void addLanguageChip(String language) {
-        Chip chip = new Chip(this);
+        Chip chip = new Chip(this, null, com.google.android.material.R.style.Widget_MaterialComponents_Chip_Choice);
         chip.setText(language);
         chip.setCheckable(true);
         chip.setCheckedIconVisible(false);
         chipGroupLanguages.addView(chip);
     }
+    
 
     private void addRoleChip(String role) {
-        Chip chip = new Chip(this);
+        Chip chip = new Chip(this, null, com.google.android.material.R.style.Widget_MaterialComponents_Chip_Choice);
         chip.setText(role);
         chip.setCheckable(true);
         chip.setCheckedIconVisible(false);

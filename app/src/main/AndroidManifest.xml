@@ -29,6 +29,9 @@
             android:name=".auth.SignupInterestActivity"
             android:exported="false" />
         <activity
+            android:name=".auth.SignupTestActivity"
+            android:exported="false" />
+        <activity
             android:name=".applicant.ApplicantListActivity"
             android:exported="false"/>
         <activity
