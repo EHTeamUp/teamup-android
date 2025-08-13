@@ -102,12 +102,16 @@ public class SignupInterestActivity extends AppCompatActivity {
         tvNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                android.util.Log.d("SignupInterestActivity", "Next 버튼 클릭됨");
+                
                 if (validateSelections()) {
                     // 선택된 관심사들을 다음 액티비티로 전달
                     List<String> selectedLanguages = getSelectedLanguages();
                     List<String> selectedRoles = getSelectedRoles();
                     
-                    // TODO: 다음 액티비티로 이동 (예: SignupExperienceActivity)
+                    android.util.Log.d("SignupInterestActivity", "선택된 언어: " + selectedLanguages.size() + "개");
+                    android.util.Log.d("SignupInterestActivity", "선택된 역할: " + selectedRoles.size() + "개");
+                    
                     Intent intent = new Intent(SignupInterestActivity.this, SignupTestActivity.class);
                     intent.putExtra("id", userId);
                     intent.putExtra("password", userPassword);
@@ -115,28 +119,28 @@ public class SignupInterestActivity extends AppCompatActivity {
                     intent.putExtra("email", userEmail);
                     intent.putStringArrayListExtra("languages", new ArrayList<>(selectedLanguages));
                     intent.putStringArrayListExtra("roles", new ArrayList<>(selectedRoles));
+                    
+                    android.util.Log.d("SignupInterestActivity", "SignupTestActivity로 Intent 전송");
                     startActivity(intent);
                     
                     Toast.makeText(SignupInterestActivity.this, "관심사가 저장되었습니다.", Toast.LENGTH_SHORT).show();
+                } else {
+                    android.util.Log.d("SignupInterestActivity", "유효성 검사 실패");
                 }
             }
         });
     }
 
     private void addLanguageChip(String language) {
-        Chip chip = new Chip(this, null, com.google.android.material.R.style.Widget_MaterialComponents_Chip_Choice);
+        Chip chip = (Chip) getLayoutInflater().inflate(R.layout.view_chip_choice, chipGroupLanguages, false);
         chip.setText(language);
-        chip.setCheckable(true);
-        chip.setCheckedIconVisible(false);
         chipGroupLanguages.addView(chip);
     }
     
 
     private void addRoleChip(String role) {
-        Chip chip = new Chip(this, null, com.google.android.material.R.style.Widget_MaterialComponents_Chip_Choice);
+        Chip chip = (Chip) getLayoutInflater().inflate(R.layout.view_chip_choice, chipGroupLanguages, false);
         chip.setText(role);
-        chip.setCheckable(true);
-        chip.setCheckedIconVisible(false);
         chipGroupRoles.addView(chip);
     }
 
