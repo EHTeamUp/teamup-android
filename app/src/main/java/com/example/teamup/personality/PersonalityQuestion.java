@@ -63,7 +63,7 @@ public class PersonalityQuestion {
         List<PersonalityQuestion> questions = new ArrayList<>();
 
         try {
-            // Load JSON file from raw resources
+            // 더미 데이터 JSON 파일 로드
             InputStream inputStream = context.getResources().openRawResource(R.raw.personality_questions);
             int size = inputStream.available();
             byte[] buffer = new byte[size];
@@ -92,25 +92,12 @@ public class PersonalityQuestion {
     }
 
     /**
-     * 백엔드에서 질문 데이터를 받아오는 메서드 (구현 예정)
+     * 백엔드에서 질문 데이터를 받아오는 메서드 
      */
     public static List<PersonalityQuestion> loadQuestionsFromAPI() {
         // TODO: 백엔드 API 호출로 질문 데이터 받아오기
-        /*
-        ApiService apiService = RetrofitClient.getApiService();
-        Call<List<PersonalityQuestion>> call = apiService.getPersonalityQuestions();
         
-        try {
-            Response<List<PersonalityQuestion>> response = call.execute();
-            if (response.isSuccessful() && response.body() != null) {
-                return response.body();
-            }
-        } catch (IOException e) {
-            Log.e("PersonalityQuestion", "Error loading questions from API", e);
-        }
-        */
-        
-        // 실패시 빈 리스트 반환 (호출하는 쪽에서 더미 데이터로 대체)
+        // 실패시 빈 리스트 반환 
         return new ArrayList<>();
     }
 } 

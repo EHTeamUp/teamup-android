@@ -39,7 +39,7 @@ public class PersonalityTestQuestionActivity extends AppCompatActivity implement
             return insets;
         });
 
-        // Initialize
+        // 초기화
         selectedAnswers = new HashMap<>();
         
         // 더미데이터 로드, 나중에 백엔드에서 로드
@@ -71,7 +71,7 @@ public class PersonalityTestQuestionActivity extends AppCompatActivity implement
     }
     
     /**
-     * 백엔드에서 질문 데이터를 받아오는 메서드 (구현 예정)
+     * 백엔드에서 질문 데이터를 받아오는 메서드
      */
     private void loadQuestionsFromAPI() {
         // TODO: 백엔드 API 호출로 질문 데이터 받아오기
@@ -100,11 +100,11 @@ public class PersonalityTestQuestionActivity extends AppCompatActivity implement
      */
     private void checkAndNavigateToResult() {
         if (selectedAnswers.size() == questions.size()) {
-            // 모든 질문이 답변됨 - 결과 페이지로 이동
+            // 모든 질문이 답변되면 결과 페이지 이동
             Intent intent = new Intent(PersonalityTestQuestionActivity.this, PersonalityTestResultActivity.class);
             startActivity(intent);
         } else {
-            // 모든 질문이 답변되지 않음 - Toast 메시지 표시
+            // 모든 질문이 답변되지 않으면 Toast 메시지
             Toast.makeText(PersonalityTestQuestionActivity.this, "모든 항목이 선택되어 있지 않습니다", Toast.LENGTH_SHORT).show();
         }
     }
@@ -113,20 +113,19 @@ public class PersonalityTestQuestionActivity extends AppCompatActivity implement
     public void onOptionSelected(int questionIndex, String option) {
         selectedAnswers.put(questionIndex, option);
         
-        // 결과 버튼 상태 업데이트 (선택사항 - 시각적 피드백용)
+        // 결과 버튼 상태 업데이트
         updateResultButtonState();
     }
     
     /**
-     * 결과 버튼의 활성화/비활성화 상태를 업데이트하는 메서드 (선택사항)
+     * 결과 버튼의 활성화/비활성화 상태를 업데이트하는 메서드 
      */
     private void updateResultButtonState() {
-        // 버튼을 항상 활성화 상태로 유지하거나, 시각적 피드백만 제공
         if (selectedAnswers.size() == questions.size()) {
-            // 모든 질문이 답변됨 - 버튼 스타일 변경 (선택사항)
+            // 모든 질문이 답변됨 
             btnResult.setAlpha(1.0f);
         } else {
-            // 모든 질문이 답변되지 않음 - 버튼 스타일 변경 (선택사항)
+            // 모든 질문이 답변되지 않음
             btnResult.setAlpha(0.7f);
         }
     }

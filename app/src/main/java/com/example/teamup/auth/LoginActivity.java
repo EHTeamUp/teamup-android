@@ -33,13 +33,13 @@ public class LoginActivity extends AppCompatActivity {
             return insets;
         });
 
-        // Initialize views
+        // 뷰 초기화
         etId = findViewById(R.id.et_id);
         etPassword = findViewById(R.id.et_password);
         btnLogin = findViewById(R.id.btn_login);
         btnSignIn = findViewById(R.id.btn_sign_in);
 
-        // Setup button click listeners
+        // 버튼 클릭 리스너 설정
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

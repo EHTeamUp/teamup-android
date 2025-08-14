@@ -26,7 +26,7 @@ public class MainPersonalityTestActivity extends AppCompatActivity {
             return insets;
         });
 
-        // Setup start button click listener
+        // 시작 버튼 클릭 리스너 설정
         setupStartButton();
     }
 
@@ -35,7 +35,7 @@ public class MainPersonalityTestActivity extends AppCompatActivity {
         btnStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Navigate to PersonalityTestQuestionActivity
+                // 성향테스트 질문 화면으로 이동
                 Intent intent = new Intent(MainPersonalityTestActivity.this, PersonalityTestQuestionActivity.class);
                 startActivity(intent);
             }
