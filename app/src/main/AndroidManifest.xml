@@ -14,10 +14,10 @@
         <activity
             android:name=".MainActivity"
             android:exported="true" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+<!--            <intent-filter>-->
+<!--                <action android:name="android.intent.action.MAIN" />-->
+<!--                <category android:name="android.intent.category.LAUNCHER" />-->
+<!--            </intent-filter>-->
         </activity>
         <activity
             android:name=".auth.LoginActivity"
@@ -37,5 +37,17 @@
         <activity
             android:name=".personality.PersonalityTestQuestionActivity"
             android:exported="false" />
+        <activity
+            android:name=".recruitment.ContestRecruitmentListActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".recruitment.ContestRecruitmentDetailActivity"
+            android:exported="false" />
+
     </application>
 </manifest>
