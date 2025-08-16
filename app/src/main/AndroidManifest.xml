@@ -52,5 +52,26 @@
         <activity
             android:name=".personality.PersonalityTestQuestionActivity"
             android:exported="false" />
+        <activity
+            android:name=".MypageActivity"
+            android:exported="false" />
+        <activity
+            android:name=".mypage.MypageUserinfoActivity"
+            android:exported="false" />
+        <activity
+            android:name=".mypage.MypageUserinfoEditActivity"
+            android:exported="false" />
+        <activity
+            android:name=".mypage.MypageProfileActivity"
+            android:exported="false" />
+        <activity
+            android:name=".mypage.MypageInterestActivity"
+            android:exported="false" />
+        <activity
+            android:name=".mypage.MypageTestIngActivity"
+            android:exported="false" />
+        <activity
+            android:name=".mypage.MypageTestResultActivity"
+            android:exported="false" />
     </application>
 </manifest>
