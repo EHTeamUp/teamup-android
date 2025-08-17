@@ -27,6 +27,7 @@ public class TeamSynergyScoreActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private TeamMemberAdapter adapter;
     private List<TeamMemberData> teamMemberList;
+    private TextView tvSynergyScore;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,20 +43,16 @@ public class TeamSynergyScoreActivity extends AppCompatActivity {
         initViews();
         setupRecyclerView();
         setupClickListeners();
+        loadDummyData();
     }
 
     private void initViews() {
         recyclerView = findViewById(R.id.rv_team_members);
+        tvSynergyScore = findViewById(R.id.tv_synergy_score);
     }
 
     private void setupRecyclerView() {
         teamMemberList = new ArrayList<>();
-        
-        // 팀원 데이터 추가
-        teamMemberList.add(new TeamMemberData("홍길동", "프론트엔드 개발자", "React, JavaScript", "리더형"));
-        teamMemberList.add(new TeamMemberData("김영희", "백엔드 개발자", "Node.js, Express", "협력형"));
-        teamMemberList.add(new TeamMemberData("이철수", "UI/UX 디자이너", "Figma, Sketch", "창의형"));
-
         adapter = new TeamMemberAdapter(teamMemberList);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
@@ -84,6 +81,32 @@ public class TeamSynergyScoreActivity extends AppCompatActivity {
                     finish(); // 현재 액티비티 종료
                 }
             });
+        }
+    }
+
+    /**
+     * 더미 데이터를 로드하는 메서드
+     */
+    private void loadDummyData() {
+        // 팀원 데이터 추가
+        teamMemberList.clear();
+        teamMemberList.add(new TeamMemberData("홍길동", "프론트엔드 개발자", "React, JavaScript, TypeScript", "리더형"));
+        teamMemberList.add(new TeamMemberData("김영희", "백엔드 개발자", "Node.js, Express, MongoDB", "협력형"));
+        teamMemberList.add(new TeamMemberData("이철수", "UI/UX 디자이너", "Figma, Sketch, Adobe XD", "창의형"));
+        teamMemberList.add(new TeamMemberData("박민수", "DevOps 엔지니어", "Docker, AWS, Kubernetes", "분석형"));
+
+        // 팀 시너지 점수 (백엔드에서 받아올 예정)
+        updateSynergyScore(85);
+
+        adapter.notifyDataSetChanged();
+    }
+
+    /**
+     * UI 업데이트 메서드들
+     */
+    private void updateSynergyScore(int score) {
+        if (tvSynergyScore != null) {
+            tvSynergyScore.setText(String.valueOf(score));
         }
     }
 

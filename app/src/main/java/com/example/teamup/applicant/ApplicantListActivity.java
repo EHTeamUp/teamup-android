@@ -96,7 +96,7 @@ public class ApplicantListActivity extends AppCompatActivity {
             }
         } catch (IOException | JSONException e) {
             e.printStackTrace();
-            // JSON 로드 실패 시 기본 데이터 사용
+            // JSON 로드 실패시 기본 데이터 사용
             applicantList.add(new ApplicantData("1", "z_one_1", "배리어프리 앱 개발 콘테스트 지원", "풀스택 개발자", 
                 new String[]{"파이썬", "Spring Boot", "기획"}, "리더형", "3년", "웹 개발 경험이 풍부합니다."));
         }
@@ -121,7 +121,7 @@ public class ApplicantListActivity extends AppCompatActivity {
         });
     }
 
-    // 데이터 클래스
+    // 지원자 데이터 클래스
     public static class ApplicantData {
         private String id;
         private String name;
@@ -154,7 +154,7 @@ public class ApplicantListActivity extends AppCompatActivity {
         public String getDescription() { return description; }
     }
 
-    // 어댑터 클래스
+    // 지원자 목록 어댑터 클래스
     public static class ApplicantAdapter extends RecyclerView.Adapter<ApplicantAdapter.ViewHolder> {
         private List<ApplicantData> dataList;
 
