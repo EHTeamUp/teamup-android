@@ -12,10 +12,13 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.teamup.auth.LoginActivity;
 import com.example.teamup.auth.LoginManager;
+import com.example.teamup.auth.TokenManager;
 import com.example.teamup.MypageActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
+
+    private TokenManager tokenManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +31,9 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
+        // TokenManager 초기화
+        tokenManager = TokenManager.getInstance(this);
+
         // Setup Bottom Navigation
         BottomNavigationView navView = findViewById(R.id.bottom_navigation);
         
@@ -37,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
             if (itemId == R.id.navigation_profile) {
 
                 // 로그인 상태에 따라 다르게 동작
-                if (LoginManager.isLoggedIn()) {
+                if (tokenManager.isLoggedIn()) {
                     // 로그인된 경우 마이페이지 이동
                     Intent intent = new Intent(MainActivity.this, MypageActivity.class);
                     startActivity(intent);
