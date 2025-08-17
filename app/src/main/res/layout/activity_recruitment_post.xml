@@ -41,6 +41,7 @@
             android:layout_marginEnd="8dp" />
 
         <TextView
+            android:id="@+id/tv_contest_name"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -50,7 +51,7 @@
             android:textStyle="bold" />
     </LinearLayout>
 
-    <!-- 제목 라벨 -->
+    <!-- 제목 라벨 (변경 없음) -->
     <TextView
         android:id="@+id/subject_label"
         android:layout_width="wrap_content"
@@ -64,28 +65,24 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="24dp" />
 
-    <!-- 제목 입력 박스 -->
-    <LinearLayout
-        android:id="@+id/subject_input_box"
+    <!-- 제목 입력 박스: TextView를 EditText로 변경 -->
+    <EditText
+        android:id="@+id/et_subject_input"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="@drawable/rounded_box_border"
+        android:hint="제목을 입력하세요 (예: 프론트 잘하시는 분 모집합니다!)"
+        android:inputType="text"
         android:padding="16dp"
+        android:textColor="#000000"
+        android:textSize="14sp"
         app:layout_constraintTop_toBottomOf="@id/subject_label"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="8dp">
+        android:layout_marginTop="8dp" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="프론트 잘하시는 분 모집합니다!"
-            android:textSize="14sp"
-            android:textColor="#000000" />
-    </LinearLayout>
-
-    <!-- 모집 인원 수 라벨 -->
+    <!-- 모집 인원 수 라벨 (변경 없음) -->
     <TextView
         android:id="@+id/member_count_label"
         android:layout_width="wrap_content"
@@ -94,101 +91,26 @@
         android:textSize="16sp"
         android:textColor="#000000"
         android:textStyle="bold"
-        app:layout_constraintTop_toBottomOf="@id/subject_input_box"
+        app:layout_constraintTop_toBottomOf="@id/et_subject_input"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginStart="16dp"
         android:layout_marginTop="24dp" />
 
-    <!-- 인원 수 드롭다운 박스 -->
-    <LinearLayout
-        android:id="@+id/member_dropdown_box"
+    <!-- 인원 수 선택 UI: 기존 LinearLayout을 Spinner로 변경 -->
+    <Spinner
+        android:id="@+id/spinner_member_count"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="@drawable/rounded_box_border"
-        android:orientation="vertical"
+        android:padding="4dp"
+        android:minHeight="48dp"
         app:layout_constraintTop_toBottomOf="@id/member_count_label"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="8dp">
+        android:layout_marginTop="8dp" />
 
-        <!-- 선택된 값 표시 -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="16dp"
-            android:gravity="center_vertical">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="2명"
-                android:textSize="16sp"
-                android:textColor="#000000"
-                android:textStyle="bold" />
-
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_arrow_up"
-                android:layout_marginStart="8dp" />
-        </LinearLayout>
-
-        <!-- 드롭다운 옵션들 (숨김) -->
-        <LinearLayout
-            android:id="@+id/dropdown_options"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:visibility="gone">
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#E0E0E0" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@android:color/transparent"
-                android:padding="16dp"
-                android:text="1명"
-                android:textColor="#666666"
-                android:textSize="14sp" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="#E0E0E0"
-                android:padding="16dp"
-                android:text="2명"
-                android:textColor="#000000"
-                android:textSize="14sp" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@android:color/transparent"
-                android:padding="16dp"
-                android:text="3명"
-                android:textColor="#666666"
-                android:textSize="14sp" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@android:color/transparent"
-                android:padding="16dp"
-                android:text="4명"
-                android:textColor="#666666"
-                android:textSize="14sp" />
-
-        </LinearLayout>
-    </LinearLayout>
-
-    <!-- 내용 라벨 -->
+    <!-- 내용 라벨 (변경 없음) -->
     <TextView
         android:id="@+id/content_label"
         android:layout_width="wrap_content"
@@ -197,42 +119,33 @@
         android:textSize="16sp"
         android:textColor="#000000"
         android:textStyle="bold"
-        app:layout_constraintTop_toBottomOf="@id/member_dropdown_box"
+        app:layout_constraintTop_toBottomOf="@id/spinner_member_count"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginStart="16dp"
         android:layout_marginTop="24dp" />
 
-    <!-- 내용 입력 박스 -->
-    <LinearLayout
-        android:id="@+id/content_input_box"
+    <!-- 내용 입력 박스: TextView를 EditText로 변경 -->
+    <EditText
+        android:id="@+id/et_content_input"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:background="@drawable/rounded_box_border"
+        android:gravity="top"
+        android:hint="모집글 내용을 입력해주세요. (예: 어떤 주제로 무엇을 개발할 계획인지, 어떤 팀원이면 좋은지 등)"
+        android:inputType="textMultiLine"
         android:padding="16dp"
-        android:orientation="vertical"
+        android:textColor="#000000"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toTopOf="@+id/submit_button"
         app:layout_constraintTop_toBottomOf="@id/content_label"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="8dp">
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="16dp"/>
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="~~ 주제를 가지고 ~~을 개발할 계획입니다"
-            android:textSize="14sp"
-            android:textColor="#000000"
-            android:layout_marginBottom="8dp" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="~~인 분이면 좋겠습니다."
-            android:textSize="14sp"
-            android:textColor="#000000" />
-    </LinearLayout>
-
-    <!-- 작성 버튼 -->
+    <!-- 작성 버튼 (변경 없음) -->
     <Button
         android:id="@+id/submit_button"
         android:layout_width="wrap_content"
@@ -241,12 +154,12 @@
         android:textColor="#FFFFFF"
         android:backgroundTint="#000000"
         android:paddingHorizontal="32dp"
-        android:layout_marginTop="24dp"
         android:layout_marginEnd="16dp"
-        app:layout_constraintTop_toBottomOf="@id/content_input_box"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintBottom_toTopOf="@id/bottom_navigation"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- 하단 네비게이션 -->
+    <!-- 하단 네비게이션 (변경 없음) -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"
         android:layout_width="match_parent"

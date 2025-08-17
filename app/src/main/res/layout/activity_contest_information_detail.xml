@@ -117,7 +117,7 @@
                 android:id="@+id/btn_apply"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="모집하기"
+                android:text="이 공모전으로 팀 꾸리기"
                 android:textColor="@android:color/white"
                 android:backgroundTint="@android:color/black"
                 android:layout_marginTop="8dp"
