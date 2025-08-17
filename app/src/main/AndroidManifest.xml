@@ -23,6 +23,21 @@
             android:name=".auth.LoginActivity"
             android:exported="false" />
         <activity
+            android:name=".auth.SignupActivity"
+            android:exported="false" />
+        <activity
+            android:name=".auth.SignupInterestActivity"
+            android:exported="false" />
+        <activity
+            android:name=".auth.SignupTestActivity"
+            android:exported="false" />
+        <activity
+            android:name=".auth.SignupExperienceActivity"
+            android:exported="false" />
+        <activity
+            android:name=".auth.SignupFinishActivity"
+            android:exported="false" />
+        <activity
             android:name=".applicant.ApplicantListActivity"
             android:exported="false"/>
         <activity
@@ -36,6 +51,27 @@
             android:exported="false"/>
         <activity
             android:name=".personality.PersonalityTestQuestionActivity"
+            android:exported="false" />
+        <activity
+            android:name=".MypageActivity"
+            android:exported="false" />
+        <activity
+            android:name=".mypage.MypageUserinfoActivity"
+            android:exported="false" />
+        <activity
+            android:name=".mypage.MypageUserinfoEditActivity"
+            android:exported="false" />
+        <activity
+            android:name=".mypage.MypageProfileActivity"
+            android:exported="false" />
+        <activity
+            android:name=".mypage.MypageInterestActivity"
+            android:exported="false" />
+        <activity
+            android:name=".mypage.MypageTestIngActivity"
+            android:exported="false" />
+        <activity
+            android:name=".mypage.MypageTestResultActivity"
             android:exported="false" />
     </application>
 </manifest>
