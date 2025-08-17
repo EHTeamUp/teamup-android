@@ -58,16 +58,8 @@ public class LoginActivity extends AppCompatActivity {
         btnSignIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String id = etId.getText().toString();
-                String password = etPassword.getText().toString();
-                
-                if (id.isEmpty() || password.isEmpty()) {
-                    Toast.makeText(LoginActivity.this, "Please enter ID and Password", Toast.LENGTH_SHORT).show();
-                } else {
-                    // Show success message and go back to MainActivity
-                    Toast.makeText(LoginActivity.this, "Sign in successful!", Toast.LENGTH_SHORT).show();
-                    finish(); // Close LoginActivity and return to MainActivity
-                }
+                Intent intent = new Intent(LoginActivity.this, SignupActivity.class);
+                startActivity(intent);
             }
         });
     }
