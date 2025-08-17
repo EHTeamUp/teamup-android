@@ -52,6 +52,8 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View v) {
                 // TODO: 회원가입 화면으로 이동
                 Toast.makeText(LoginActivity.this, "회원가입 페이지 이동", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(LoginActivity.this, SignupActivity.class);
+                startActivity(intent);
             }
         });
     }
