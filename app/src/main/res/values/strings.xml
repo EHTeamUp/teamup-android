@@ -11,6 +11,9 @@
     <string name="login_button">Login</string>
     <string name="sign_in_button">Sign In</string>
     <string name="input_placeholder">Value</string>
+    <string name="login_success">로그인이 완료되었습니다</string>
+    <string name="login_failed">로그인에 실패했습니다</string>
+    <string name="please_enter_id_password">ID와 비밀번호를 입력해주세요</string>
     
     <!-- Bottom Navigation -->
     <string name="nav_home">Home</string>

@@ -57,7 +57,6 @@
         android:id="@+id/tv_id_message"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="사용 가능한 아이디입니다."
         android:textSize="12sp"
         android:textColor="#888888"
         app:layout_constraintTop_toBottomOf="@id/et_id"
@@ -86,13 +85,35 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
+    <!-- Confirm Password -->
+    <TextView
+        android:id="@+id/tv_confirm_pw_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Confirm Password"
+        app:layout_constraintTop_toBottomOf="@id/et_password"
+        android:layout_marginTop="24dp"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <EditText
+        android:id="@+id/et_confirm_password"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:hint="Value"
+        android:inputType="textPassword"
+        android:padding="12dp"
+        android:background="@drawable/edittext_background"
+        app:layout_constraintTop_toBottomOf="@id/tv_confirm_pw_label"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
     <!-- Name -->
     <TextView
         android:id="@+id/tv_name_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Name"
-        app:layout_constraintTop_toBottomOf="@id/et_password"
+        app:layout_constraintTop_toBottomOf="@id/et_confirm_password"
         android:layout_marginTop="24dp"
         app:layout_constraintStart_toStartOf="parent" />
 
@@ -162,6 +183,10 @@
         android:layout_marginBottom="4dp"
         android:text="Next →"
         android:textSize="16sp"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?android:attr/selectableItemBackground"
+        android:padding="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 

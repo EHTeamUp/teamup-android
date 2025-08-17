@@ -44,11 +44,26 @@ public class PersonalityQuestion {
         return optionB;
     }
 
+    /**
+     * 질문 데이터를 로드하는 메서드
+     * 현재는 더미 데이터를 사용하지만, 나중에 백엔드에서 받아올 예정
+     */
     public static List<PersonalityQuestion> loadQuestions(Context context) {
+        // TODO: 백엔드에서 질문 데이터를 받아올 예정
+        // return loadQuestionsFromAPI();
+        
+        // 임시로 더미 데이터 사용
+        return loadDummyQuestions(context);
+    }
+
+    /**
+     * 더미 질문 데이터를 로드하는 메서드
+     */
+    public static List<PersonalityQuestion> loadDummyQuestions(Context context) {
         List<PersonalityQuestion> questions = new ArrayList<>();
 
         try {
-            // Load JSON file from raw resources
+            // 더미 데이터 JSON 파일 로드
             InputStream inputStream = context.getResources().openRawResource(R.raw.personality_questions);
             int size = inputStream.available();
             byte[] buffer = new byte[size];
@@ -70,9 +85,19 @@ public class PersonalityQuestion {
             }
 
         } catch (IOException | JSONException e) {
-            Log.e("PersonalityQuestion", "Error loading questions", e);
+            Log.e("PersonalityQuestion", "Error loading dummy questions", e);
         }
 
         return questions;
+    }
+
+    /**
+     * 백엔드에서 질문 데이터를 받아오는 메서드 
+     */
+    public static List<PersonalityQuestion> loadQuestionsFromAPI() {
+        // TODO: 백엔드 API 호출로 질문 데이터 받아오기
+        
+        // 실패시 빈 리스트 반환 
+        return new ArrayList<>();
     }
 } 

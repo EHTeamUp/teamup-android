@@ -2,6 +2,7 @@ package com.example.teamup;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -10,6 +11,8 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.teamup.auth.LoginActivity;
+import com.example.teamup.auth.LoginManager;
+import com.example.teamup.MypageActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
@@ -32,9 +35,18 @@ public class MainActivity extends AppCompatActivity {
         navView.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
             if (itemId == R.id.navigation_profile) {
-                // Navigate to LoginActivity when profile is clicked
-                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-                startActivity(intent);
+
+                // 로그인 상태에 따라 다르게 동작
+                if (LoginManager.isLoggedIn()) {
+                    // 로그인된 경우 마이페이지 이동 코드 추가
+                    Toast.makeText(MainActivity.this, "마이페이지로 이동", Toast.LENGTH_SHORT).show();
+//                     Intent intent = new Intent(MainActivity.this, MypageActivity.class);
+//                     startActivity(intent);
+                } else {
+                    // 로그인되지 않은 경우 로그인 페이지로 이동
+                    Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                    startActivity(intent);
+                }
                 return true;
             } else if (itemId == R.id.navigation_home) {
                 // Handle home navigation
