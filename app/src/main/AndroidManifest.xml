@@ -54,22 +54,22 @@
             android:exported="false" />
         <activity
             android:name=".recruitment.ContestRecruitmentListActivity"
-            android:exported="false">
-        </activity>
+            android:exported="false" />
         <activity
             android:name=".recruitment.ContestRecruitmentDetailActivity"
             android:exported="false" />
         <activity
             android:name=".contest.ContestListActivity"
-            android:exported="true">
-        </activity>
+            android:exported="false" />
         <activity
             android:name=".contest.ContestInformationDetailActivity"
             android:exported="false" />
         <activity
             android:name=".recruitment.RecruitmentPostActivity"
-            android:name=".MypageActivity"
             android:exported="false" />
+        <activity
+            android:name=".MypageActivity"
+            android:exported="false"/>
         <activity
             android:name=".mypage.MypageUserinfoActivity"
             android:exported="false" />
