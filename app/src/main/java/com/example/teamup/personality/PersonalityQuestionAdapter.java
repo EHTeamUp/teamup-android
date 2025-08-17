@@ -78,18 +78,18 @@ public class PersonalityQuestionAdapter extends RecyclerView.Adapter<Personality
             btnOptionA.setText("A. " + question.getOptionA());
             btnOptionB.setText("B. " + question.getOptionB());
 
-            // Reset button states
+            // 버튼 상태 초기화
             resetButtonStates();
         }
 
         private void selectOption(MaterialButton selectedButton, MaterialButton unselectedButton) {
-            // Reset both buttons to unselected state
+            // 두 버튼 모두 선택되지 않은 상태로 초기화
             selectedButton.setBackgroundTintList(itemView.getContext().getColorStateList(android.R.color.white));
             selectedButton.setTextColor(itemView.getContext().getColor(android.R.color.black));
             unselectedButton.setBackgroundTintList(itemView.getContext().getColorStateList(android.R.color.white));
             unselectedButton.setTextColor(itemView.getContext().getColor(android.R.color.black));
 
-            // Set selected button to selected state
+            // 선택된 버튼을 선택된 상태로 설정
             selectedButton.setBackgroundTintList(itemView.getContext().getColorStateList(android.R.color.darker_gray));
             selectedButton.setTextColor(itemView.getContext().getColor(android.R.color.white));
         }

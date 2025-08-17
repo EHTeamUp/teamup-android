@@ -29,14 +29,14 @@ public class PersonalityTestResultActivity extends AppCompatActivity {
             return insets;
         });
 
-        // Initialize views
+        // 뷰 초기화
         btnFinishTest = findViewById(R.id.btn_finish_test);
 
-        // Setup button click listener
+        // 버튼 클릭 리스너 설정
         btnFinishTest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Navigate back to main activity
+                // 메인 화면으로 이동
                 Intent intent = new Intent(PersonalityTestResultActivity.this, MainActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
