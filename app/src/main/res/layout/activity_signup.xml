@@ -154,7 +154,7 @@
         android:id="@+id/btn_send_email"
         android:layout_width="wrap_content"
         android:layout_height="48dp"
-        android:text="인증 요청"
+        android:text="인증번호 발송"
         app:cornerRadius="10dp"
         android:backgroundTint="@color/black"
         android:textColor="@android:color/white"
@@ -162,17 +162,50 @@
         app:layout_constraintBottom_toBottomOf="@id/et_email"
         app:layout_constraintEnd_toEndOf="parent" />
 
+    <!-- Email Verification Code -->
+    <TextView
+        android:id="@+id/tv_email_code_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="인증번호"
+        app:layout_constraintTop_toBottomOf="@id/et_email"
+        android:layout_marginTop="12dp"
+        app:layout_constraintStart_toStartOf="parent" />
+
     <EditText
         android:id="@+id/et_email_code"
         android:layout_width="0dp"
         android:layout_height="48dp"
-        android:hint="Value"
+        android:hint="인증번호를 입력하세요"
         android:padding="12dp"
         android:background="@drawable/edittext_background"
-        app:layout_constraintTop_toBottomOf="@id/et_email"
-        android:layout_marginTop="12dp"
+        app:layout_constraintTop_toBottomOf="@id/tv_email_code_label"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/btn_verify_email"
+        android:layout_marginEnd="8dp" />
+
+    <Button
+        android:id="@+id/btn_verify_email"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:text="인증 확인"
+        app:cornerRadius="10dp"
+        android:backgroundTint="@color/black"
+        android:textColor="@android:color/white"
+        app:layout_constraintTop_toTopOf="@id/et_email_code"
+        app:layout_constraintBottom_toBottomOf="@id/et_email_code"
         app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Email 결과 메시지 -->
+    <TextView
+        android:id="@+id/tv_email_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="12sp"
+        android:textColor="#888888"
+        app:layout_constraintTop_toBottomOf="@id/et_email_code"
+        app:layout_constraintStart_toStartOf="@id/et_email_code"
+        android:layout_marginTop="4dp" />
 
     <!-- Next 버튼 (오른쪽 하단) -->
     <TextView

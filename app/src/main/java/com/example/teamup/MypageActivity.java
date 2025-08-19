@@ -2,6 +2,7 @@ package com.example.teamup;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -14,6 +15,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.example.teamup.auth.LoginActivity;
 import com.example.teamup.auth.LoginManager;
 import com.example.teamup.auth.TokenManager;
+import com.example.teamup.auth.UserManager;
 import com.example.teamup.mypage.MypageUserinfoActivity;
 import com.example.teamup.R;
 import com.example.teamup.mypage.MypageProfileActivity;
@@ -21,24 +23,38 @@ import com.example.teamup.mypage.MypageProfileActivity;
 
 public class MypageActivity extends AppCompatActivity {
 
-    //현재 임시로 로그인 가정하고 마이페이지 띄우지만 나중에 로그인 여부에 따라 띄우도록 수정 필요
+    private static final String TAG = "MypageActivity";
 
     // UI 컴포넌트들
     private LinearLayout llMemberInfo, llProfile, llContestList, llLogout;
-    private TextView tvHeaderTitle;
+    private TextView tvHeaderTitle, tvUserName, tvUserEmail;
     private BottomNavigationView bottomNavigationView;
     private TokenManager tokenManager;
+    private UserManager userManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mypage);
 
-        // TokenManager 초기화
+        // Manager 초기화
         tokenManager = TokenManager.getInstance(this);
+        userManager = UserManager.getInstance(this);
+
+        // 로그인 상태 확인
+        if (!tokenManager.isLoggedIn()) {
+            Log.d(TAG, "로그인되지 않은 상태입니다. LoginActivity로 이동합니다.");
+            Intent intent = new Intent(MypageActivity.this, LoginActivity.class);
+            startActivity(intent);
+            finish();
+            return;
+        }
 
         // 뷰 초기화
         initViews();
+        
+        // 사용자 정보 로드
+        loadUserInfo();
         
         // 클릭 리스너 설정
         setClickListeners();
@@ -47,11 +63,46 @@ public class MypageActivity extends AppCompatActivity {
 
     private void initViews() {
         tvHeaderTitle = findViewById(R.id.tv_header_title);
+        tvUserName = findViewById(R.id.tv_user_name);
+        tvUserEmail = findViewById(R.id.tv_user_email);
         llMemberInfo = findViewById(R.id.ll_member_info);
         llProfile = findViewById(R.id.ll_profile);
         llContestList = findViewById(R.id.ll_contest_list);
         llLogout = findViewById(R.id.ll_logout);
         bottomNavigationView = findViewById(R.id.bottom_navigation);
+    }
+
+    /**
+     * 사용자 정보 로드
+     */
+    private void loadUserInfo() {
+        userManager.getCurrentUser(this, new UserManager.UserCallback() {
+            @Override
+            public void onSuccess(com.example.teamup.api.model.UserDTO user) {
+                Log.d(TAG, "사용자 정보 로드 성공: " + user.getUserId());
+                
+                // UI 업데이트
+                if (tvUserName != null) {
+                    tvUserName.setText(user.getName() != null ? user.getName() : "사용자");
+                }
+                if (tvUserEmail != null) {
+                    tvUserEmail.setText(user.getEmail() != null ? user.getEmail() : "");
+                }
+            }
+
+            @Override
+            public void onError(String errorMessage) {
+                Log.e(TAG, "사용자 정보 로드 실패: " + errorMessage);
+                Toast.makeText(MypageActivity.this, errorMessage, Toast.LENGTH_SHORT).show();
+                
+                // 에러가 인증 관련이라면 로그인 화면으로 이동
+                if (errorMessage.contains("인증") || errorMessage.contains("로그인")) {
+                    Intent intent = new Intent(MypageActivity.this, LoginActivity.class);
+                    startActivity(intent);
+                    finish();
+                }
+            }
+        });
     }
 
     /**
@@ -81,6 +132,7 @@ public class MypageActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // 공모전 목록 화면으로 이동
+                Toast.makeText(MypageActivity.this, "참여 공모전 목록 기능은 준비 중입니다.", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -111,6 +163,9 @@ public class MypageActivity extends AppCompatActivity {
      * 로그아웃 수행
      */
     private void performLogout() {
+        // 사용자 정보 캐시 초기화
+        userManager.clearUserCache();
+        
         // 토큰 삭제
         tokenManager.clearToken();
         
@@ -151,5 +206,14 @@ public class MypageActivity extends AppCompatActivity {
             }
             return false;
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // 화면이 다시 활성화될 때 사용자 정보 새로고침
+        if (tokenManager.isLoggedIn()) {
+            loadUserInfo();
+        }
     }
 }
