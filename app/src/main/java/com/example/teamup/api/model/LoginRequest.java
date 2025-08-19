@@ -1,4 +1,4 @@
-package com.example.teamup.model;
+package com.example.teamup.api.model;
 
 import com.google.gson.annotations.SerializedName;
 
