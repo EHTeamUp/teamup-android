@@ -5,7 +5,9 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,6 +19,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.teamup.MainActivity;
 import com.example.teamup.R;
+import com.example.teamup.recruitment.TeamSynergyScoreActivity;
+import com.google.android.material.button.MaterialButton;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -33,6 +37,8 @@ public class ApplicantListActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private ApplicantAdapter adapter;
     private List<ApplicantData> applicantList;
+    private TextView tvSelectedCount;
+    private MaterialButton btnSynergyCheck;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,20 +53,48 @@ public class ApplicantListActivity extends AppCompatActivity {
 
         initViews();
         setupRecyclerView();
+        setupSelectionControls();
         setupBottomNavigation();
     }
 
     private void initViews() {
         recyclerView = findViewById(R.id.rv_applicant_list);
+        tvSelectedCount = findViewById(R.id.tv_selected_count);
+        btnSynergyCheck = findViewById(R.id.btn_synergy_check);
     }
 
     private void setupRecyclerView() {
         applicantList = new ArrayList<>();
         loadApplicantsFromJson();
         
-        adapter = new ApplicantAdapter(applicantList);
+        adapter = new ApplicantAdapter(applicantList, this);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
+    }
+
+    private void setupSelectionControls() {
+        // 시너지 확인 버튼
+        btnSynergyCheck.setOnClickListener(v -> {
+            // 선택된 지원자들 시너지 확인
+            List<ApplicantData> selectedApplicants = adapter.getSelectedApplicants();
+            
+            if (selectedApplicants.isEmpty()) {
+                // 선택된 지원자가 없으면 Toast 메시지 표시
+                Toast.makeText(this, "시너지를 확인해 볼 지원자를 눌러주세요", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            
+            // TeamSynergyScoreActivity로 이동
+            Intent intent = new Intent(this, TeamSynergyScoreActivity.class);
+            // 선택된 지원자 정보를 전달 (필요한 경우)
+            intent.putExtra("selected_count", selectedApplicants.size());
+            startActivity(intent);
+        });
+    }
+
+    public void updateSelectedCount() {
+        int selectedCount = adapter.getSelectedCount();
+        tvSelectedCount.setText(selectedCount + "명 선택됨");
     }
 
     private void loadApplicantsFromJson() {
@@ -157,9 +191,16 @@ public class ApplicantListActivity extends AppCompatActivity {
     // 지원자 목록 어댑터 클래스
     public static class ApplicantAdapter extends RecyclerView.Adapter<ApplicantAdapter.ViewHolder> {
         private List<ApplicantData> dataList;
+        private List<Boolean> selectedItems;
+        private ApplicantListActivity activity;
 
-        public ApplicantAdapter(List<ApplicantData> dataList) {
+        public ApplicantAdapter(List<ApplicantData> dataList, ApplicantListActivity activity) {
             this.dataList = dataList;
+            this.selectedItems = new ArrayList<>();
+            for (int i = 0; i < dataList.size(); i++) {
+                selectedItems.add(false);
+            }
+            this.activity = activity;
         }
 
         @Override
@@ -172,19 +213,30 @@ public class ApplicantListActivity extends AppCompatActivity {
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
             ApplicantData data = dataList.get(position);
-            holder.tvApplicationTitle.setText(data.getTitle());
-            holder.tvApplicantInfo.setText("지원자: " + data.getName());
-            holder.tvRoleTag.setText(data.getRole());
             
-            // 스킬 태그 설정 (최대 3개까지만 표시)
-            int skillCount = Math.min(data.getSkills().length, 3);
-            holder.tvSkillPython.setText(data.getSkills()[0]);
-            if (skillCount > 1) {
-                holder.tvSkillSpring.setText(data.getSkills()[1]);
-            }
-            if (skillCount > 2) {
-                holder.tvSkillPlanning.setText(data.getSkills()[2]);
-            }
+            // 지원자 이름을 제목으로 설정
+            holder.tvApplicationTitle.setText(data.getName());
+            holder.tvApplicantMessage.setText(data.getDescription());
+            
+            // 체크박스 상태 설정
+            holder.cbApplicantSelect.setChecked(selectedItems.get(position));
+            
+            // 체크박스 리스너
+            holder.cbApplicantSelect.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                selectedItems.set(position, isChecked);
+                activity.updateSelectedCount();
+            });
+            
+            // 버튼 리스너들
+            holder.btnAcceptTeam.setOnClickListener(v -> {
+                // 개별 팀원 수락 처리
+                // TODO: 수락 로직 구현
+            });
+            
+            holder.btnReject.setOnClickListener(v -> {
+                // 개별 거절 처리
+                // TODO: 거절 로직 구현
+            });
         }
 
         @Override
@@ -192,18 +244,36 @@ public class ApplicantListActivity extends AppCompatActivity {
             return dataList.size();
         }
 
+        public int getSelectedCount() {
+            int count = 0;
+            for (Boolean selected : selectedItems) {
+                if (selected) count++;
+            }
+            return count;
+        }
+
+        public List<ApplicantData> getSelectedApplicants() {
+            List<ApplicantData> selected = new ArrayList<>();
+            for (int i = 0; i < selectedItems.size(); i++) {
+                if (selectedItems.get(i)) {
+                    selected.add(dataList.get(i));
+                }
+            }
+            return selected;
+        }
+
         public static class ViewHolder extends RecyclerView.ViewHolder {
-            TextView tvApplicationTitle, tvApplicantInfo, tvRoleTag;
-            TextView tvSkillPython, tvSkillSpring, tvSkillPlanning;
+            CheckBox cbApplicantSelect;
+            TextView tvApplicationTitle, tvApplicantMessage;
+            MaterialButton btnAcceptTeam, btnReject;
 
             public ViewHolder(View itemView) {
                 super(itemView);
+                cbApplicantSelect = itemView.findViewById(R.id.cb_applicant_select);
                 tvApplicationTitle = itemView.findViewById(R.id.tv_application_title);
-                tvApplicantInfo = itemView.findViewById(R.id.tv_applicant_info);
-                tvRoleTag = itemView.findViewById(R.id.tv_role_tag);
-                tvSkillPython = itemView.findViewById(R.id.tv_skill_python);
-                tvSkillSpring = itemView.findViewById(R.id.tv_skill_spring);
-                tvSkillPlanning = itemView.findViewById(R.id.tv_skill_planning);
+                tvApplicantMessage = itemView.findViewById(R.id.tv_applicant_message);
+                btnAcceptTeam = itemView.findViewById(R.id.btn_accept_team);
+                btnReject = itemView.findViewById(R.id.btn_reject);
             }
         }
     }
