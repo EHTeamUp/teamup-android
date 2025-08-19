@@ -16,7 +16,8 @@ import androidx.core.view.WindowInsetsCompat;
 import com.example.teamup.MainActivity;
 import com.example.teamup.R;
 import com.example.teamup.api.RetrofitClient;
-import com.example.teamup.api.model.UserDTO;
+import com.example.teamup.model.dto.LoginRequest;
+import com.example.teamup.model.dto.LoginResponse;
 import com.google.android.material.button.MaterialButton;
 
 import retrofit2.Call;
@@ -95,22 +96,22 @@ public class LoginActivity extends AppCompatActivity {
      */
     private void loginWithAPI(String userId, String password) {
         // 로그인 요청 데이터 생성
-        UserDTO loginRequest = new UserDTO(userId, password);
+        LoginRequest loginRequest = new LoginRequest(userId, password);
         
         // Retrofit을 통한 API 호출
         RetrofitClient.getInstance()
                 .getApiService()
                 .login(loginRequest)
-                .enqueue(new Callback<UserDTO>() {
+                .enqueue(new Callback<LoginResponse>() {
                     @Override
-                    public void onResponse(Call<UserDTO> call, Response<UserDTO> response) {
+                    public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
                         // 로그인 버튼 다시 활성화
                         btnLogin.setEnabled(true);
                         btnLogin.setText("Login");
                         
                         if (response.isSuccessful() && response.body() != null) {
                             // 로그인 성공
-                            UserDTO loginResponse = response.body();
+                            LoginResponse loginResponse = response.body();
                             
                             // 토큰 저장 (JWT에서 사용자 정보 자동 추출)
                             tokenManager.saveToken(
@@ -121,8 +122,7 @@ public class LoginActivity extends AppCompatActivity {
                             // JWT에서 사용자 ID 추출
                             String userId = JwtUtils.getUserIdFromToken(loginResponse.getAccessToken());
                             
-                            Log.d(TAG, "로그인 성공: " + loginResponse.getAccessToken());
-                            Log.d(TAG, "추출된 사용자 ID: " + userId);
+                            Log.d(TAG, "로그인 성공: " + userId);
                             
                             // 로그인 상태 업데이트
                             LoginManager.setLoggedIn(true);
@@ -152,8 +152,9 @@ public class LoginActivity extends AppCompatActivity {
                         }
                     }
 
+
                     @Override
-                    public void onFailure(Call<UserDTO> call, Throwable t) {
+                    public void onFailure(Call<LoginResponse> call, Throwable t) {
                         // 로그인 버튼 다시 활성화
                         btnLogin.setEnabled(true);
                         btnLogin.setText("Login");

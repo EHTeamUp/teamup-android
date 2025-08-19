@@ -1,6 +1,7 @@
 package com.example.teamup.api;
 
-import com.example.teamup.api.model.UserDTO;
+import com.example.teamup.model.dto.LoginRequest;
+import com.example.teamup.model.dto.LoginResponse;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -16,5 +17,5 @@ public interface ApiService {
      * POST /api/v1/users/login
      */
     @POST("api/v1/users/login")
-    Call<UserDTO> login(@Body UserDTO loginRequest);
+    Call<LoginResponse> login(@Body LoginRequest loginRequest);
 }
