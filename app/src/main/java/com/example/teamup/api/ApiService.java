@@ -8,6 +8,9 @@ import com.example.teamup.api.model.ApplicationReject;
 import com.example.teamup.api.model.ApiResponse;
 import com.example.teamup.api.model.RecruitmentPostResponse;
 import com.example.teamup.api.model.ContestResponse;
+import com.example.teamup.api.model.PersonalityQuestionResponse;
+import com.example.teamup.api.model.PersonalityTestRequest;
+import com.example.teamup.api.model.PersonalityTestResponse;
 
 import java.util.List;
 
@@ -64,4 +67,18 @@ public interface ApiService {
      */
     @GET("api/v1/contests/{contest_id}")
     Call<ContestResponse> getContestDetail(@Path("contest_id") int contestId);
+    
+    /**
+     * 성향 테스트 질문 조회 API
+     * GET /api/v1/personality/questions
+     */
+    @GET("api/v1/personality/questions")
+    Call<PersonalityQuestionResponse> getPersonalityQuestions();
+    
+    /**
+     * 성향 테스트 제출 API
+     * POST /api/v1/personality/test
+     */
+    @POST("api/v1/personality/test")
+    Call<PersonalityTestResponse> submitPersonalityTest(@Body PersonalityTestRequest request);
 }
