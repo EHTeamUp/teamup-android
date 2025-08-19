@@ -1,7 +1,7 @@
 package com.example.teamup.api;
 
-import com.example.teamup.model.dto.LoginRequest;
-import com.example.teamup.model.dto.LoginResponse;
+import com.example.teamup.model.LoginRequest;
+import com.example.teamup.model.LoginResponse;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
