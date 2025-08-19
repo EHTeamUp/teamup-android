@@ -16,8 +16,8 @@ import androidx.core.view.WindowInsetsCompat;
 import com.example.teamup.MainActivity;
 import com.example.teamup.R;
 import com.example.teamup.api.RetrofitClient;
-import com.example.teamup.model.dto.LoginRequest;
-import com.example.teamup.model.dto.LoginResponse;
+import com.example.teamup.model.LoginRequest;
+import com.example.teamup.model.LoginResponse;
 import com.google.android.material.button.MaterialButton;
 
 import retrofit2.Call;
