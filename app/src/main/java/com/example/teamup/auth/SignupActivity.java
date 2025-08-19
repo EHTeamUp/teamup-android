@@ -2,6 +2,7 @@ package com.example.teamup.auth;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -11,18 +12,21 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.teamup.R;
+import com.example.teamup.api.model.StepResponse;
 
 public class SignupActivity extends AppCompatActivity {
+
+    private static final String TAG = "SignupActivity";
 
     // ==================== UI 컴포넌트 ====================
     /** 사용자 입력 필드들 */
     private EditText etId, etPassword, etName, etEmail, etEmailCode;
     
     /** 기능 버튼들 */
-    private Button btnCheckId, btnSendEmail;
+    private Button btnCheckId, btnSendEmail, btnVerifyEmail;
     
     /** 네비게이션 및 메시지 표시 */
-    private TextView tvNext, tvIdMessage;
+    private TextView tvNext, tvIdMessage, tvEmailMessage;
     
     // ==================== 상태 관리 플래그 ====================
     /** ID 중복 검사 완료 여부를 추적하는 플래그 */
@@ -30,11 +34,20 @@ public class SignupActivity extends AppCompatActivity {
     
     /** 이메일 인증 요청 완료 여부를 추적하는 플래그 */
     private boolean isEmailSent = false;
+    
+    /** 이메일 인증 완료 여부를 추적하는 플래그 */
+    private boolean isEmailVerified = false;
+    
+    /** RegistrationManager 인스턴스 */
+    private RegistrationManager registrationManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
+
+        // RegistrationManager 초기화
+        registrationManager = RegistrationManager.getInstance();
 
         // 뷰 초기화
         initViews();
@@ -60,10 +73,12 @@ public class SignupActivity extends AppCompatActivity {
         // 기능 버튼 초기화
         btnCheckId = findViewById(R.id.btn_check_id);
         btnSendEmail = findViewById(R.id.btn_send_email);
+        btnVerifyEmail = findViewById(R.id.btn_verify_email);
         
         // 네비게이션 및 메시지 초기화
         tvNext = findViewById(R.id.tv_next);
         tvIdMessage = findViewById(R.id.tv_id_message);
+        tvEmailMessage = findViewById(R.id.tv_email_message);
     }
 
     /**
@@ -82,11 +97,45 @@ public class SignupActivity extends AppCompatActivity {
                     return;
                 }
                 
-                // TODO: 실제 ID 중복 검사 로직 구현
-                // 현재는 임시로 성공 처리
-                tvIdMessage.setText("사용 가능한 아이디입니다.");
-                tvIdMessage.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
-                isIdChecked = true; // ID 중복 검사 완료 플래그 설정
+                // ID 길이 검증
+                if (id.length() < 4) {
+                    Toast.makeText(SignupActivity.this, "ID는 4자 이상 입력해주세요.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                
+                // 버튼 비활성화
+                btnCheckId.setEnabled(false);
+                btnCheckId.setText("확인 중...");
+                
+                // 실제 ID 중복 검사 API 호출
+                registrationManager.checkUserId(id, new RegistrationManager.UserIdCheckCallback() {
+                    @Override
+                    public void onResult(boolean available, String message) {
+                        runOnUiThread(() -> {
+                            btnCheckId.setEnabled(true);
+                            btnCheckId.setText("중복 확인");
+                            
+                            if (available) {
+                                tvIdMessage.setText(message);
+                                tvIdMessage.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
+                                isIdChecked = true;
+                            } else {
+                                tvIdMessage.setText(message);
+                                tvIdMessage.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
+                                isIdChecked = false;
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onError(String errorMessage) {
+                        runOnUiThread(() -> {
+                            btnCheckId.setEnabled(true);
+                            btnCheckId.setText("중복 확인");
+                            Toast.makeText(SignupActivity.this, errorMessage, Toast.LENGTH_SHORT).show();
+                        });
+                    }
+                });
             }
         });
 
@@ -114,10 +163,80 @@ public class SignupActivity extends AppCompatActivity {
                     return;
                 }
                 
-                // TODO: 실제 이메일 인증 로직 구현
-                // 현재는 임시로 성공 처리
-                Toast.makeText(SignupActivity.this, "인증 이메일이 발송되었습니다.", Toast.LENGTH_SHORT).show();
-                isEmailSent = true; // 이메일 인증 요청 완료 플래그 설정
+                // 버튼 비활성화
+                btnSendEmail.setEnabled(false);
+                btnSendEmail.setText("발송 중...");
+                
+                // 실제 이메일 인증번호 발송 API 호출
+                registrationManager.sendEmailVerification(email, new RegistrationManager.EmailVerificationCallback() {
+                    @Override
+                    public void onSuccess(String message) {
+                        runOnUiThread(() -> {
+                            btnSendEmail.setEnabled(true);
+                            btnSendEmail.setText("인증번호 발송");
+                            Toast.makeText(SignupActivity.this, message, Toast.LENGTH_SHORT).show();
+                            isEmailSent = true;
+                            isEmailVerified = false; // 새로운 인증번호 발송 시 인증 상태 리셋
+                        });
+                    }
+
+                    @Override
+                    public void onError(String errorMessage) {
+                        runOnUiThread(() -> {
+                            btnSendEmail.setEnabled(true);
+                            btnSendEmail.setText("인증번호 발송");
+                            Toast.makeText(SignupActivity.this, errorMessage, Toast.LENGTH_SHORT).show();
+                        });
+                    }
+                });
+            }
+        });
+
+        // ==================== 이메일 인증번호 검증 버튼 ====================
+        btnVerifyEmail.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String email = etEmail.getText().toString().trim();
+                String emailCode = etEmailCode.getText().toString().trim();
+                
+                if (email.isEmpty()) {
+                    Toast.makeText(SignupActivity.this, "이메일을 입력해주세요.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                
+                if (emailCode.isEmpty()) {
+                    Toast.makeText(SignupActivity.this, "인증번호를 입력해주세요.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                
+                // 버튼 비활성화
+                btnVerifyEmail.setEnabled(false);
+                btnVerifyEmail.setText("확인 중...");
+                
+                // 실제 이메일 인증번호 검증 API 호출
+                registrationManager.verifyEmail(email, emailCode, new RegistrationManager.EmailVerificationCallback() {
+                    @Override
+                    public void onSuccess(String message) {
+                        runOnUiThread(() -> {
+                            btnVerifyEmail.setEnabled(true);
+                            btnVerifyEmail.setText("인증 확인");
+                            tvEmailMessage.setText(message);
+                            tvEmailMessage.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
+                            isEmailVerified = true;
+                        });
+                    }
+
+                    @Override
+                    public void onError(String errorMessage) {
+                        runOnUiThread(() -> {
+                            btnVerifyEmail.setEnabled(true);
+                            btnVerifyEmail.setText("인증 확인");
+                            tvEmailMessage.setText(errorMessage);
+                            tvEmailMessage.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
+                            isEmailVerified = false;
+                        });
+                    }
+                });
             }
         });
 
@@ -127,33 +246,56 @@ public class SignupActivity extends AppCompatActivity {
             public void onClick(View v) {
                 // 모든 입력 데이터의 유효성 검사 수행
                 if (validateInputs()) {
-                    // SignupInterestActivity로 이동하여 관심사 선택 단계 진행
-                    Intent intent = new Intent(SignupActivity.this, SignupInterestActivity.class);
-                    
-                    // 입력된 데이터를 다음 액티비티로 전달
-                    intent.putExtra("id", etId.getText().toString().trim());
-                    intent.putExtra("password", etPassword.getText().toString().trim());
-                    intent.putExtra("name", etName.getText().toString().trim());
-                    intent.putExtra("email", etEmail.getText().toString().trim());
-                    
-                    startActivity(intent);
+                    // 회원가입 1단계 완료
+                    completeStep1();
                 }
             }
         });
     }
 
     /**
+     * 회원가입 1단계 완료 처리
+     */
+    private void completeStep1() {
+        String userId = etId.getText().toString().trim();
+        String name = etName.getText().toString().trim();
+        String email = etEmail.getText().toString().trim();
+        String password = etPassword.getText().toString().trim();
+        String verificationCode = etEmailCode.getText().toString().trim();
+        
+        // 버튼 비활성화
+        tvNext.setEnabled(false);
+        tvNext.setText("처리 중...");
+        
+        registrationManager.completeStep1(userId, name, email, password, verificationCode, new RegistrationManager.StepCallback() {
+            @Override
+            public void onSuccess(StepResponse response) {
+                runOnUiThread(() -> {
+                    tvNext.setEnabled(true);
+                    tvNext.setText("다음");
+                    
+                    Toast.makeText(SignupActivity.this, response.getMessage(), Toast.LENGTH_SHORT).show();
+                    
+                    // SignupInterestActivity로 이동하여 관심사 선택 단계 진행
+                    Intent intent = new Intent(SignupActivity.this, SignupInterestActivity.class);
+                    intent.putExtra("user_id", userId);
+                    startActivity(intent);
+                });
+            }
+
+            @Override
+            public void onError(String errorMessage) {
+                runOnUiThread(() -> {
+                    tvNext.setEnabled(true);
+                    tvNext.setText("다음");
+                    Toast.makeText(SignupActivity.this, errorMessage, Toast.LENGTH_SHORT).show();
+                });
+            }
+        });
+    }
+
+    /**
      * 모든 입력 필드의 유효성을 검사하는 메서드
-     * 
-     * 검사 항목:
-     * - ID: 필수 입력, 최소 4자, 중복 검사 완료
-     * - 비밀번호: 필수 입력, 최소 6자
-     * - 비밀번호 확인: 비밀번호와 일치
-     * - 이름: 필수 입력
-     * - 이메일: 필수 입력, 올바른 형식, @itc.ac.kr 도메인, 인증 요청 완료
-     * - 이메일 인증 코드: 필수 입력
-     * 
-     * @return 모든 검증을 통과하면 true, 실패하면 false
      */
     private boolean validateInputs() {
         // ==================== 입력 데이터 추출 ====================
@@ -244,7 +386,7 @@ public class SignupActivity extends AppCompatActivity {
             return false;
         }
         
-        // 이메일 형식 검증 (기본 이메일 패턴)
+        // 이메일 형식 검증
         if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             Toast.makeText(this, "올바른 이메일 형식을 입력해주세요.", Toast.LENGTH_SHORT).show();
             return false;
@@ -256,30 +398,17 @@ public class SignupActivity extends AppCompatActivity {
             return false;
         }
         
-        // 이메일 인증 요청 완료 여부 확인
-        if (!isEmailSent) {
-            Toast.makeText(this, "이메일 인증 요청을 완료해주세요.", Toast.LENGTH_SHORT).show();
+        // 이메일 인증 완료 여부 확인
+        if (!isEmailVerified) {
+            Toast.makeText(this, "이메일 인증을 완료해주세요.", Toast.LENGTH_SHORT).show();
             return false;
         }
-
-        if (emailCode.isEmpty()) {
-            Toast.makeText(this, "이메일 인증 코드를 입력해주세요.", Toast.LENGTH_SHORT).show();
-            return false;
-        }
-
-        // TODO: 실제 이메일 인증 코드 검증 로직 구현
-        // 현재는 임시로 통과시킴
 
         return true; // 모든 검증 통과
     }
     
     /**
      * 텍스트 필드의 변경을 감지하여 관련 플래그를 리셋하는 메서드
-     * 
-     * 목적:
-     * - ID 변경 시 중복 검사 플래그 리셋
-     * - 이메일 변경 시 인증 요청 플래그 리셋
-     * - 사용자가 정보를 변경했을 때 다시 검증하도록 유도
      */
     private void setupTextWatchers() {
         // ID 필드 변경 감지
@@ -305,8 +434,10 @@ public class SignupActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                // 이메일이 변경되면 인증 요청 플래그 리셋
+                // 이메일이 변경되면 인증 관련 플래그 리셋
                 isEmailSent = false;
+                isEmailVerified = false;
+                tvEmailMessage.setText(""); // 이메일 메시지 초기화
             }
 
             @Override

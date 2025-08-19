@@ -58,6 +58,7 @@
                     android:layout_marginEnd="12dp" />
 
                 <TextView
+                    android:id="@+id/tv_user_id"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -101,9 +102,61 @@
                             android:layout_marginBottom="4dp" />
 
                         <TextView
+                            android:id="@+id/tv_user_skills"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Python, Java, 웹/앱 / 백엔드"
+                            android:textSize="14sp"
+                            android:textColor="@android:color/black" />
+
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=">"
+                        android:textSize="16sp"
+                        android:textColor="@android:color/black" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- 역할 정보 Section -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/profile_card_background"
+                android:padding="16dp"
+                android:layout_marginBottom="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="역할 정보"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="@android:color/black"
+                            android:layout_marginBottom="4dp" />
+
+                        <TextView
+                            android:id="@+id/tv_user_roles"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="등록된 역할이 없습니다"
                             android:textSize="14sp"
                             android:textColor="@android:color/black" />
 
@@ -152,17 +205,10 @@
                             android:layout_marginBottom="4dp" />
 
                         <TextView
+                            android:id="@+id/tv_user_experiences"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="배리어프리 앱 개발 콘테스트 1차 서류 합격"
-                            android:textSize="14sp"
-                            android:textColor="@android:color/black"
-                            android:layout_marginBottom="2dp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="교내 해커톤 우수상"
+                            android:text="배리어프리 앱 개발 콘테스트 1차 서류 합격\n교내 해커톤 우수상"
                             android:textSize="14sp"
                             android:textColor="@android:color/black" />
 

@@ -4,17 +4,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.teamup.MainActivity;
 import com.example.teamup.R;
-//import com.example.teamup.database.DatabaseHelper;
 
-import java.util.ArrayList;
-import java.util.List;
+
+
 
 public class SignupFinishActivity extends AppCompatActivity {
     
@@ -25,18 +21,14 @@ public class SignupFinishActivity extends AppCompatActivity {
     private String userId, userPassword, userName, userEmail;
     private String[] languages, roles;
     private String contestName, awardTitle, experience;
-    
-    // 데이터베이스 헬퍼
-//    private DatabaseHelper databaseHelper;
+
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup_finish);
         
-        // 데이터베이스 헬퍼 초기화
-//        databaseHelper = new DatabaseHelper(this);
-        
+
         // 이전 액티비티에서 데이터 받기
         receiveDataFromPreviousActivity();
         
@@ -86,48 +78,37 @@ public class SignupFinishActivity extends AppCompatActivity {
   
 
     private void saveUserDataToDatabase() {
-//        try {
-//            // UserData 객체 생성
-//            UserData userData = new UserData();
-//            userData.setUserId(userId);
-//            userData.setPassword(userPassword);
-//            userData.setName(userName);
-//            userData.setEmail(userEmail);
-//
-//            // 언어 배열을 문자열로 변환
-//            if (languages != null) {
-//                StringBuilder languagesStr = new StringBuilder();
-//                for (String language : languages) {
-//                    if (languagesStr.length() > 0) {
-//                        languagesStr.append(",");
-//                    }
-//                    languagesStr.append(language);
-//                }
-//                userData.setLanguages(languagesStr.toString());
-//            }
-//
-//            // 역할 배열을 문자열로 변환
-//            if (roles != null) {
-//                StringBuilder rolesStr = new StringBuilder();
-//                for (String role : roles) {
-//                    if (rolesStr.length() > 0) {
-//                        rolesStr.append(",");
-//                    }
-//                    rolesStr.append(role);
-//                }
-//                userData.setRoles(rolesStr.toString());
-//            }
-//
-//            // 경험 데이터 설정
-//            userData.setContestName(contestName != null ? contestName : "");
-//            userData.setAwardTitle(awardTitle != null ? awardTitle : "");
-//            userData.setExperience(experience != null ? experience : "");
-//
-//            // 데이터베이스에 저장
-//            databaseHelper.insertUser(userData);
-//
-//        } catch (Exception e) {
-//            // 오류 발생 시에도 사용자에게는 표시하지 않음
-//        }
+
+        try {
+
+            
+            // 언어 배열을 문자열로 변환
+            if (languages != null) {
+                StringBuilder languagesStr = new StringBuilder();
+                for (String language : languages) {
+                    if (languagesStr.length() > 0) {
+                        languagesStr.append(",");
+                    }
+                    languagesStr.append(language);
+                }
+            }
+            
+            // 역할 배열을 문자열로 변환
+            if (roles != null) {
+                StringBuilder rolesStr = new StringBuilder();
+                for (String role : roles) {
+                    if (rolesStr.length() > 0) {
+                        rolesStr.append(",");
+                    }
+                    rolesStr.append(role);
+                }
+            }
+            
+
+            
+        } catch (Exception e) {
+            // 오류 발생 시에도 사용자에게는 표시하지 않음
+        }
+
     }
 }
