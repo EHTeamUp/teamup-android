@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    android:background="@android:color/white"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+
+    <!-- 뒤로가기 버튼 -->
+    <LinearLayout
+        android:id="@+id/ll_back_navigation"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:orientation="horizontal"
+        android:background="@drawable/mypage_menu_item_background"
+        android:padding="16dp"
+        android:gravity="center_vertical"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="?android:attr/selectableItemBackground">
+
+        <TextView
+            android:id="@+id/tv_back_arrow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="←"
+            android:textSize="20sp"
+            android:textColor="@android:color/black"
+            android:layout_marginEnd="12dp" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="기술/역할"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:textColor="@android:color/black"
+            android:gravity="start" />
+
+    </LinearLayout>
+
+    <!-- 관심 언어 타이틀 -->
+    <TextView
+        android:id="@+id/tv_language_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="사용 가능한 기술 *"
+        android:textStyle="bold"
+        android:layout_marginBottom="8dp"/>
+
+    <!-- ScrollView for main content -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginBottom="24dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- 기술 선택을 위한 ScrollView -->
+            <ScrollView
+                android:id="@+id/scrollViewSkills"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_marginBottom="8dp"
+                android:background="@android:color/transparent">
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/chipGroupLanguages"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:singleSelection="false"
+                    app:chipSpacing="8dp"
+                    android:padding="8dp">
+
+                </com.google.android.material.chip.ChipGroup>
+            </ScrollView>
+
+            <!-- 기술 페이지 인디케이터 -->
+            <LinearLayout
+                android:id="@+id/ll_skills_page_indicator"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginBottom="8dp"
+                android:visibility="gone">
+            </LinearLayout>
+
+
+
+            <!-- 언어 추가 입력 필드 -->
+            <LinearLayout
+                android:id="@+id/ll_language_input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="32dp">
+
+                <EditText
+                    android:id="@+id/et_language_input"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="다른 기술 추가"
+                    android:padding="12dp"
+                    android:background="@drawable/edit_text_background"
+                    android:layout_marginEnd="8dp" />
+
+                <Button
+                    android:id="@+id/btn_add_language"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="추가"
+                    app:cornerRadius="10dp"
+                    android:textColor="@android:color/white"
+                    android:backgroundTint="@android:color/black"
+                    android:padding="12dp" />
+
+            </LinearLayout>
+
+            <!-- 역할 타이틀 -->
+            <TextView
+                android:id="@+id/tv_role_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="원하는 역할 *"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp"/>
+
+            <!-- 역할 선택을 위한 ScrollView -->
+            <ScrollView
+                android:id="@+id/scrollViewRoles"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_marginBottom="8dp"
+                android:background="@android:color/transparent">
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/chipGroupRoles"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:singleSelection="false"
+                    app:chipSpacing="8dp"
+                    android:padding="8dp">
+
+                </com.google.android.material.chip.ChipGroup>
+            </ScrollView>
+
+            <!-- 역할 페이지 인디케이터 -->
+            <LinearLayout
+                android:id="@+id/ll_roles_page_indicator"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginBottom="8dp"
+                android:visibility="gone">
+            </LinearLayout>
+
+
+
+            <!-- 역할 추가 입력 필드 -->
+            <LinearLayout
+                android:id="@+id/ll_role_input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/et_role_input"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="다른 역할 추가"
+                    android:padding="12dp"
+                    android:background="@drawable/edit_text_background"
+                    android:layout_marginEnd="8dp" />
+
+                <Button
+                    android:id="@+id/btn_add_role"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="추가"
+                    app:cornerRadius="10dp"
+                    android:textColor="@android:color/white"
+                    android:backgroundTint="@android:color/black"
+                    android:padding="12dp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</LinearLayout>

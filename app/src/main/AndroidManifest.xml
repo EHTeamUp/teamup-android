@@ -28,19 +28,7 @@
             android:name=".auth.LoginActivity"
             android:exported="false" />
         <activity
-            android:name=".auth.SignupActivity"
-            android:exported="false" />
-        <activity
-            android:name=".auth.SignupInterestActivity"
-            android:exported="false" />
-        <activity
-            android:name=".auth.SignupTestActivity"
-            android:exported="false" />
-        <activity
-            android:name=".auth.SignupExperienceActivity"
-            android:exported="false" />
-        <activity
-            android:name=".auth.SignupFinishActivity"
+            android:name=".auth.SignupBaseActivity"
             android:exported="false" />
         <activity
             android:name=".applicant.ApplicantListActivity"
@@ -72,18 +60,12 @@
         <activity
             android:name=".recruitment.RecruitmentPostActivity"
             android:exported="false" />
-        <activity
-            android:name=".MypageActivity"
-            android:exported="false"/>
-        <activity
-            android:name=".mypage.MypageUserinfoActivity"
-            android:exported="false" />
+
+
         <activity
             android:name=".mypage.MypageUserinfoEditActivity"
             android:exported="false" />
-        <activity
-            android:name=".mypage.MypageProfileActivity"
-            android:exported="false" />
+
         <activity
             android:name=".mypage.MypageInterestActivity"
             android:exported="false" />

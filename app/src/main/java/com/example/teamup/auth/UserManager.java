@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.example.teamup.api.RetrofitClient;
 import com.example.teamup.api.model.UserDTO;
+import com.example.teamup.api.model.UserUpdateRequest;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -81,7 +82,7 @@ public class UserManager {
     /**
      * 사용자 정보 업데이트
      */
-    public void updateUserInfo(Context context, String name, String newPassword, UserCallback callback) {
+    public void updateUserInfo(Context context, String name, String currentPassword, String newPassword, UserCallback callback) {
         if (!tokenManager.isLoggedIn()) {
             callback.onError("로그인이 필요합니다.");
             return;
@@ -94,10 +95,11 @@ public class UserManager {
         }
         
         // 업데이트할 사용자 정보 생성
-        UserDTO updateRequest = new UserDTO();
+        UserUpdateRequest updateRequest = new UserUpdateRequest();
         updateRequest.setName(name);
+        updateRequest.setCurrentPassword(currentPassword);
         if (newPassword != null && !newPassword.isEmpty()) {
-            updateRequest.setPassword(newPassword);
+            updateRequest.setNewPassword(newPassword);
         }
         
         RetrofitClient.getInstance()

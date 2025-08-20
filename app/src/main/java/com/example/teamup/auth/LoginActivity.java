@@ -63,8 +63,8 @@ public class LoginActivity extends AppCompatActivity {
         btnSignIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // 회원가입 화면 이동
-                Intent intent = new Intent(LoginActivity.this, SignupActivity.class);
+                // 회원가입 화면 이동 (Fragment 기반)
+                Intent intent = new Intent(LoginActivity.this, SignupBaseActivity.class);
                 startActivity(intent);
             }
         });

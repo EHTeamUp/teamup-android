@@ -10,17 +10,25 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.example.teamup.auth.LoginActivity;
 import com.example.teamup.auth.LoginManager;
 import com.example.teamup.auth.TokenManager;
-import com.example.teamup.MypageActivity;
+import com.example.teamup.fragments.HomeFragment;
+import com.example.teamup.fragments.MypageFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
     private TokenManager tokenManager;
+
+    // Fragment 태그들
+    private static final String FRAGMENT_HOME = "home";
+    private static final String FRAGMENT_MYPAGE = "mypage";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +49,9 @@ public class MainActivity extends AppCompatActivity {
 
         // Setup Bottom Navigation
         setupBottomNavigation();
+
+        // 기본적으로 홈 Fragment 표시
+        showHomeFragment();
     }
 
     /**
@@ -64,33 +75,83 @@ public class MainActivity extends AppCompatActivity {
     private void setupBottomNavigation() {
         BottomNavigationView navView = findViewById(R.id.bottom_navigation);
         
-        // Setup custom navigation for profile
         navView.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
-            if (itemId == R.id.navigation_profile) {
+            
+            if (itemId == R.id.navigation_home) {
+                showHomeFragment();
+                return true;
+            } else if (itemId == R.id.navigation_contest) {
+                showContestFragment();
+                return true;
+            } else if (itemId == R.id.navigation_board) {
+                showBoardFragment();
+                return true;
+            } else if (itemId == R.id.navigation_profile) {
                 // 로그인 상태에 따라 다르게 동작
                 if (tokenManager.isLoggedIn()) {
-                    // 로그인된 경우 마이페이지 이동
-                    Intent intent = new Intent(MainActivity.this, MypageActivity.class);
-                    startActivity(intent);
+                    showMypageFragment();
                 } else {
                     // 로그인되지 않은 경우 로그인 페이지로 이동
                     Intent intent = new Intent(MainActivity.this, LoginActivity.class);
                     startActivity(intent);
                 }
                 return true;
-            } else if (itemId == R.id.navigation_home) {
-                // Handle home navigation
-                return true;
-            } else if (itemId == R.id.navigation_contest) {
-                // Handle contest navigation
-                return true;
-            } else if (itemId == R.id.navigation_board) {
-                // Handle board navigation
-                return true;
             }
             return false;
         });
+    }
+
+    /**
+     * 홈 Fragment 표시
+     */
+    private void showHomeFragment() {
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag(FRAGMENT_HOME);
+        if (fragment == null) {
+            fragment = new HomeFragment();
+        }
+        replaceFragment(fragment, FRAGMENT_HOME);
+    }
+
+    /**
+     * 마이페이지 Fragment 표시
+     */
+    private void showMypageFragment() {
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag(FRAGMENT_MYPAGE);
+        if (fragment == null) {
+            fragment = new MypageFragment();
+        }
+        replaceFragment(fragment, FRAGMENT_MYPAGE);
+    }
+
+    /**
+     * Fragment 교체 메서드
+     */
+    private void replaceFragment(Fragment fragment, String tag) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        
+        // 기존 Fragment들을 모두 숨기고 새로운 Fragment 추가
+        transaction.replace(R.id.content_container, fragment, tag);
+        
+        transaction.commit();
+        
+        Log.d(TAG, "Fragment 교체: " + tag);
+    }
+
+    /**
+     * 외부에서 Fragment를 표시할 수 있는 public 메서드
+     */
+    public void showFragment(Fragment fragment) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        
+        // 기존 Fragment들을 모두 숨기고 새로운 Fragment 추가
+        transaction.replace(R.id.content_container, fragment);
+        
+        transaction.commit();
+        
+        Log.d(TAG, "Fragment 표시: " + fragment.getClass().getSimpleName());
     }
 
     @Override
