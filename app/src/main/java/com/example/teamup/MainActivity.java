@@ -9,11 +9,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.fragment.app.Fragment;
 
 import com.example.teamup.auth.LoginActivity;
 import com.example.teamup.auth.LoginManager;
 import com.example.teamup.auth.TokenManager;
-import com.example.teamup.MypageActivity;
+import com.example.teamup.fragment.HomeFragment;
+import com.example.teamup.fragment.ContestFragment;
+import com.example.teamup.fragment.BoardFragment;
+import com.example.teamup.fragment.ProfileFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
@@ -37,32 +41,36 @@ public class MainActivity extends AppCompatActivity {
         // Setup Bottom Navigation
         BottomNavigationView navView = findViewById(R.id.bottom_navigation);
         
-        // Setup custom navigation for profile
+        // 기본적으로 Home Fragment 표시
+        if (savedInstanceState == null) {
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, new HomeFragment())
+                    .commit();
+        }
+        
+        // Setup navigation listener
         navView.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
+            Fragment selectedFragment = null;
+            
             if (itemId == R.id.navigation_profile) {
-
-                // 로그인 상태에 따라 다르게 동작
-                if (tokenManager.isLoggedIn()) {
-                    // 로그인된 경우 마이페이지 이동
-                    Intent intent = new Intent(MainActivity.this, MypageActivity.class);
-                    startActivity(intent);
-                } else {
-                    // 로그인되지 않은 경우 로그인 페이지로 이동
-                    Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-                    startActivity(intent);
-                }
-                return true;
+                // 마이페이지는 ProfileFragment로 처리
+                selectedFragment = new ProfileFragment();
             } else if (itemId == R.id.navigation_home) {
-                // Handle home navigation
-                return true;
+                selectedFragment = new HomeFragment();
             } else if (itemId == R.id.navigation_contest) {
-                // Handle contest navigation
-                return true;
+                selectedFragment = new ContestFragment();
             } else if (itemId == R.id.navigation_board) {
-                // Handle board navigation
+                selectedFragment = new BoardFragment();
+            }
+            
+            if (selectedFragment != null) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, selectedFragment)
+                        .commit();
                 return true;
             }
+            
             return false;
         });
     }
