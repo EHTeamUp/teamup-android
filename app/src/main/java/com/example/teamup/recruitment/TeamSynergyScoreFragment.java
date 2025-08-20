@@ -1,7 +1,7 @@
 package com.example.teamup.recruitment;
 
-import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,17 +15,28 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.teamup.R;
+import com.example.teamup.api.ApiService;
+import com.example.teamup.api.RetrofitClient;
+import com.example.teamup.api.model.SynergyAnalysisRequest;
+import com.example.teamup.api.model.SynergyAnalysisResponse;
 import com.example.teamup.applicant.ApplicantListFragment;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class TeamSynergyScoreFragment extends Fragment {
 
+    private static final String TAG = "TeamSynergyScoreFragment";
     private RecyclerView recyclerView;
     private TeamMemberAdapter adapter;
     private List<TeamMemberData> teamMemberList;
     private TextView tvSynergyScore;
+    private ApiService apiService;
+    private List<String> selectedUserIds;
 
     @Nullable
     @Override
@@ -40,12 +51,27 @@ public class TeamSynergyScoreFragment extends Fragment {
         initViews(view);
         setupRecyclerView();
         setupClickListeners();
-        loadDummyData();
+        
+        // Bundle에서 선택된 사용자 ID들 받기
+        Bundle args = getArguments();
+        if (args != null && args.containsKey("selected_user_ids")) {
+            selectedUserIds = args.getStringArrayList("selected_user_ids");
+            Log.d(TAG, "받은 사용자 ID들: " + selectedUserIds);
+            
+            // 시너지 분석 API 호출
+            analyzeSynergy();
+        } else {
+            // 기본 더미 데이터 로드
+            loadDummyData();
+        }
     }
 
     private void initViews(View view) {
         recyclerView = view.findViewById(R.id.rv_team_members);
         tvSynergyScore = view.findViewById(R.id.tv_synergy_score);
+        
+        // API 서비스 초기화
+        apiService = RetrofitClient.getInstance().getApiService();
     }
 
     private void setupRecyclerView() {
@@ -89,6 +115,104 @@ public class TeamSynergyScoreFragment extends Fragment {
         }
     }
 
+    /**
+     * 시너지 분석 API를 호출하는 메서드
+     */
+    private void analyzeSynergy() {
+        if (selectedUserIds == null || selectedUserIds.isEmpty()) {
+            Log.e(TAG, "선택된 사용자 ID가 없습니다.");
+            return;
+        }
+        
+        
+        // API 요청 데이터 생성
+        SynergyAnalysisRequest request = new SynergyAnalysisRequest(selectedUserIds);
+        
+        // API 호출
+        Call<SynergyAnalysisResponse> call = apiService.analyzeSynergy(request);
+        call.enqueue(new Callback<SynergyAnalysisResponse>() {
+            @Override
+            public void onResponse(Call<SynergyAnalysisResponse> call, Response<SynergyAnalysisResponse> response) {
+                
+                if (response.isSuccessful() && response.body() != null) {
+                    SynergyAnalysisResponse result = response.body();
+                    
+                    // 팀 분석 결과 로그 출력
+                    if (result.getTeamAnalysis() != null) {
+                        SynergyAnalysisResponse.TeamAnalysis teamAnalysis = result.getTeamAnalysis();
+                        Log.d(TAG, "=== 팀 분석 결과 ===");
+                        Log.d(TAG, "팀 시너지 점수: " + teamAnalysis.getTeamSynergyScore());
+                        Log.d(TAG, "분석 요약: " + teamAnalysis.getAnalysisSummary());
+                        Log.d(TAG, "추천사항 개수: " + (teamAnalysis.getRecommendations() != null ? teamAnalysis.getRecommendations().size() : 0));
+                        if (teamAnalysis.getRecommendations() != null) {
+                            for (int i = 0; i < teamAnalysis.getRecommendations().size(); i++) {
+                                Log.d(TAG, "추천사항 [" + (i+1) + "]: " + teamAnalysis.getRecommendations().get(i));
+                            }
+                        }
+                    } else {
+                        Log.w(TAG, "팀 분석 결과가 null입니다.");
+                    }
+                    
+                    // 개별 점수 결과 로그 출력
+                    if (result.getIndividualScores() != null) {
+                        Log.d(TAG, "=== 개별 점수 결과 ===");
+                        Log.d(TAG, "개별 점수 개수: " + result.getIndividualScores().size());
+                        for (int i = 0; i < result.getIndividualScores().size(); i++) {
+                            SynergyAnalysisResponse.IndividualScore score = result.getIndividualScores().get(i);
+                            Log.d(TAG, "사용자 [" + (i+1) + "]: " + score.getName() + 
+                                  ", 시너지 점수: " + score.getSynergyScore() + 
+                                  ", 호환성: " + score.getCompatibility());
+                        }
+                    } else {
+                        Log.w(TAG, "개별 점수 결과가 null입니다.");
+                    }
+                    
+                    // 사용자 정보 로그 출력
+                    if (result.getUsers() != null) {
+                        Log.d(TAG, "=== 사용자 정보 ===");
+                        Log.d(TAG, "사용자 정보 개수: " + result.getUsers().size());
+                        for (int i = 0; i < result.getUsers().size(); i++) {
+                            SynergyAnalysisResponse.User user = result.getUsers().get(i);
+                            Log.d(TAG, "사용자 [" + (i+1) + "] - ID: " + user.getUserId() + 
+                                  ", 이름: " + user.getName() + 
+                                  ", 이메일: " + user.getEmail());
+                        }
+                    } else {
+                        Log.w(TAG, "사용자 정보가 null입니다.");
+                    }
+                    
+                    // UI 업데이트 (나중에 구현)
+                    updateUIWithSynergyResult(result);
+                    Log.d(TAG, "=== 시너지 분석 완료 ===");
+                    
+                } else {
+                    Log.e(TAG, "=== 시너지 분석 API 실패 ===");
+                    Log.e(TAG, "응답 코드: " + response.code());
+                    Log.e(TAG, "응답 메시지: " + response.message());
+                    // 실패시 더미 데이터 로드
+                    loadDummyData();
+                }
+            }
+            
+            @Override
+            public void onFailure(Call<SynergyAnalysisResponse> call, Throwable t) {
+                Log.e(TAG, "=== 시너지 분석 API 네트워크 오류 ===");
+                Log.e(TAG, "오류 메시지: " + t.getMessage());
+                Log.e(TAG, "오류 타입: " + t.getClass().getSimpleName());
+                // 실패시 더미 데이터 로드
+                loadDummyData();
+            }
+        });
+    }
+    
+    /**
+     * 시너지 분석 결과로 UI를 업데이트하는 메서드 (나중에 구현)
+     */
+    private void updateUIWithSynergyResult(SynergyAnalysisResponse result) {
+        // TODO: 실제 UI 업데이트 로직 구현
+        Log.d(TAG, "UI 업데이트 메서드 호출됨");
+    }
+    
     /**
      * 더미 데이터를 로드하는 메서드
      */
