@@ -10,7 +10,7 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
 
-    <!-- 뒤로가기 버튼 -->
+    <!-- 뒤로가기 버튼 - signup 모드에서는 숨김 -->
     <LinearLayout
         android:id="@+id/ll_back_navigation"
         android:layout_width="match_parent"
@@ -23,7 +23,8 @@
         android:layout_marginBottom="16dp"
         android:clickable="true"
         android:focusable="true"
-        android:foreground="?android:attr/selectableItemBackground">
+        android:foreground="?android:attr/selectableItemBackground"
+        android:visibility="gone">
 
         <TextView
             android:id="@+id/tv_back_arrow"
@@ -46,34 +47,34 @@
 
     </LinearLayout>
 
-    <!-- 관심 언어 타이틀 -->
-    <TextView
-        android:id="@+id/tv_language_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="사용 가능한 기술 *"
-        android:textStyle="bold"
-        android:layout_marginBottom="8dp"/>
-
     <!-- ScrollView for main content -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:layout_marginBottom="24dp">
+        android:layout_marginBottom="8dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:padding="8dp">
+
+            <!-- 관심 언어 타이틀 -->
+            <TextView
+                android:id="@+id/tv_language_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="사용 가능한 기술 *"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp"/>
 
             <!-- 기술 선택을 위한 ScrollView -->
             <ScrollView
                 android:id="@+id/scrollViewSkills"
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
-                android:layout_marginBottom="8dp"
+                android:layout_height="100dp"
+                android:layout_marginBottom="4dp"
                 android:background="@android:color/transparent">
 
                 <com.google.android.material.chip.ChipGroup
@@ -81,8 +82,12 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:singleSelection="false"
-                    app:chipSpacing="8dp"
-                    android:padding="8dp">
+                    app:chipSpacing="2dp"
+                    app:lineSpacing="0dp"
+                    android:layout_marginTop="0dp"
+                    android:layout_marginBottom="0dp"
+                    android:paddingTop="0dp"
+                    android:paddingBottom="0dp">
 
                 </com.google.android.material.chip.ChipGroup>
             </ScrollView>
@@ -98,15 +103,13 @@
                 android:visibility="gone">
             </LinearLayout>
 
-
-
             <!-- 언어 추가 입력 필드 -->
             <LinearLayout
                 android:id="@+id/ll_language_input"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginBottom="32dp">
+                android:layout_marginBottom="8dp">
 
                 <EditText
                     android:id="@+id/et_language_input"
@@ -137,14 +140,15 @@
                 android:layout_height="wrap_content"
                 android:text="원하는 역할 *"
                 android:textStyle="bold"
-                android:layout_marginBottom="8dp"/>
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="4dp"/>
 
             <!-- 역할 선택을 위한 ScrollView -->
             <ScrollView
                 android:id="@+id/scrollViewRoles"
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
-                android:layout_marginBottom="8dp"
+                android:layout_height="100dp"
+                android:layout_marginBottom="4dp"
                 android:background="@android:color/transparent">
 
                 <com.google.android.material.chip.ChipGroup
@@ -152,8 +156,12 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:singleSelection="false"
-                    app:chipSpacing="8dp"
-                    android:padding="8dp">
+                    app:chipSpacing="2dp"
+                    app:lineSpacing="0dp"
+                    android:layout_marginTop="0dp"
+                    android:layout_marginBottom="0dp"
+                    android:paddingTop="0dp"
+                    android:paddingBottom="0dp">
 
                 </com.google.android.material.chip.ChipGroup>
             </ScrollView>
@@ -168,8 +176,6 @@
                 android:layout_marginBottom="8dp"
                 android:visibility="gone">
             </LinearLayout>
-
-
 
             <!-- 역할 추가 입력 필드 -->
             <LinearLayout

@@ -17,11 +17,15 @@ import androidx.fragment.app.FragmentTransaction;
 import com.example.teamup.auth.LoginActivity;
 import com.example.teamup.auth.LoginManager;
 import com.example.teamup.auth.TokenManager;
+import com.example.teamup.contest.ContestListActivity;
+import com.example.teamup.recruitment.ContestRecruitmentListActivity;
 import com.example.teamup.fragments.HomeFragment;
 import com.example.teamup.fragments.MypageFragment;
+import com.example.teamup.fragments.ExperienceFragment;
+import com.example.teamup.fragments.MypageProfileFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements ExperienceFragment.ExperienceFragmentListener {
 
     private static final String TAG = "MainActivity";
     private TokenManager tokenManager;
@@ -82,10 +86,14 @@ public class MainActivity extends AppCompatActivity {
                 showHomeFragment();
                 return true;
             } else if (itemId == R.id.navigation_contest) {
-                showContestFragment();
+                // 공모전 목록 Activity로 이동
+                Intent intent = new Intent(MainActivity.this, ContestListActivity.class);
+                startActivity(intent);
                 return true;
             } else if (itemId == R.id.navigation_board) {
-                showBoardFragment();
+                // 팀원 모집 게시판 Activity로 이동
+                Intent intent = new Intent(MainActivity.this, ContestRecruitmentListActivity.class);
+                startActivity(intent);
                 return true;
             } else if (itemId == R.id.navigation_profile) {
                 // 로그인 상태에 따라 다르게 동작
@@ -149,6 +157,9 @@ public class MainActivity extends AppCompatActivity {
         // 기존 Fragment들을 모두 숨기고 새로운 Fragment 추가
         transaction.replace(R.id.content_container, fragment);
         
+        // 백 스택에 추가 (뒤로가기 버튼으로 이전 Fragment로 돌아갈 수 있도록)
+        transaction.addToBackStack(null);
+        
         transaction.commit();
         
         Log.d(TAG, "Fragment 표시: " + fragment.getClass().getSimpleName());
@@ -164,5 +175,33 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
             finish();
         }
+    }
+    
+    // ===== ExperienceFragmentListener 구현 =====
+    
+    @Override
+    public void onBackPressed() {
+        // 프래그먼트 백 스택에 항목이 있는지 확인
+        if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+            // 백 스택의 최상위 프래그먼트를 팝 (이전 프래그먼트로 돌아감)
+            getSupportFragmentManager().popBackStack();
+        } else {
+            // 백 스택이 비어있으면, 액티비티의 기본 뒤로가기 동작을 수행 (앱 종료 또는 이전 액티비티로 이동)
+            super.onBackPressed();
+        }
+    }
+    
+    @Override
+    public void onExperienceUpdated() {
+        // 경험 정보가 업데이트되면 MypageProfileFragment로 돌아가기
+        showMypageProfileFragment();
+    }
+    
+    /**
+     * MypageProfileFragment 표시
+     */
+    public void showMypageProfileFragment() {
+        Fragment fragment = new MypageProfileFragment();
+        showFragment(fragment);
     }
 }

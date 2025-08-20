@@ -21,6 +21,9 @@ public class Experience {
     @SerializedName("description")
     private String description;
     
+    @SerializedName("filter_id")
+    private Integer filterId;
+    
     public Experience() {
         // 기본 생성자
     }
@@ -31,6 +34,7 @@ public class Experience {
         this.hostOrganization = hostOrganization;
         this.awardName = awardName;
         this.description = description;
+        this.filterId = 1; // 기본값 설정
     }
     
     public String getContestName() {
@@ -71,5 +75,25 @@ public class Experience {
     
     public void setDescription(String description) {
         this.description = description;
+    }
+    
+    public Integer getFilterId() {
+        return filterId;
+    }
+    
+    public void setFilterId(Integer filterId) {
+        this.filterId = filterId;
+    }
+    
+    @Override
+    public String toString() {
+        return "Experience{" +
+                "contestName='" + contestName + '\'' +
+                ", awardDate='" + awardDate + '\'' +
+                ", hostOrganization='" + hostOrganization + '\'' +
+                ", awardName='" + awardName + '\'' +
+                ", description='" + description + '\'' +
+                ", filterId=" + filterId +
+                '}';
     }
 }

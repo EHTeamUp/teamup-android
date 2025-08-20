@@ -177,6 +177,13 @@ public class MypageInterestFragment extends Fragment {
         
         // Roles pagination views
         llRolesPageIndicator = view.findViewById(R.id.ll_roles_page_indicator);
+        
+        // Signup 모드일 때 뒤로가기 버튼 숨기기
+        if (SOURCE_SIGNUP.equals(source)) {
+            if (llBackNavigation != null) {
+                llBackNavigation.setVisibility(View.GONE);
+            }
+        }
     }
 
     private void setupGestureDetectors() {
@@ -582,7 +589,8 @@ public class MypageInterestFragment extends Fragment {
                     Log.d(TAG, "마이페이지 모드 - handleSkillSelection 호출");
                     handleSkillSelection(chip, isChecked);
                 } else {
-                    Log.d(TAG, "회원가입 모드 - 선택 처리 안함");
+                    Log.d(TAG, "회원가입 모드 - 선택 데이터 저장");
+                    handleSkillSelectionForSignup(chip, isChecked);
                 }
             });
             
@@ -645,7 +653,8 @@ public class MypageInterestFragment extends Fragment {
                     Log.d(TAG, "마이페이지 모드 - handleRoleSelection 호출");
                     handleRoleSelection(chip, isChecked);
                 } else {
-                    Log.d(TAG, "회원가입 모드 - 선택 처리 안함");
+                    Log.d(TAG, "회원가입 모드 - 선택 데이터 저장");
+                    handleRoleSelectionForSignup(chip, isChecked);
                 }
             });
             
@@ -907,6 +916,96 @@ public class MypageInterestFragment extends Fragment {
     }
 
     /**
+     * 스킬 선택 처리 (회원가입용)
+     */
+    private void handleSkillSelectionForSignup(Chip chip, boolean isChecked) {
+        Object tag = chip.getTag();
+        Log.d(TAG, "=== 회원가입 스킬 선택 처리 시작 ===");
+        Log.d(TAG, "Chip 텍스트: " + chip.getText() + ", isChecked: " + isChecked + ", tag: " + tag);
+        
+        if (tag instanceof Integer) {
+            Integer skillId = (Integer) tag;
+            Log.d(TAG, "기존 스킬 처리: skillId=" + skillId);
+            
+            if (isChecked) {
+                if (!selectedSkillIds.contains(skillId)) {
+                    selectedSkillIds.add(skillId);
+                    Log.d(TAG, "스킬 추가됨: " + skillId);
+                } else {
+                    Log.d(TAG, "스킬 이미 선택되어 있음: " + skillId);
+                }
+            } else {
+                boolean removed = selectedSkillIds.remove(skillId);
+                Log.d(TAG, "스킬 제거됨: " + skillId + ", 제거 성공: " + removed);
+            }
+        } else if (tag instanceof String && ((String) tag).startsWith("custom_")) {
+            String customSkill = ((String) tag).substring(7); // "custom_" 제거
+            Log.d(TAG, "커스텀 스킬 처리: customSkill=" + customSkill);
+            
+            if (isChecked) {
+                if (!selectedCustomSkills.contains(customSkill)) {
+                    selectedCustomSkills.add(customSkill);
+                    Log.d(TAG, "커스텀 스킬 추가됨: " + customSkill);
+                } else {
+                    Log.d(TAG, "커스텀 스킬 이미 선택되어 있음: " + customSkill);
+                }
+            } else {
+                boolean removed = selectedCustomSkills.remove(customSkill);
+                Log.d(TAG, "커스텀 스킬 제거됨: " + customSkill + ", 제거 성공: " + removed);
+            }
+        }
+        
+        Log.d(TAG, "현재 선택된 스킬 IDs: " + selectedSkillIds.toString());
+        Log.d(TAG, "현재 선택된 커스텀 스킬: " + selectedCustomSkills.toString());
+        Log.d(TAG, "=== 회원가입 스킬 선택 처리 끝 ===");
+    }
+
+    /**
+     * 역할 선택 처리 (회원가입용)
+     */
+    private void handleRoleSelectionForSignup(Chip chip, boolean isChecked) {
+        Object tag = chip.getTag();
+        Log.d(TAG, "=== 회원가입 역할 선택 처리 시작 ===");
+        Log.d(TAG, "Chip 텍스트: " + chip.getText() + ", isChecked: " + isChecked + ", tag: " + tag);
+        
+        if (tag instanceof Integer) {
+            Integer roleId = (Integer) tag;
+            Log.d(TAG, "기존 역할 처리: roleId=" + roleId);
+            
+            if (isChecked) {
+                if (!selectedRoleIds.contains(roleId)) {
+                    selectedRoleIds.add(roleId);
+                    Log.d(TAG, "역할 추가됨: " + roleId);
+                } else {
+                    Log.d(TAG, "역할 이미 선택되어 있음: " + roleId);
+                }
+            } else {
+                boolean removed = selectedRoleIds.remove(roleId);
+                Log.d(TAG, "역할 제거됨: " + roleId + ", 제거 성공: " + removed);
+            }
+        } else if (tag instanceof String && ((String) tag).startsWith("custom_")) {
+            String customRole = ((String) tag).substring(7); // "custom_" 제거
+            Log.d(TAG, "커스텀 역할 처리: customRole=" + customRole);
+            
+            if (isChecked) {
+                if (!selectedCustomRoles.contains(customRole)) {
+                    selectedCustomRoles.add(customRole);
+                    Log.d(TAG, "커스텀 역할 추가됨: " + customRole);
+                } else {
+                    Log.d(TAG, "커스텀 역할 이미 선택되어 있음: " + customRole);
+                }
+            } else {
+                boolean removed = selectedCustomRoles.remove(customRole);
+                Log.d(TAG, "커스텀 역할 제거됨: " + customRole + ", 제거 성공: " + removed);
+            }
+        }
+        
+        Log.d(TAG, "현재 선택된 역할 IDs: " + selectedRoleIds.toString());
+        Log.d(TAG, "현재 선택된 커스텀 역할: " + selectedCustomRoles.toString());
+        Log.d(TAG, "=== 회원가입 역할 선택 처리 끝 ===");
+    }
+
+    /**
      * 사용자 스킬 업데이트 (마이페이지용)
      */
     private void updateUserSkills() {
@@ -1022,5 +1121,22 @@ public class MypageInterestFragment extends Fragment {
         } else {
             loadSkillsAndRoles();
         }
+    }
+
+    // 선택된 데이터를 반환하는 메서드들 (Activity에서 호출)
+    public java.util.List<Integer> getSelectedSkillIds() {
+        return new java.util.ArrayList<>(selectedSkillIds);
+    }
+
+    public java.util.List<String> getSelectedCustomSkills() {
+        return new java.util.ArrayList<>(selectedCustomSkills);
+    }
+
+    public java.util.List<Integer> getSelectedRoleIds() {
+        return new java.util.ArrayList<>(selectedRoleIds);
+    }
+
+    public java.util.List<String> getSelectedCustomRoles() {
+        return new java.util.ArrayList<>(selectedCustomRoles);
     }
 }

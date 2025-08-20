@@ -20,12 +20,25 @@ public class PersonalityQuestion {
     private String question;
     private String optionA;
     private String optionB;
+    private String optionC;
+    private String optionD;
+    private String typeA;
+    private String typeB;
+    private String typeC;
+    private String typeD;
 
-    public PersonalityQuestion(int id, String question, String optionA, String optionB) {
+    public PersonalityQuestion(int id, String question, String optionA, String optionB, String optionC, String optionD, 
+                             String typeA, String typeB, String typeC, String typeD) {
         this.id = id;
         this.question = question;
         this.optionA = optionA;
         this.optionB = optionB;
+        this.optionC = optionC;
+        this.optionD = optionD;
+        this.typeA = typeA;
+        this.typeB = typeB;
+        this.typeC = typeC;
+        this.typeD = typeD;
     }
 
     public int getId() {
@@ -42,6 +55,30 @@ public class PersonalityQuestion {
 
     public String getOptionB() {
         return optionB;
+    }
+
+    public String getOptionC() {
+        return optionC;
+    }
+
+    public String getOptionD() {
+        return optionD;
+    }
+
+    public String getTypeA() {
+        return typeA;
+    }
+
+    public String getTypeB() {
+        return typeB;
+    }
+
+    public String getTypeC() {
+        return typeC;
+    }
+
+    public String getTypeD() {
+        return typeD;
     }
 
     /**
@@ -62,31 +99,54 @@ public class PersonalityQuestion {
     public static List<PersonalityQuestion> loadDummyQuestions(Context context) {
         List<PersonalityQuestion> questions = new ArrayList<>();
 
-        try {
-            // 더미 데이터 JSON 파일 로드
-            InputStream inputStream = context.getResources().openRawResource(R.raw.personality_questions);
-            int size = inputStream.available();
-            byte[] buffer = new byte[size];
-            inputStream.read(buffer);
-            inputStream.close();
+        // 새로운 6문항 성향 테스트
+        questions.add(new PersonalityQuestion(1, 
+            "새로운 프로젝트를 시작할 때, 나는?", 
+            "전체 구조와 문제를 먼저 분석한다.", 
+            "작은 부분부터 바로 실행해본다.", 
+            "독창적인 아이디어나 방식을 제시한다.", 
+            "팀원들과 협력할 방법을 먼저 찾는다.",
+            "분석형", "실행형", "창의형", "협력형"));
 
-            String jsonString = new String(buffer, StandardCharsets.UTF_8);
-            JSONObject jsonObject = new JSONObject(jsonString);
-            JSONArray questionsArray = jsonObject.getJSONArray("questions");
+        questions.add(new PersonalityQuestion(2, 
+            "문제가 발생했을 때, 나는?", 
+            "자료와 데이터를 찾아 해결책을 마련한다.", 
+            "직접 부딪혀가며 해결한다.", 
+            "새로운 접근법을 떠올린다.", 
+            "주변 사람들에게 조언을 구하고 함께 논의한다.",
+            "분석형", "실행형", "창의형", "협력형"));
 
-            for (int i = 0; i < questionsArray.length(); i++) {
-                JSONObject questionObj = questionsArray.getJSONObject(i);
-                int id = questionObj.getInt("id");
-                String question = questionObj.getString("question");
-                String optionA = questionObj.getString("optionA");
-                String optionB = questionObj.getString("optionB");
+        questions.add(new PersonalityQuestion(3, 
+            "내가 성취감을 느끼는 순간은?", 
+            "복잡한 문제를 논리적으로 풀었을 때", 
+            "주어진 일을 신속하게 끝냈을 때", 
+            "창의적인 아이디어로 주목받았을 때", 
+            "모두가 만족하는 결과를 함께 만들어냈을 때",
+            "분석형", "실행형", "창의형", "협력형"));
 
-                questions.add(new PersonalityQuestion(id, question, optionA, optionB));
-            }
+        questions.add(new PersonalityQuestion(4, 
+            "회의 시간에 나는 보통?", 
+            "데이터를 기반으로 의견을 제시한다.", 
+            "실현 가능한 실행 방안을 말한다.", 
+            "새로운 가능성을 탐색하는 아이디어를 낸다.", 
+            "다른 사람들의 의견을 조율한다.",
+            "분석형", "실행형", "창의형", "협력형"));
 
-        } catch (IOException | JSONException e) {
-            Log.e("PersonalityQuestion", "Error loading dummy questions", e);
-        }
+        questions.add(new PersonalityQuestion(5, 
+            "중요한 결정을 내려야 할 때, 나는?", 
+            "충분히 분석하고 신중히 결정한다.", 
+            "빠르게 결정을 내려 실행한다.", 
+            "남들과 다른 차별화된 선택을 한다.", 
+            "여러 사람의 의견을 반영하려 한다.",
+            "분석형", "실행형", "창의형", "협력형"));
+
+        questions.add(new PersonalityQuestion(6, 
+            "내가 선호하는 팀 역할은?", 
+            "문제 해결사 (논리와 분석 담당)", 
+            "실행가 (즉시 행동하고 추진하는 담당)", 
+            "아이디어 뱅크 (새로운 발상 담당)", 
+            "조율자 (사람들을 모으고 협력 담당)",
+            "분석형", "실행형", "창의형", "협력형"));
 
         return questions;
     }

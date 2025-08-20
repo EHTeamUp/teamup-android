@@ -2,184 +2,110 @@ package com.example.teamup.auth;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 
 import com.example.teamup.R;
-import com.google.android.material.chip.Chip;
-import com.google.android.material.chip.ChipGroup;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.example.teamup.api.model.StepResponse;
+import com.example.teamup.fragments.MypageInterestFragment;
 
 public class SignupInterestActivity extends AppCompatActivity {
-
-    private ChipGroup chipGroupLanguages, chipGroupRoles;
-    private EditText etLanguageInput, etRoleInput;
-    private Button btnAddLanguage, btnAddRole;
-    private TextView tvPrevious, tvNext;
-
-    // 이전 액티비티에서 전달받은 데이터
-    private String userId, userPassword, userName, userEmail;
+    private static final String TAG = "SignupInterestActivity";
+    
+    private String userId;
+    private RegistrationManager registrationManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup_interest);
-
-        // 이전 액티비티에서 데이터 받기
-        receiveDataFromPreviousActivity();
-
-        // 뷰 초기화
-        initViews();
         
-        // 클릭 리스너 설정
-        setClickListeners();
-    }
-
-    private void receiveDataFromPreviousActivity() {
-        Intent intent = getIntent();
-        userId = intent.getStringExtra("id");
-        userPassword = intent.getStringExtra("password");
-        userName = intent.getStringExtra("name");
-        userEmail = intent.getStringExtra("email");
-    }
-
-    private void initViews() {
-        chipGroupLanguages = findViewById(R.id.chipGroupLanguages);
-        chipGroupRoles = findViewById(R.id.chipGroupRoles);
-        etLanguageInput = findViewById(R.id.et_language_input);
-        etRoleInput = findViewById(R.id.et_role_input);
-        btnAddLanguage = findViewById(R.id.btn_add_language);
-        btnAddRole = findViewById(R.id.btn_add_role);
-        tvPrevious = findViewById(R.id.tv_previous);
-        tvNext = findViewById(R.id.tv_next);
-    }
-
-    private void setClickListeners() {
-        // 언어 추가 버튼
-        btnAddLanguage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String language = etLanguageInput.getText().toString().trim();
-                if (!language.isEmpty()) {
-                    addLanguageChip(language);
-                    etLanguageInput.setText("");
-                } else {
-                    Toast.makeText(SignupInterestActivity.this, "언어를 입력해주세요.", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-
-        // 역할 추가 버튼
-        btnAddRole.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String role = etRoleInput.getText().toString().trim();
-                if (!role.isEmpty()) {
-                    addRoleChip(role);
-                    etRoleInput.setText("");
-                } else {
-                    Toast.makeText(SignupInterestActivity.this, "역할을 입력해주세요.", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-
-        // Previous 버튼
-        tvPrevious.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish(); // 이전 액티비티로 돌아가기
-            }
-        });
-
-        // Next 버튼
-        tvNext.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                android.util.Log.d("SignupInterestActivity", "Next 버튼 클릭됨");
-                
-                if (validateSelections()) {
-                    // 선택된 관심사들을 다음 액티비티로 전달
-                    List<String> selectedLanguages = getSelectedLanguages();
-                    List<String> selectedRoles = getSelectedRoles();
-                    
-                    android.util.Log.d("SignupInterestActivity", "선택된 언어: " + selectedLanguages.size() + "개");
-                    android.util.Log.d("SignupInterestActivity", "선택된 역할: " + selectedRoles.size() + "개");
-                    
-                    Intent intent = new Intent(SignupInterestActivity.this, SignupTestActivity.class);
-                    intent.putExtra("id", userId);
-                    intent.putExtra("password", userPassword);
-                    intent.putExtra("name", userName);
-                    intent.putExtra("email", userEmail);
-                    intent.putStringArrayListExtra("languages", new ArrayList<>(selectedLanguages));
-                    intent.putStringArrayListExtra("roles", new ArrayList<>(selectedRoles));
-                    
-                    android.util.Log.d("SignupInterestActivity", "SignupTestActivity로 Intent 전송");
-                    startActivity(intent);
-                    
-                    Toast.makeText(SignupInterestActivity.this, "관심사가 저장되었습니다.", Toast.LENGTH_SHORT).show();
-                } else {
-                    android.util.Log.d("SignupInterestActivity", "유효성 검사 실패");
-                }
-            }
-        });
-    }
-
-    private void addLanguageChip(String language) {
-        Chip chip = (Chip) getLayoutInflater().inflate(R.layout.view_chip_choice, chipGroupLanguages, false);
-        chip.setText(language);
-        chipGroupLanguages.addView(chip);
+        userId = getIntent().getStringExtra("userId");
+        registrationManager = RegistrationManager.getInstance();
+        
+        // Fragment 로드
+        loadFragment();
+        
+        // 버튼 설정
+        TextView btnPrevious = findViewById(R.id.btn_previous);
+        TextView btnNext = findViewById(R.id.btn_next);
+        
+        btnPrevious.setOnClickListener(v -> goToPreviousStep());
+        btnNext.setOnClickListener(v -> proceedToNextStep());
     }
     
-
-    private void addRoleChip(String role) {
-        Chip chip = (Chip) getLayoutInflater().inflate(R.layout.view_chip_choice, chipGroupLanguages, false);
-        chip.setText(role);
-        chipGroupRoles.addView(chip);
+    private void loadFragment() {
+        MypageInterestFragment fragment = MypageInterestFragment.newInstance("signup", userId);
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragment_container, fragment)
+                .commit();
     }
 
-    private List<String> getSelectedLanguages() {
-        List<String> selectedLanguages = new ArrayList<>();
-        for (int i = 0; i < chipGroupLanguages.getChildCount(); i++) {
-            Chip chip = (Chip) chipGroupLanguages.getChildAt(i);
-            if (chip.isChecked()) {
-                selectedLanguages.add(chip.getText().toString());
+    private void proceedToNextStep() {
+        // Fragment에서 선택된 데이터 가져오기
+        Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        if (currentFragment instanceof MypageInterestFragment) {
+            MypageInterestFragment interestFragment = (MypageInterestFragment) currentFragment;
+            
+            // 선택된 기술과 역할 가져오기
+            java.util.List<Integer> selectedSkillIds = interestFragment.getSelectedSkillIds();
+            java.util.List<String> selectedCustomSkills = interestFragment.getSelectedCustomSkills();
+            java.util.List<Integer> selectedRoleIds = interestFragment.getSelectedRoleIds();
+            java.util.List<String> selectedCustomRoles = interestFragment.getSelectedCustomRoles();
+            
+            // 디버깅을 위한 로그 추가
+            Log.d(TAG, "=== API 요청 데이터 ===");
+            Log.d(TAG, "userId: " + userId);
+            Log.d(TAG, "selectedSkillIds: " + selectedSkillIds.toString());
+            Log.d(TAG, "selectedCustomSkills: " + selectedCustomSkills.toString());
+            Log.d(TAG, "selectedRoleIds: " + selectedRoleIds.toString());
+            Log.d(TAG, "selectedCustomRoles: " + selectedCustomRoles.toString());
+            Log.d(TAG, "========================");
+            
+            // 유효성 검사
+            if (selectedSkillIds.isEmpty() && selectedCustomSkills.isEmpty()) {
+                Toast.makeText(this, "기술과 역할은 1개 이상 선택해야 합니다.", Toast.LENGTH_SHORT).show();
+                return;
             }
-        }
-        return selectedLanguages;
-    }
-
-    private List<String> getSelectedRoles() {
-        List<String> selectedRoles = new ArrayList<>();
-        for (int i = 0; i < chipGroupRoles.getChildCount(); i++) {
-            Chip chip = (Chip) chipGroupRoles.getChildAt(i);
-            if (chip.isChecked()) {
-                selectedRoles.add(chip.getText().toString());
+            
+            if (selectedRoleIds.isEmpty() && selectedCustomRoles.isEmpty()) {
+                Toast.makeText(this, "기술과 역할은 1개 이상 선택해야 합니다.", Toast.LENGTH_SHORT).show();
+                return;
             }
+            
+            // 2단계 완료 API 호출
+            registrationManager.completeStep2(userId, selectedSkillIds, selectedCustomSkills, selectedRoleIds, selectedCustomRoles, new RegistrationManager.StepCallback() {
+                @Override
+                public void onSuccess(StepResponse response) {
+                    runOnUiThread(() -> {
+                        Toast.makeText(SignupInterestActivity.this, "관심사 등록이 완료되었습니다", Toast.LENGTH_SHORT).show();
+                        
+                        // 다음 단계로 이동 (경험 입력)
+                        Intent intent = new Intent(SignupInterestActivity.this, SignupExperienceActivity.class);
+                        intent.putExtra("userId", userId);
+                        startActivity(intent);
+                    });
+                }
+
+                @Override
+                public void onError(String error) {
+                    runOnUiThread(() -> {
+                        Toast.makeText(SignupInterestActivity.this, "관심사 등록에 실패했습니다: " + error, Toast.LENGTH_SHORT).show();
+                    });
+                }
+            });
+        } else {
+            Toast.makeText(this, "기술과 역할은 1개 이상 선택해야 합니다.", Toast.LENGTH_SHORT).show();
         }
-        return selectedRoles;
     }
 
-    private boolean validateSelections() {
-        List<String> selectedLanguages = getSelectedLanguages();
-        List<String> selectedRoles = getSelectedRoles();
-
-        if (selectedLanguages.isEmpty()) {
-            Toast.makeText(this, "관심있는 프로그래밍 언어를 선택해주세요.", Toast.LENGTH_SHORT).show();
-            return false;
-        }
-
-        if (selectedRoles.isEmpty()) {
-            Toast.makeText(this, "원하는 역할을 선택해주세요.", Toast.LENGTH_SHORT).show();
-            return false;
-        }
-
-        return true;
+    private void goToPreviousStep() {
+        finish(); // 이전 Activity로 돌아가기
     }
 }

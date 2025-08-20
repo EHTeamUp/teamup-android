@@ -21,4 +21,28 @@ public class ExperienceCreate {
     public void setExperiences(List<Experience> experiences) {
         this.experiences = experiences;
     }
+    
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("ExperienceCreate{");
+        if (experiences != null) {
+            sb.append("experiences=[");
+            for (int i = 0; i < experiences.size(); i++) {
+                Experience exp = experiences.get(i);
+                sb.append("{contest_name=").append(exp.getContestName())
+                  .append(", filter_id=").append(exp.getFilterId())
+                  .append(", host_organization=").append(exp.getHostOrganization())
+                  .append(", award_date=").append(exp.getAwardDate())
+                  .append(", description=").append(exp.getDescription())
+                  .append("}");
+                if (i < experiences.size() - 1) {
+                    sb.append(", ");
+                }
+            }
+            sb.append("]");
+        }
+        sb.append("}");
+        return sb.toString();
+    }
 }
