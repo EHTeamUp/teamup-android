@@ -24,6 +24,8 @@ import com.example.teamup.api.model.ApplicationReject;
 import com.example.teamup.api.model.ApiResponse;
 import com.example.teamup.api.model.RecruitmentPostResponse;
 import com.example.teamup.api.model.ContestResponse;
+import com.example.teamup.auth.JwtUtils;
+import com.example.teamup.auth.TokenManager;
 import com.example.teamup.recruitment.TeamSynergyScoreFragment;
 import com.google.android.material.button.MaterialButton;
 
@@ -113,15 +115,48 @@ public class ApplicantListFragment extends Fragment {
             
             if (selectedApplicants.isEmpty()) {
                 // 선택된 지원자가 없으면 Toast 메시지 표시
-                Toast.makeText(getContext(), "시너지를 확인해 볼 지원자를 눌러주세요", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "선택된 지원자가 없습니다.", Toast.LENGTH_SHORT).show();
                 return;
             }
             
-            // TeamSynergyScoreFragment로 이동
+            // 현재 로그인한 사용자의 ID 가져오기
+            String currentUserId = null;
+            TokenManager tokenManager = TokenManager.getInstance(getContext());
+            String token = tokenManager.getAccessToken();
+            if (token != null) {
+                currentUserId = JwtUtils.getUserIdFromToken(token);
+//                Log.d(TAG, "현재 로그인한 사용자 ID: " + currentUserId);
+            }
+            
+            // 선택된 지원자들의 user_id 목록 생성
+            List<String> selectedUserIds = new ArrayList<>();
+            Log.d(TAG, "=== 선택된 지원자 정보 ===");
+            for (Application applicant : selectedApplicants) {
+                String applicantId = applicant.getUserId();
+                selectedUserIds.add(applicantId);
+//                Log.d(TAG, "선택된 지원자 ID: " + applicantId + ", 이름: " + applicant.getUserName());
+            }
+            
+            // 현재 로그인한 사용자 ID도 추가
+            if (currentUserId != null && !selectedUserIds.contains(currentUserId)) {
+                selectedUserIds.add(currentUserId);
+//                Log.d(TAG, "현재 로그인한 사용자 ID 추가됨: " + currentUserId);
+            } else if (currentUserId != null) {
+//                Log.d(TAG, "현재 로그인한 사용자 ID가 이미 선택된 목록에 포함되어 있음: " + currentUserId);
+            } else {
+//                Log.w(TAG, "현재 로그인한 사용자 ID를 가져올 수 없음");
+            }
+            
+            // TeamSynergyScoreFragment로 이동하면서 선택된 사용자 ID들 전달
             if (getActivity() != null) {
+                TeamSynergyScoreFragment fragment = new TeamSynergyScoreFragment();
+                Bundle args = new Bundle();
+                args.putStringArrayList("selected_user_ids", new ArrayList<>(selectedUserIds));
+                fragment.setArguments(args);
+                
                 getActivity().getSupportFragmentManager()
                     .beginTransaction()
-                    .replace(R.id.fragment_container, new TeamSynergyScoreFragment())
+                    .replace(R.id.fragment_container, fragment)
                     .addToBackStack(null)
                     .commit();
             }
@@ -131,19 +166,13 @@ public class ApplicantListFragment extends Fragment {
         btnAcceptSelected.setOnClickListener(v -> {
             acceptSelectedApplicants();
         });
-        Log.d(TAG, "setupSelectionControls 완료");
+//        Log.d(TAG, "setupSelectionControls 완료");
     }
 
     public void updateSelectedCount() {
         // 어댑터에서 직접 총 선택된 수를 계산
         int totalCount = adapter.getTotalSelectedCount();
         int acceptedCount = adapter.getAcceptedCount();
-        Log.d(TAG, "디버그 - 총 선택된 수: " + totalCount);
-        Log.d(TAG, "디버그 - 수락된 수: " + acceptedCount);
-        Log.d(TAG, "디버그 - selectedItems 크기: " + adapter.selectedItems.size());
-        for (int i = 0; i < adapter.selectedItems.size(); i++) {
-            Log.d(TAG, "디버그 - selectedItems[" + i + "]: " + adapter.selectedItems.get(i));
-        }
         tvSelectedCount.setText(totalCount + "명 선택됨");
     }
     
@@ -185,16 +214,15 @@ public class ApplicantListFragment extends Fragment {
             public void onResponse(Call<ContestResponse> call, Response<ContestResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     ContestResponse contest = response.body();
-                    // 디버깅을 위한 로그 추가
-                    Log.d(TAG, "공모전 ID: " + contest.getContestId());
-                    Log.d(TAG, "공모전 이름: " + contest.getName());
-                    Log.d(TAG, "공모전 URL: " + contest.getContestUrl());
+//                    Log.d(TAG, "공모전 ID: " + contest.getContestId());
+//                    Log.d(TAG, "공모전 이름: " + contest.getName());
+//                    Log.d(TAG, "공모전 URL: " + contest.getContestUrl());
                     
                     // 네비게이션 텍스트에 공모전 이름 설정
                     if (getActivity() != null) {
                         getActivity().runOnUiThread(() -> {
                             tvNavigationText.setText(contest.getName());
-                            Log.d(TAG, "UI에 설정된 이름: " + contest.getName());
+//                            Log.d(TAG, "UI에 설정된 이름: " + contest.getName());
                         });
                     }
                 } else {
@@ -232,7 +260,7 @@ public class ApplicantListFragment extends Fragment {
                     // 각 지원자의 상태 로그 출력
                     for (int i = 0; i < applicantList.size(); i++) {
                         Application app = applicantList.get(i);
-                        Log.d(TAG, "지원자 [" + i + "]: " + app.getUserName() + ", 상태: " + app.getStatus());
+//                        Log.d(TAG, "지원자 [" + i + "]: " + app.getUserName() + ", 상태: " + app.getStatus());
                     }
                     
                     adapter.updateSelectionList();
@@ -246,7 +274,7 @@ public class ApplicantListFragment extends Fragment {
                 } else {
                     // API 응답 실패시 기본 데이터 사용
                     loadDefaultApplicants();
-                    Toast.makeText(getContext(), 
+                    Toast.makeText(getContext(),
                         "API 응답 실패. 기본 데이터를 사용합니다.", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -255,8 +283,8 @@ public class ApplicantListFragment extends Fragment {
             public void onFailure(Call<List<Application>> call, Throwable t) {
                 // 네트워크 오류시 기본 데이터 사용
                 loadDefaultApplicants();
-                Toast.makeText(getContext(), 
-                    "네트워크 오류. 기본 데이터를 사용합니다.", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getContext(),
+//                    "네트워크 오류. 기본 데이터를 사용합니다.", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -318,7 +346,7 @@ public class ApplicantListFragment extends Fragment {
                     // 수락된 지원자 상태 업데이트
                     updateApplicantStatus(userId, "accepted");
                 } else {
-                    Toast.makeText(getContext(), 
+                    Toast.makeText(getContext(),
                         "수락 처리 중 오류가 발생했습니다.", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -565,10 +593,8 @@ public class ApplicantListFragment extends Fragment {
             for (int i = 0; i < selectedItems.size(); i++) {
                 if (selectedItems.get(i)) {
                     Application app = dataList.get(i);
-                    // 대기 중인 지원자만 선택 가능
-                    if ("pending".equals(app.getStatus())) {
-                        selected.add(app);
-                    }
+                    // 수락된 지원자와 대기 중인 지원자 모두 포함
+                    selected.add(app);
                 }
             }
             return selected;
@@ -583,10 +609,10 @@ public class ApplicantListFragment extends Fragment {
                 // 수락된 지원자는 자동으로 선택된 상태로 설정
                 if ("accepted".equals(dataList.get(i).getStatus())) {
                     selectedItems.add(true);
-                    Log.d(TAG, "디버그 - 수락된 지원자 [" + i + "]: " + dataList.get(i).getUserName() + " -> true");
+//                    Log.d(TAG, "디버그 - 수락된 지원자 [" + i + "]: " + dataList.get(i).getUserName() + " -> true");
                 } else {
                     selectedItems.add(false);
-                    Log.d(TAG, "디버그 - 대기 중인 지원자 [" + i + "]: " + dataList.get(i).getUserName() + " -> false");
+//                    Log.d(TAG, "디버그 - 대기 중인 지원자 [" + i + "]: " + dataList.get(i).getUserName() + " -> false");
                 }
             }
         }

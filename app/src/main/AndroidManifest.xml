@@ -42,12 +42,8 @@
         <activity
             android:name=".auth.SignupFinishActivity"
             android:exported="false" />
-        <activity
-            android:name=".applicant.ApplicantListActivity"
-            android:exported="false"/>
-        <activity
-            android:name=".recruitment.TeamSynergyScoreActivity"
-            android:exported="false"/>
+
+
         <activity
             android:name=".personality.MainPersonalityTestActivity"
             android:exported="false"/>

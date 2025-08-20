@@ -18,6 +18,7 @@ import com.example.teamup.fragment.HomeFragment;
 import com.example.teamup.fragment.ContestFragment;
 import com.example.teamup.fragment.BoardFragment;
 import com.example.teamup.fragment.ProfileFragment;
+import com.example.teamup.applicant.ApplicantListFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
@@ -41,11 +42,22 @@ public class MainActivity extends AppCompatActivity {
         // Setup Bottom Navigation
         BottomNavigationView navView = findViewById(R.id.bottom_navigation);
         
-        // 기본적으로 Home Fragment 표시
-        if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, new HomeFragment())
-                    .commit();
+        // Intent에서 Fragment 로드 요청 확인
+        Intent intent = getIntent();
+        if (intent != null && intent.hasExtra("FRAGMENT_TO_LOAD")) {
+            String fragmentToLoad = intent.getStringExtra("FRAGMENT_TO_LOAD");
+            if ("ApplicantListFragment".equals(fragmentToLoad)) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, new ApplicantListFragment())
+                        .commit();
+            }
+        } else {
+            // 기본적으로 Home Fragment 표시
+            if (savedInstanceState == null) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, new HomeFragment())
+                        .commit();
+            }
         }
         
         // Setup navigation listener

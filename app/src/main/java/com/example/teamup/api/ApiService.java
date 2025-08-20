@@ -11,6 +11,8 @@ import com.example.teamup.api.model.ContestResponse;
 import com.example.teamup.api.model.PersonalityQuestionResponse;
 import com.example.teamup.api.model.PersonalityTestRequest;
 import com.example.teamup.api.model.PersonalityTestResponse;
+import com.example.teamup.api.model.SynergyAnalysisRequest;
+import com.example.teamup.api.model.SynergyAnalysisResponse;
 
 import java.util.List;
 
@@ -81,4 +83,11 @@ public interface ApiService {
      */
     @POST("api/v1/personality/test")
     Call<PersonalityTestResponse> submitPersonalityTest(@Body PersonalityTestRequest request);
+    
+    /**
+     * 시너지 분석 API
+     * POST /api/v1/synergy/analyze
+     */
+    @POST("api/v1/synergy/analyze")
+    Call<SynergyAnalysisResponse> analyzeSynergy(@Body SynergyAnalysisRequest request);
 }
