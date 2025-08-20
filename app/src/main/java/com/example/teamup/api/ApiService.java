@@ -38,7 +38,7 @@ public interface ApiService {
      * PUT /api/v1/users/mypage
      */
     @PUT("api/v1/users/mypage")
-    Call<UserDTO> updateUserInfo(@Header("Authorization") String authorization, @Body UserDTO userInfo);
+    Call<UserDTO> updateUserInfo(@Header("Authorization") String authorization, @Body UserUpdateRequest userInfo);
     
     // ===== 회원가입 관련 API =====
     

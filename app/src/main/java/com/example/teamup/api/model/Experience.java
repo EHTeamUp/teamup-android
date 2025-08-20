@@ -21,6 +21,10 @@ public class Experience {
     @SerializedName("description")
     private String description;
     
+    public Experience() {
+        // 기본 생성자
+    }
+    
     public Experience(String contestName, String awardDate, String hostOrganization, String awardName, String description) {
         this.contestName = contestName;
         this.awardDate = awardDate;

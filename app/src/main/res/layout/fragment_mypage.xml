@@ -7,66 +7,17 @@
     android:background="#FFFFFF"
     tools:context=".MainActivity">
 
-    <!-- Header - TeamUp Title -->
-    <TextView
-        android:id="@+id/tv_header_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/app_name"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:textColor="@android:color/black"
-        android:layout_marginTop="32dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <!-- User Info Section -->
-    <LinearLayout
-        android:id="@+id/ll_user_info"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginTop="16dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginEnd="24dp"
-        android:background="@drawable/profile_card_background"
-        android:padding="16dp"
-        app:layout_constraintTop_toBottomOf="@id/tv_header_title">
-
-        <TextView
-            android:id="@+id/tv_user_name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="사용자"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:textColor="@android:color/black"
-            android:gravity="center"
-            android:layout_marginBottom="4dp" />
-
-        <TextView
-            android:id="@+id/tv_user_email"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="user@example.com"
-            android:textSize="14sp"
-            android:textColor="@android:color/darker_gray"
-            android:gravity="center" />
-
-    </LinearLayout>
-
     <!-- Main Content Container -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="32dp"
         android:layout_marginStart="24dp"
         android:layout_marginEnd="24dp"
         android:background="@android:color/white"
         android:padding="24dp"
-        app:layout_constraintTop_toBottomOf="@id/ll_user_info">
+        app:layout_constraintTop_toTopOf="parent">
 
         <!-- Menu Item 1: 회원정보 -->
         <LinearLayout
@@ -77,7 +28,10 @@
             android:background="@drawable/mypage_menu_item_background"
             android:padding="16dp"
             android:gravity="center_vertical"
-            android:layout_marginBottom="12dp">
+            android:layout_marginBottom="12dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?android:attr/selectableItemBackground">
 
             <TextView
                 android:layout_width="0dp"
@@ -108,7 +62,10 @@
             android:background="@drawable/mypage_menu_item_background"
             android:padding="16dp"
             android:gravity="center_vertical"
-            android:layout_marginBottom="12dp">
+            android:layout_marginBottom="12dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?android:attr/selectableItemBackground">
 
             <TextView
                 android:layout_width="0dp"
@@ -139,7 +96,10 @@
             android:background="@drawable/mypage_menu_item_background"
             android:padding="16dp"
             android:gravity="center_vertical"
-            android:layout_marginBottom="12dp">
+            android:layout_marginBottom="12dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?android:attr/selectableItemBackground">
 
             <TextView
                 android:layout_width="0dp"
@@ -169,7 +129,10 @@
             android:orientation="horizontal"
             android:background="@drawable/mypage_menu_item_background"
             android:padding="16dp"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?android:attr/selectableItemBackground">
 
             <TextView
                 android:layout_width="0dp"
@@ -192,17 +155,5 @@
         </LinearLayout>
 
     </LinearLayout>
-    <!-- Bottom Navigation -->
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottom_navigation"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="0dp"
-        android:layout_marginEnd="0dp"
-        android:background="@android:color/white"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:menu="@menu/bottom_nav_menu" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
