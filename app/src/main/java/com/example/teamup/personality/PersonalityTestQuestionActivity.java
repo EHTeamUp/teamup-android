@@ -27,6 +27,9 @@ public class PersonalityTestQuestionActivity extends AppCompatActivity implement
     private PersonalityQuestionAdapter adapter;
     private MaterialButton btnResult;
     private Map<Integer, String> selectedAnswers;
+    private Map<Integer, String> selectedTypes;
+    private String userId;
+    private boolean fromSignup;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,8 +42,13 @@ public class PersonalityTestQuestionActivity extends AppCompatActivity implement
             return insets;
         });
 
+        // 회원가입에서 온 경우 userId와 fromSignup 플래그 받기
+        userId = getIntent().getStringExtra("userId");
+        fromSignup = getIntent().getBooleanExtra("fromSignup", false);
+
         // 초기화
         selectedAnswers = new HashMap<>();
+        selectedTypes = new HashMap<>();
         
         // 더미데이터 로드, 나중에 백엔드에서 로드
         loadQuestions();
@@ -100,8 +108,16 @@ public class PersonalityTestQuestionActivity extends AppCompatActivity implement
      */
     private void checkAndNavigateToResult() {
         if (selectedAnswers.size() == questions.size()) {
+            // 성향 분석
+            String personalityType = analyzePersonality();
+            
             // 모든 질문이 답변되면 결과 페이지 이동
             Intent intent = new Intent(PersonalityTestQuestionActivity.this, PersonalityTestResultActivity.class);
+            intent.putExtra("personalityType", personalityType);
+            if (fromSignup && userId != null) {
+                intent.putExtra("userId", userId);
+                intent.putExtra("fromSignup", true);
+            }
             startActivity(intent);
         } else {
             // 모든 질문이 답변되지 않으면 Toast 메시지
@@ -109,9 +125,72 @@ public class PersonalityTestQuestionActivity extends AppCompatActivity implement
         }
     }
     
+    private String analyzePersonality() {
+        // 각 성향별 카운트
+        int analyticalCount = 0;
+        int executionCount = 0;
+        int creativeCount = 0;
+        int cooperativeCount = 0;
+        
+        for (String type : selectedTypes.values()) {
+            switch (type) {
+                case "분석형":
+                    analyticalCount++;
+                    break;
+                case "실행형":
+                    executionCount++;
+                    break;
+                case "창의형":
+                    creativeCount++;
+                    break;
+                case "협력형":
+                    cooperativeCount++;
+                    break;
+            }
+        }
+        
+        // 가장 많이 선택된 성향 찾기
+        int maxCount = Math.max(Math.max(analyticalCount, executionCount), Math.max(creativeCount, cooperativeCount));
+        
+        // 동점이 있는지 확인
+        boolean hasTie = false;
+        String result = "";
+        
+        if (analyticalCount == maxCount) {
+            result = "분석형";
+            hasTie = true;
+        }
+        if (executionCount == maxCount) {
+            if (hasTie) {
+                result += "/실행형";
+            } else {
+                result = "실행형";
+                hasTie = true;
+            }
+        }
+        if (creativeCount == maxCount) {
+            if (hasTie) {
+                result += "/창의형";
+            } else {
+                result = "창의형";
+                hasTie = true;
+            }
+        }
+        if (cooperativeCount == maxCount) {
+            if (hasTie) {
+                result += "/협력형";
+            } else {
+                result = "협력형";
+            }
+        }
+        
+        return result;
+    }
+    
     @Override
-    public void onOptionSelected(int questionIndex, String option) {
+    public void onOptionSelected(int questionIndex, String option, String type) {
         selectedAnswers.put(questionIndex, option);
+        selectedTypes.put(questionIndex, type);
         
         // 결과 버튼 상태 업데이트
         updateResultButtonState();

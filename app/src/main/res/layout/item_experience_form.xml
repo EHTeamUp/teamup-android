@@ -8,43 +8,37 @@
     android:padding="16dp">
 
     <!-- 섹션 헤더 (제목 + 삭제 버튼) -->
+
+    <!-- 공모전명 입력 필드 -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:layout_marginBottom="16dp">
+        android:layout_marginBottom="4dp">
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="수상 경력 및 공모전 활동"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:textColor="@android:color/black" />
+            android:text="공모전명"
+            android:textSize="14sp"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/tv_remove_form"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="x"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:text="✕"
             android:textSize="16sp"
-            android:padding="8dp"
+            android:textColor="#FF0000"
+            android:gravity="center"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
             android:clickable="true"
             android:focusable="true"
-            android:background="?android:attr/selectableItemBackground" />
+            android:visibility="gone" />
 
     </LinearLayout>
-
-    <!-- 공모전명 입력 필드 -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="공모전명"
-        android:textSize="14sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="4dp" />
 
     <EditText
         android:id="@+id/et_contest_name_additional"
@@ -55,25 +49,24 @@
         android:padding="12dp"
         android:layout_marginBottom="16dp" />
 
-    <!-- 수상명 입력 필드 -->
+    <!-- 카테고리 선택 드롭다운 -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="수상명"
+        android:text="카테고리"
         android:textSize="14sp"
         android:textStyle="bold"
         android:layout_marginBottom="4dp" />
 
-    <EditText
-        android:id="@+id/et_award_title_additional"
+    <Spinner
+        android:id="@+id/spinner_category"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
         android:background="@drawable/edit_text_background"
-        android:hint="수상명을 입력하세요"
         android:padding="12dp"
         android:layout_marginBottom="16dp" />
 
-    <!-- 날짜 입력 필드 -->
+    <!-- 날짜 입력 필드 (달력형) -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -86,27 +79,20 @@
         android:id="@+id/et_date_additional"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="날짜"
+        android:hint="날짜를 선택하세요"
         android:padding="12dp"
         android:background="@drawable/edit_text_background"
-        android:layout_marginBottom="16dp" />
+        android:layout_marginBottom="16dp"
+        android:focusable="false"
+        android:clickable="true" />
 
-    <!-- 주최 기관 입력 필드 -->
-    <TextView
+    <!-- 수상 유무 체크박스 -->
+    <CheckBox
+        android:id="@+id/cb_award_received"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="주최 기관"
+        android:text="수상함"
         android:textSize="14sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="4dp" />
-
-    <EditText
-        android:id="@+id/et_organizer_additional"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="주최 기관명"
-        android:padding="12dp"
-        android:background="@drawable/edit_text_background"
         android:layout_marginBottom="16dp" />
 
     <!-- 설명 입력 필드 -->
@@ -128,5 +114,16 @@
         android:minLines="3"
         android:gravity="top"
         android:layout_marginBottom="16dp" />
+
+    <!-- 수상 경력 및 공모전 활동 추가 버튼 -->
+    <Button
+        android:id="@+id/btn_add_experience_form"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:text="+ 수상 경력 및 공모전 활동 추가"
+        android:textSize="16sp"
+        android:textColor="@android:color/white"
+        android:backgroundTint="@color/black"
+        android:layout_marginTop="16dp" />
 
 </LinearLayout>

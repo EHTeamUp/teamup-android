@@ -30,6 +30,13 @@ public class RegistrationManager {
         return instance;
     }
     
+    /**
+     * ApiService 인스턴스 반환
+     */
+    public com.example.teamup.api.ApiService getApiService() {
+        return RetrofitClient.getInstance().getApiService();
+    }
+    
     // ===== 이메일 인증 관련 =====
     
     /**
@@ -391,7 +398,8 @@ public class RegistrationManager {
                     }
                 });
     }
-    
+
+
     // ===== 콜백 인터페이스들 =====
     
     public interface EmailVerificationCallback {
