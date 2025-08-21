@@ -9,11 +9,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.fragment.app.Fragment;
 
-import com.example.teamup.auth.LoginActivity;
-import com.example.teamup.auth.LoginManager;
 import com.example.teamup.auth.TokenManager;
-import com.example.teamup.MypageActivity;
+import com.example.teamup.contest.ContestListFragment;
+import com.example.teamup.recruitment.ContestRecruitmentListFragment;
+import com.example.teamup.util.PlaceholderFragment; // 임시 프래그먼트 import
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
@@ -31,38 +32,42 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
-        // TokenManager 초기화
         tokenManager = TokenManager.getInstance(this);
-
-        // Setup Bottom Navigation
         BottomNavigationView navView = findViewById(R.id.bottom_navigation);
-        
-        // Setup custom navigation for profile
+
+        // 기본 화면 설정 (임시 홈 화면)
+        if (savedInstanceState == null) {
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, PlaceholderFragment.newInstance("홈"))
+                    .commit();
+        }
+
+        // 하단 탭 선택 리스너 설정
         navView.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
-            if (itemId == R.id.navigation_profile) {
+            Fragment selectedFragment = null;
 
-                // 로그인 상태에 따라 다르게 동작
-                if (tokenManager.isLoggedIn()) {
-                    // 로그인된 경우 마이페이지 이동
-                    Intent intent = new Intent(MainActivity.this, MypageActivity.class);
-                    startActivity(intent);
-                } else {
-                    // 로그인되지 않은 경우 로그인 페이지로 이동
-                    Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-                    startActivity(intent);
-                }
-                return true;
+            if (itemId == R.id.navigation_profile) {
+                // 마이페이지는 임시 프래그먼트로 처리
+                selectedFragment = PlaceholderFragment.newInstance("마이페이지");
             } else if (itemId == R.id.navigation_home) {
-                // Handle home navigation
-                return true;
+                // 홈은 임시 프래그먼트로 처리
+                selectedFragment = PlaceholderFragment.newInstance("홈");
             } else if (itemId == R.id.navigation_contest) {
-                // Handle contest navigation
-                return true;
+                // 공모전은 ContestListFragment로 처리
+                selectedFragment = new ContestListFragment();
             } else if (itemId == R.id.navigation_board) {
-                // Handle board navigation
+                // 게시판은 ContestRecruitmentListFragment로 처리
+                selectedFragment = new ContestRecruitmentListFragment();
+            }
+
+            if (selectedFragment != null) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, selectedFragment)
+                        .commit();
                 return true;
             }
+
             return false;
         });
     }
