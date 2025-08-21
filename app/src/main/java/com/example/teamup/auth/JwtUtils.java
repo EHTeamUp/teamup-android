@@ -31,7 +31,7 @@ public class JwtUtils {
             String payload = parts[1];
             String decodedPayload = new String(Base64.decode(payload, Base64.URL_SAFE));
             
-            Log.d(TAG, "JWT 페이로드 디코딩: " + decodedPayload);
+            // Log.d(TAG, "JWT 페이로드 디코딩: " + decodedPayload);
             
             // JSON으로 파싱
             Gson gson = new Gson();
@@ -52,11 +52,11 @@ public class JwtUtils {
             // JWT 표준에서는 'sub' 필드가 사용자 ID를 나타냄
             if (payload.has("sub")) {
                 String userId = payload.get("sub").getAsString();
-                Log.d(TAG, "JWT에서 추출된 사용자 ID (sub): " + userId);
+                // Log.d(TAG, "JWT에서 추출된 사용자 ID (sub): " + userId);
                 return userId;
             } else if (payload.has("user_id")) {
                 String userId = payload.get("user_id").getAsString();
-                Log.d(TAG, "JWT에서 추출된 사용자 ID (user_id): " + userId);
+                // Log.d(TAG, "JWT에서 추출된 사용자 ID (user_id): " + userId);
                 return userId;
             } else {
                 Log.w(TAG, "JWT에서 사용자 ID를 찾을 수 없습니다. 페이로드: " + payload);

@@ -9,11 +9,19 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.fragment.app.Fragment;
 
 import com.example.teamup.auth.LoginActivity;
 import com.example.teamup.auth.LoginManager;
 import com.example.teamup.auth.TokenManager;
-import com.example.teamup.MypageActivity;
+import com.example.teamup.fragment.HomeFragment;
+import com.example.teamup.fragment.ContestFragment;
+import com.example.teamup.fragment.BoardFragment;
+import com.example.teamup.fragment.ProfileFragment;
+import com.example.teamup.applicant.ApplicantListFragment;
+import com.example.teamup.recruitment.TeamSynergyScoreFragment;
+import com.example.teamup.notification.FcmTokenManager;
+import com.example.teamup.notification.NotificationPermissionHelper;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
@@ -34,35 +42,60 @@ public class MainActivity extends AppCompatActivity {
         // TokenManager 초기화
         tokenManager = TokenManager.getInstance(this);
 
+        // FCM 토큰 매니저 초기화
+        FcmTokenManager.getInstance(this);
+
+        // 알림 권한 요청
+        NotificationPermissionHelper.requestNotificationPermission(this);
+
         // Setup Bottom Navigation
         BottomNavigationView navView = findViewById(R.id.bottom_navigation);
-        
-        // Setup custom navigation for profile
+
+        // Intent에서 Fragment 로드 요청 확인
+        Intent intent = getIntent();
+        if (intent != null && intent.hasExtra("FRAGMENT_TO_LOAD")) {
+            String fragmentToLoad = intent.getStringExtra("FRAGMENT_TO_LOAD");
+            if ("ApplicantListFragment".equals(fragmentToLoad)) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, new ApplicantListFragment())
+                        .commit();
+            } else if ("TeamSynergyScoreFragment".equals(fragmentToLoad)) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, new TeamSynergyScoreFragment())
+                        .commit();
+            }
+        } else {
+            // 기본적으로 Home Fragment 표시
+            if (savedInstanceState == null) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, new HomeFragment())
+                        .commit();
+            }
+        }
+
+        // Setup navigation listener
         navView.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
-            if (itemId == R.id.navigation_profile) {
+            Fragment selectedFragment = null;
 
-                // 로그인 상태에 따라 다르게 동작
-                if (tokenManager.isLoggedIn()) {
-                    // 로그인된 경우 마이페이지 이동
-                    Intent intent = new Intent(MainActivity.this, MypageActivity.class);
-                    startActivity(intent);
-                } else {
-                    // 로그인되지 않은 경우 로그인 페이지로 이동
-                    Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-                    startActivity(intent);
-                }
-                return true;
+            if (itemId == R.id.navigation_profile) {
+                // 마이페이지는 ProfileFragment로 처리
+                selectedFragment = new ProfileFragment();
             } else if (itemId == R.id.navigation_home) {
-                // Handle home navigation
-                return true;
+                selectedFragment = new HomeFragment();
             } else if (itemId == R.id.navigation_contest) {
-                // Handle contest navigation
-                return true;
+                selectedFragment = new ContestFragment();
             } else if (itemId == R.id.navigation_board) {
-                // Handle board navigation
+                selectedFragment = new BoardFragment();
+            }
+
+            if (selectedFragment != null) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, selectedFragment)
+                        .commit();
                 return true;
             }
+
             return false;
         });
     }
