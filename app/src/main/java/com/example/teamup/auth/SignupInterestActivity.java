@@ -61,7 +61,6 @@ public class SignupInterestActivity extends AppCompatActivity {
             
             // 디버깅을 위한 로그 추가
             Log.d(TAG, "=== API 요청 데이터 ===");
-            Log.d(TAG, "userId: " + userId);
             Log.d(TAG, "selectedSkillIds: " + selectedSkillIds.toString());
             Log.d(TAG, "selectedCustomSkills: " + selectedCustomSkills.toString());
             Log.d(TAG, "selectedRoleIds: " + selectedRoleIds.toString());

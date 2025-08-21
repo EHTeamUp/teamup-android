@@ -91,7 +91,7 @@
         android:id="@+id/cb_award_received"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="수상함"
+        android:text="수상 여부"
         android:textSize="14sp"
         android:layout_marginBottom="16dp" />
 

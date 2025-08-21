@@ -15,7 +15,6 @@ import androidx.core.view.WindowInsetsCompat;
 import com.example.teamup.MainActivity;
 import com.example.teamup.R;
 import com.example.teamup.api.model.PersonalityTraits;
-import com.google.android.material.button.MaterialButton;
 
 public class PersonalityTestResultActivity extends AppCompatActivity {
 
@@ -29,7 +28,7 @@ public class PersonalityTestResultActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_personality_test_result);
+        setContentView(R.layout.fragment_personality_test_result);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);

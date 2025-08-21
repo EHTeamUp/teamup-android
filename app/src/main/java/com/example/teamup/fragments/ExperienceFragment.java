@@ -53,6 +53,7 @@ public class ExperienceFragment extends Fragment {
     public interface ExperienceFragmentListener {
         void onBackPressed();
         void onExperienceUpdated();
+        void onFormContentChanged(boolean hasContent); // form 내용 변경 감지
     }
     
     private ExperienceFragmentListener listener;
@@ -278,6 +279,9 @@ public class ExperienceFragment extends Fragment {
         
         llExperienceFormsContainer.addView(formView);
         experienceFormViews.add(formView);
+        
+        // form 내용 변경 감지 리스너 추가
+        setupFormChangeListeners(formView);
     }
     
     private void removeExperienceForm(View formView) {
@@ -297,6 +301,84 @@ public class ExperienceFragment extends Fragment {
             Button btnAddForm = lastForm.findViewById(R.id.btn_add_experience_form);
             btnAddForm.setVisibility(View.VISIBLE);
             btnAddForm.setOnClickListener(v -> addExperienceForm());
+        }
+        
+        // form 내용 변경 감지
+        checkFormContentAndNotify();
+    }
+    
+    /**
+     * form 내용 변경 감지 리스너 설정
+     */
+    private void setupFormChangeListeners(View formView) {
+        EditText etContestName = formView.findViewById(R.id.et_contest_name_additional);
+        Spinner spinnerCategory = formView.findViewById(R.id.spinner_category);
+        EditText etDate = formView.findViewById(R.id.et_date_additional);
+        CheckBox cbAwardReceived = formView.findViewById(R.id.cb_award_received);
+        EditText etDescription = formView.findViewById(R.id.et_description_additional);
+        
+        // 텍스트 변경 리스너
+        android.text.TextWatcher textWatcher = new android.text.TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                checkFormContentAndNotify();
+            }
+            
+            @Override
+            public void afterTextChanged(android.text.Editable s) {}
+        };
+        
+        etContestName.addTextChangedListener(textWatcher);
+        etDate.addTextChangedListener(textWatcher);
+        etDescription.addTextChangedListener(textWatcher);
+        
+        // 스피너 변경 리스너
+        spinnerCategory.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(android.widget.AdapterView<?> parent, View view, int position, long id) {
+                checkFormContentAndNotify();
+            }
+            
+            @Override
+            public void onNothingSelected(android.widget.AdapterView<?> parent) {}
+        });
+        
+        // 체크박스 변경 리스너
+        cbAwardReceived.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            checkFormContentAndNotify();
+        });
+    }
+    
+    /**
+     * form 내용이 있는지 확인하고 리스너에 알림
+     */
+    private void checkFormContentAndNotify() {
+        boolean hasContent = false;
+        
+        for (View formView : experienceFormViews) {
+            EditText etContestName = formView.findViewById(R.id.et_contest_name_additional);
+            Spinner spinnerCategory = formView.findViewById(R.id.spinner_category);
+            EditText etDate = formView.findViewById(R.id.et_date_additional);
+            CheckBox cbAwardReceived = formView.findViewById(R.id.cb_award_received);
+            EditText etDescription = formView.findViewById(R.id.et_description_additional);
+            
+            // 하나라도 내용이 있으면 hasContent = true
+            if (!etContestName.getText().toString().trim().isEmpty() ||
+                spinnerCategory.getSelectedItemPosition() > 0 || // "카테고리 선택"이 아닌 경우
+                !etDate.getText().toString().trim().isEmpty() ||
+                cbAwardReceived.isChecked() ||
+                !etDescription.getText().toString().trim().isEmpty()) {
+                hasContent = true;
+                break;
+            }
+        }
+        
+        // 리스너에 알림
+        if (listener != null) {
+            listener.onFormContentChanged(hasContent);
         }
     }
     
@@ -448,16 +530,64 @@ public class ExperienceFragment extends Fragment {
             String date = etDate.getText().toString().trim();
             String description = etDescription.getText().toString().trim();
             
-            if (!contestName.isEmpty() && !category.isEmpty() && !date.isEmpty()) {
+            // 모든 필수 필드가 입력되었는지 확인
+            // "카테고리 선택"은 빈 값으로 처리
+            if (!contestName.isEmpty() && 
+                !category.equals("카테고리 선택") && 
+                !date.isEmpty() && 
+                !description.isEmpty()) {
+                
                 Experience experience = new Experience();
-                experience.setAwardName(contestName);
+                experience.setContestName(contestName);  // contest_name 필드에 설정
+                experience.setAwardName(contestName);    // award_name 필드에도 동일한 값 설정
                 experience.setHostOrganization(category);
                 experience.setAwardDate(date);
                 experience.setDescription(description);
+                
+                // 카테고리별 filter_id 매핑
+                int filterId = getFilterIdByCategory(category);
+                experience.setFilterId(filterId);
+                
                 selectedExperiences.add(experience);
             }
         }
         
         return selectedExperiences;
+    }
+    
+    /**
+     * form에 내용이 있는지 확인 (모든 form 검사)
+     */
+    public boolean hasAnyFormContent() {
+        for (View formView : experienceFormViews) {
+            EditText etContestName = formView.findViewById(R.id.et_contest_name_additional);
+            Spinner spinnerCategory = formView.findViewById(R.id.spinner_category);
+            EditText etDate = formView.findViewById(R.id.et_date_additional);
+            CheckBox cbAwardReceived = formView.findViewById(R.id.cb_award_received);
+            EditText etDescription = formView.findViewById(R.id.et_description_additional);
+            
+            String contestName = etContestName.getText().toString().trim();
+            String category = spinnerCategory.getSelectedItem().toString();
+            String date = etDate.getText().toString().trim();
+            String description = etDescription.getText().toString().trim();
+            
+            // 하나라도 내용이 있으면 true 반환
+            if (!contestName.isEmpty() || 
+                !category.equals("카테고리 선택") || 
+                !date.isEmpty() || 
+                !description.isEmpty() ||
+                cbAwardReceived.isChecked()) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    /**
+     * form view 리스트 반환
+     */
+    public List<View> getExperienceFormViews() {
+        return experienceFormViews;
     }
 }

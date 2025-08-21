@@ -3,8 +3,13 @@ package com.example.teamup.auth;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import androidx.fragment.app.Fragment;
+import com.google.android.material.button.MaterialButton;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -22,6 +27,8 @@ public class SignupTestBaseActivity extends AppCompatActivity {
     private String userId;
     private TextView btnPrevious, btnNext;
 
+
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,6 +42,9 @@ public class SignupTestBaseActivity extends AppCompatActivity {
         }
         
         initViews();
+        
+        // 기본적으로 성향 테스트 시작 화면 표시
+        showPersonalityTestFragment();
     }
     
     private void initViews() {
@@ -46,8 +56,18 @@ public class SignupTestBaseActivity extends AppCompatActivity {
     }
     
     private void proceedToNextStep() {
-        // 사용자의 성향 테스트 완료 여부 확인
-        checkPersonalityTestCompletion();
+        // 현재 표시된 Fragment가 PersonalityTestResultFragment인지 확인
+        Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        
+        if (currentFragment instanceof com.example.teamup.personality.PersonalityTestResultFragment) {
+            // 성향 테스트 결과가 표시된 경우: 회원가입 완료 단계로 이동
+            Intent intent = new Intent(SignupTestBaseActivity.this, com.example.teamup.auth.SignupFinishActivity.class);
+            intent.putExtra("userId", userId);
+            startActivity(intent);
+        } else {
+            // 성향 테스트 결과가 표시되지 않은 경우: 완료 여부 확인
+            Toast.makeText(this, "테스트를 모두 진행해야 해요.", Toast.LENGTH_SHORT).show();
+        }
     }
     
     private void checkPersonalityTestCompletion() {
@@ -69,13 +89,9 @@ public class SignupTestBaseActivity extends AppCompatActivity {
                             intent.putExtra("fromSignup", true);
                             startActivity(intent);
                         } else {
-                            // 성향 테스트가 완료되지 않은 경우: 테스트 시작 화면으로 이동
+                            // 성향 테스트가 완료되지 않은 경우: Fragment로 테스트 시작 화면 표시
                             Log.d(TAG, "성향 테스트 미완료: " + response.code());
-                            
-                            Intent intent = new Intent(SignupTestBaseActivity.this, com.example.teamup.personality.MainPersonalityTestActivity.class);
-                            intent.putExtra("userId", userId);
-                            intent.putExtra("fromSignup", true);
-                            startActivity(intent);
+                            showPersonalityTestFragment();
                         }
                     }
                     
@@ -84,16 +100,84 @@ public class SignupTestBaseActivity extends AppCompatActivity {
                         Log.e(TAG, "성향 테스트 완료 여부 확인 실패: " + t.getMessage());
                         Toast.makeText(SignupTestBaseActivity.this, "테스트를 모두 진행해야 해요.", Toast.LENGTH_SHORT).show();
                         
-                        // 네트워크 오류 시에도 테스트 시작 화면으로 이동
-                        Intent intent = new Intent(SignupTestBaseActivity.this, com.example.teamup.personality.MainPersonalityTestActivity.class);
-                        intent.putExtra("userId", userId);
-                        intent.putExtra("fromSignup", true);
-                        startActivity(intent);
+                        // 네트워크 오류 시에도 Fragment로 테스트 시작 화면 표시
+                        showPersonalityTestFragment();
                     }
                 });
     }
     
+    /**
+     * 성향 테스트 시작 화면 표시
+     */
+    private void showPersonalityTestFragment() {
+        // MainPersonalityTestActivity를 Fragment로 표시하기 위해 View 생성
+        View personalityTestView = LayoutInflater.from(this).inflate(R.layout.fragment_main_personality_test, null);
+        
+        // 시작 버튼 클릭 리스너 설정
+        MaterialButton btnStart = personalityTestView.findViewById(R.id.btn_start);
+        btnStart.setOnClickListener(v -> {
+            // PersonalityTestQuestionFragment로 교체
+            showPersonalityTestQuestionFragment();
+        });
+        
+        // Fragment 컨테이너에 View 추가
+        FrameLayout fragmentContainer = findViewById(R.id.fragment_container);
+        fragmentContainer.removeAllViews();
+        fragmentContainer.addView(personalityTestView);
+    }
+    
     private void goToPreviousStep() {
         finish(); // 이전 Activity로 돌아가기
+    }
+    
+    /**
+     * 성향 테스트 완료 시 호출되는 메서드 (Fragment에서 호출)
+     */
+    public void onPersonalityTestCompleted(String personalityType, String personalityTraits) {
+        showPersonalityTestResultFragment(personalityType, personalityTraits);
+    }
+    
+    /**
+     * 성향 테스트 질문 Fragment 표시
+     */
+    private void showPersonalityTestQuestionFragment() {
+        // PersonalityTestQuestionFragment 생성
+        com.example.teamup.personality.PersonalityTestQuestionFragment fragment = 
+            new com.example.teamup.personality.PersonalityTestQuestionFragment();
+        
+        // Bundle로 데이터 전달
+        Bundle args = new Bundle();
+        args.putString("userId", userId);
+        args.putBoolean("fromSignup", true);
+        fragment.setArguments(args);
+        
+        // Fragment 교체
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragment_container, fragment)
+                .addToBackStack(null) // 뒤로가기 스택에 추가
+                .commit();
+    }
+    
+    /**
+     * 성향 테스트 결과 Fragment 표시
+     */
+    private void showPersonalityTestResultFragment(String personalityType, String personalityTraits) {
+        // PersonalityTestResultFragment 생성
+        com.example.teamup.personality.PersonalityTestResultFragment fragment = 
+            new com.example.teamup.personality.PersonalityTestResultFragment();
+        
+        // Bundle로 데이터 전달
+        Bundle args = new Bundle();
+        args.putString("personalityType", personalityType);
+        args.putString("personalityTraitsJson", personalityTraits);
+        fragment.setArguments(args);
+        
+        // Fragment 교체
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragment_container, fragment)
+                .addToBackStack(null) // 뒤로가기 스택에 추가
+                .commit();
     }
 }

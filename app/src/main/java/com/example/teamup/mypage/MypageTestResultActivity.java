@@ -9,9 +9,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import com.example.teamup.MainActivity;
-import com.example.teamup.MainActivity;
 import com.example.teamup.R;
-import com.example.teamup.personality.PersonalityTestResultActivity;
 
 public class MypageTestResultActivity extends AppCompatActivity {
 
@@ -21,7 +19,7 @@ public class MypageTestResultActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_personality_test_result);
+        setContentView(R.layout.fragment_personality_test_result);
 
         initViews();
         setClickListeners();

@@ -19,11 +19,12 @@ public class PersonalityTestResultFragment extends Fragment {
 
     private String personalityType;
     private PersonalityTraits personalityTraits;
+    private String personalityTraitsJson;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.activity_personality_test_result, container, false);
+        return inflater.inflate(R.layout.fragment_personality_test_result, container, false);
     }
 
     @Override
@@ -35,9 +36,11 @@ public class PersonalityTestResultFragment extends Fragment {
         if (args != null) {
             personalityType = args.getString("personalityType", "CAREFUL_SUPPORTER");
             personalityTraits = (PersonalityTraits) args.getSerializable("personalityTraits");
+            personalityTraitsJson = args.getString("personalityTraitsJson", "");
         } else {
             personalityType = "CAREFUL_SUPPORTER"; // 기본값
             personalityTraits = null;
+            personalityTraitsJson = "";
         }
 
         // 결과 표시
