@@ -3,28 +3,44 @@ package com.example.teamup.recruitment;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
+import com.example.teamup.api.model.ApplicationResponse;
 import com.example.teamup.databinding.ItemContestRecruitmentMemberBinding;
-import java.util.List;
+import java.util.Objects;
 
-public class TeamMemberAdapter extends RecyclerView.Adapter<TeamMemberAdapter.ViewHolder> {
+public class TeamMemberAdapter extends ListAdapter<ApplicationResponse, TeamMemberAdapter.ViewHolder> {
 
-    private final List<TeamMember> members;
+    private OnMemberClickListener listener;
 
-    public TeamMemberAdapter(List<TeamMember> members) {
-        this.members = members;
+    public interface OnMemberClickListener {
+        void onMemberClick(String userId);
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        private final ItemContestRecruitmentMemberBinding binding;
-        public ViewHolder(ItemContestRecruitmentMemberBinding binding) {
-            super(binding.getRoot());
-            this.binding = binding;
-        }
-        public void bind(TeamMember member) {
-            binding.tvButtonText.setText(member.getName());
-        }
+    public void setOnMemberClickListener(OnMemberClickListener listener) {
+        this.listener = listener;
     }
+
+    // ListAdapter는 생성자에서 리스트를 받지 않습니다.
+    public TeamMemberAdapter() {
+        super(DIFF_CALLBACK);
+    }
+
+    // DiffUtil.ItemCallback 구현
+    private static final DiffUtil.ItemCallback<ApplicationResponse> DIFF_CALLBACK = new DiffUtil.ItemCallback<ApplicationResponse>() {
+        @Override
+        public boolean areItemsTheSame(@NonNull ApplicationResponse oldItem, @NonNull ApplicationResponse newItem) {
+            // 각 아이템의 고유 ID를 비교합니다. 여기서는 userId를 사용합니다.
+            return oldItem.getUserId().equals(newItem.getUserId());
+        }
+
+        @Override
+        public boolean areContentsTheSame(@NonNull ApplicationResponse oldItem, @NonNull ApplicationResponse newItem) {
+            // 아이템의 내용이 같은지 비교합니다.
+            return Objects.equals(oldItem, newItem); // ApplicationResponse에 equals()가 구현되어 있어야 최적입니다.
+        }
+    };
 
     @NonNull
     @Override
@@ -35,11 +51,26 @@ public class TeamMemberAdapter extends RecyclerView.Adapter<TeamMemberAdapter.Vi
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.bind(members.get(position));
+        holder.bind(getItem(position));
     }
 
-    @Override
-    public int getItemCount() {
-        return members.size();
+    class ViewHolder extends RecyclerView.ViewHolder {
+        private final ItemContestRecruitmentMemberBinding binding;
+
+        public ViewHolder(ItemContestRecruitmentMemberBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
+
+            itemView.setOnClickListener(v -> {
+                int position = getAdapterPosition();
+                if (listener != null && position != RecyclerView.NO_POSITION) {
+                    listener.onMemberClick(getItem(position).getUserId());
+                }
+            });
+        }
+
+        public void bind(ApplicationResponse member) {
+            binding.tvButtonText.setText(member.getUserId());
+        }
     }
 }
