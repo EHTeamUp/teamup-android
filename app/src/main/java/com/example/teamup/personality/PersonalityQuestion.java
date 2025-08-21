@@ -20,12 +20,25 @@ public class PersonalityQuestion {
     private String question;
     private String optionA;
     private String optionB;
+    private int optionAId;  // A 옵션의 실제 ID
+    private int optionBId;  // B 옵션의 실제 ID
 
     public PersonalityQuestion(int id, String question, String optionA, String optionB) {
         this.id = id;
         this.question = question;
         this.optionA = optionA;
         this.optionB = optionB;
+        this.optionAId = 1;  // 기본값
+        this.optionBId = 2;  // 기본값
+    }
+    
+    public PersonalityQuestion(int id, String question, String optionA, String optionB, int optionAId, int optionBId) {
+        this.id = id;
+        this.question = question;
+        this.optionA = optionA;
+        this.optionB = optionB;
+        this.optionAId = optionAId;
+        this.optionBId = optionBId;
     }
 
     public int getId() {
@@ -42,6 +55,14 @@ public class PersonalityQuestion {
 
     public String getOptionB() {
         return optionB;
+    }
+    
+    public int getOptionAId() {
+        return optionAId;
+    }
+    
+    public int getOptionBId() {
+        return optionBId;
     }
 
     /**

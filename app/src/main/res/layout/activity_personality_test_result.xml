@@ -61,14 +61,14 @@
                 android:textSize="24sp"
                 android:layout_marginEnd="8dp" />
 
-            <TextView
-                android:id="@+id/tv_result_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="계획형 / 분석형"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:textColor="@android:color/black" />
+                         <TextView
+                 android:id="@+id/tv_result_title"
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:text="당신은 전략 리더!"
+                 android:textSize="20sp"
+                 android:textStyle="bold"
+                 android:textColor="@android:color/black" />
 
         </LinearLayout>
 
@@ -85,7 +85,7 @@
                 android:orientation="vertical"
                 android:padding="20dp">
 
-                <!-- Description Item 1 -->
+                <!-- 프로필 코드 -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -99,17 +99,18 @@
                         android:layout_marginEnd="12dp"
                         android:layout_gravity="center_vertical" />
 
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="당신은 꼼꼼하고 체계적인 전략가"
-                        android:textColor="@android:color/black"
-                        android:textSize="14sp" />
+                                         <TextView
+                         android:id="@+id/tv_card_profile_code"
+                         android:layout_width="0dp"
+                         android:layout_height="wrap_content"
+                         android:layout_weight="1"
+                         android:text="프로필 코드: STRATEGIC_LEADER"
+                         android:textColor="@android:color/black"
+                         android:textSize="14sp" />
 
                 </LinearLayout>
 
-                <!-- Description Item 2 -->
+                <!-- 설명 -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -123,41 +124,18 @@
                         android:layout_marginEnd="12dp"
                         android:layout_gravity="center_vertical" />
 
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="늘 계획을 세우고, 효율적인 길을 찾아요."
-                        android:textColor="@android:color/black"
-                        android:textSize="14sp" />
+                                         <TextView
+                         android:id="@+id/tv_card_description"
+                         android:layout_width="0dp"
+                         android:layout_height="wrap_content"
+                         android:layout_weight="1"
+                         android:text="설명: 계획적이고 꼼꼼한 리더"
+                         android:textColor="@android:color/black"
+                         android:textSize="14sp" />
 
                 </LinearLayout>
 
-                <!-- Description Item 3 -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginBottom="12dp">
-
-                    <TextView
-                        android:layout_width="12dp"
-                        android:layout_height="12dp"
-                        android:background="@drawable/bullet_point"
-                        android:layout_marginEnd="12dp"
-                        android:layout_gravity="center_vertical" />
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="주변 사람들에게 믿음직한 조력자가 되어주죠."
-                        android:textColor="@android:color/black"
-                        android:textSize="14sp" />
-
-                </LinearLayout>
-
-                <!-- Description Item 4 -->
+                <!-- 특성 -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -171,10 +149,11 @@
                         android:layout_gravity="center_vertical" />
 
                     <TextView
+                        android:id="@+id/tv_card_traits"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="하지만 가끔은 예상치 못한 변화에도 열려 있는 유연함이 필요해요!"
+                        android:text="특성: LEADER, MORNING, ANALYTIC, QUALITY"
                         android:textColor="@android:color/black"
                         android:textSize="14sp" />
 
