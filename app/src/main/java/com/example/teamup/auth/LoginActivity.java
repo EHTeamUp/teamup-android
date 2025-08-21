@@ -18,6 +18,7 @@ import com.example.teamup.R;
 import com.example.teamup.api.RetrofitClient;
 import com.example.teamup.api.model.LoginRequest;
 import com.example.teamup.api.model.LoginResponse;
+import com.example.teamup.notification.FcmTokenManager;
 import com.google.android.material.button.MaterialButton;
 
 import retrofit2.Call;
@@ -126,6 +127,9 @@ public class LoginActivity extends AppCompatActivity {
                             
                             // 로그인 상태 업데이트
                             LoginManager.setLoggedIn(true);
+                            
+                            // FCM 토큰을 서버에 전송
+                            FcmTokenManager.getInstance(LoginActivity.this).sendFcmTokenOnLogin();
                             
                             // 성공 메시지 표시
                             Toast.makeText(LoginActivity.this, R.string.login_success, Toast.LENGTH_SHORT).show();

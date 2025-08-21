@@ -19,6 +19,9 @@ import com.example.teamup.fragment.ContestFragment;
 import com.example.teamup.fragment.BoardFragment;
 import com.example.teamup.fragment.ProfileFragment;
 import com.example.teamup.applicant.ApplicantListFragment;
+import com.example.teamup.recruitment.TeamSynergyScoreFragment;
+import com.example.teamup.notification.FcmTokenManager;
+import com.example.teamup.notification.NotificationPermissionHelper;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
@@ -39,9 +42,15 @@ public class MainActivity extends AppCompatActivity {
         // TokenManager 초기화
         tokenManager = TokenManager.getInstance(this);
 
+        // FCM 토큰 매니저 초기화
+        FcmTokenManager.getInstance(this);
+
+        // 알림 권한 요청
+        NotificationPermissionHelper.requestNotificationPermission(this);
+
         // Setup Bottom Navigation
         BottomNavigationView navView = findViewById(R.id.bottom_navigation);
-        
+
         // Intent에서 Fragment 로드 요청 확인
         Intent intent = getIntent();
         if (intent != null && intent.hasExtra("FRAGMENT_TO_LOAD")) {
@@ -49,6 +58,10 @@ public class MainActivity extends AppCompatActivity {
             if ("ApplicantListFragment".equals(fragmentToLoad)) {
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.fragment_container, new ApplicantListFragment())
+                        .commit();
+            } else if ("TeamSynergyScoreFragment".equals(fragmentToLoad)) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, new TeamSynergyScoreFragment())
                         .commit();
             }
         } else {
@@ -59,12 +72,12 @@ public class MainActivity extends AppCompatActivity {
                         .commit();
             }
         }
-        
+
         // Setup navigation listener
         navView.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
             Fragment selectedFragment = null;
-            
+
             if (itemId == R.id.navigation_profile) {
                 // 마이페이지는 ProfileFragment로 처리
                 selectedFragment = new ProfileFragment();
@@ -75,14 +88,14 @@ public class MainActivity extends AppCompatActivity {
             } else if (itemId == R.id.navigation_board) {
                 selectedFragment = new BoardFragment();
             }
-            
+
             if (selectedFragment != null) {
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.fragment_container, selectedFragment)
                         .commit();
                 return true;
             }
-            
+
             return false;
         });
     }

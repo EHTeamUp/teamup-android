@@ -13,6 +13,7 @@ import com.example.teamup.api.model.PersonalityTestRequest;
 import com.example.teamup.api.model.PersonalityTestResponse;
 import com.example.teamup.api.model.SynergyAnalysisRequest;
 import com.example.teamup.api.model.SynergyAnalysisResponse;
+import com.example.teamup.api.model.FcmTokenRequest;
 
 import java.util.List;
 
@@ -90,4 +91,11 @@ public interface ApiService {
      */
     @POST("api/v1/synergy/analyze")
     Call<SynergyAnalysisResponse> analyzeSynergy(@Body SynergyAnalysisRequest request);
+    
+    /**
+     * FCM 토큰 업데이트 API
+     * PUT /api/v1/notifications/fcm-token
+     */
+    @PUT("api/v1/notifications/fcm-token")
+    Call<String> updateFcmToken(@Body FcmTokenRequest request);
 }
