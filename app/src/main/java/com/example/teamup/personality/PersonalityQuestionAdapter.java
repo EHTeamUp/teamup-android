@@ -45,6 +45,10 @@ public class PersonalityQuestionAdapter extends RecyclerView.Adapter<Personality
     public int getItemCount() {
         return questions.size();
     }
+    
+    public void updateQuestions(List<PersonalityQuestion> newQuestions) {
+        this.questions = newQuestions;
+    }
 
     public class QuestionViewHolder extends RecyclerView.ViewHolder {
         private TextView tvQuestion;

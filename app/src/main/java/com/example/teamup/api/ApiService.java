@@ -169,4 +169,19 @@ public interface ApiService {
      */
     @GET("api/v1/profile/experiences")
     Call<List<Experience>> getUserExperiences(@Header("Authorization") String authorization);
+    
+    // ===== 성향 테스트 관련 API =====
+    
+    /**
+     * 성향 테스트 문제 조회
+     * GET /api/v1/personality/questions
+     */
+    @GET("api/v1/personality/questions")
+    Call<PersonalityQuestionResponse> getPersonalityQuestions();
+    
+    @GET("api/v1/personality/user-profile/{user_id}")
+    Call<PersonalityProfileResponse> getUserPersonalityProfile(@Path("user_id") String userId);
+    
+    @POST("api/v1/personality/test")
+    Call<PersonalityProfileResponse> submitPersonalityTest(@Body PersonalityTestSubmitRequest request);
 }

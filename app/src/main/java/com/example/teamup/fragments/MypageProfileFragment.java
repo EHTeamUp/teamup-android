@@ -25,8 +25,14 @@ import com.example.teamup.api.model.UserSkillsResponse;
 import com.example.teamup.api.model.Skill;
 import com.example.teamup.api.model.Role;
 
-import com.example.teamup.personality.PersonalityTestQuestionActivity;
-import com.example.teamup.personality.PersonalityTestResultActivity;
+import com.example.teamup.personality.PersonalityTestQuestionFragment;
+import com.example.teamup.personality.PersonalityTestResultFragment;
+import com.example.teamup.api.model.PersonalityProfileResponse;
+import com.example.teamup.api.model.PersonalityTraits;
+import com.example.teamup.api.RetrofitClient;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import java.util.List;
 
@@ -41,7 +47,7 @@ public class MypageProfileFragment extends Fragment {
     private LinearLayout llTeamTendency;
     
     // 프로필 정보 표시용 TextView들
-    private TextView tvUserId, tvUserSkillsAndRoles, tvUserExperiences;
+    private TextView tvUserId, tvUserSkillsAndRoles, tvUserExperiences, tvTeamTendency;
     
     // Manager 인스턴스들
     private TokenManager tokenManager;
@@ -85,6 +91,7 @@ public class MypageProfileFragment extends Fragment {
         tvUserId = view.findViewById(R.id.tv_user_id);
         tvUserSkillsAndRoles = view.findViewById(R.id.tv_user_skills_and_roles);
         tvUserExperiences = view.findViewById(R.id.tv_user_experiences);
+        tvTeamTendency = view.findViewById(R.id.tv_team_tendency);
     }
 
     /**
@@ -102,6 +109,9 @@ public class MypageProfileFragment extends Fragment {
         
         // 경험 정보 로드
         loadUserExperiences();
+        
+        // 사용자 성향 정보 로드
+        loadUserPersonalityInfo();
     }
 
     /**
@@ -468,20 +478,111 @@ public class MypageProfileFragment extends Fragment {
         llTeamTendency.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // 성향 테스트 이력 확인
-                if (hasPersonalityTestResult()) {
-                    // 성향 테스트 결과가 있으면 결과 화면으로 이동
-                    Intent intent = new Intent(requireContext(), PersonalityTestResultActivity.class);
-                    startActivity(intent);
-                } else {
-                    // 성향 테스트 결과가 없으면 테스트 화면으로 이동
-                    Intent intent = new Intent(requireContext(), PersonalityTestQuestionActivity.class);
-                    startActivity(intent);
+                // 성향 테스트 Fragment로 이동
+                if (getActivity() instanceof MainActivity) {
+                    // 사용자 성향 프로필 조회
+                    loadUserPersonalityProfile();
                 }
             }
         });
     }
 
+    private void loadUserPersonalityInfo() {
+        // 현재 로그인된 사용자 ID 가져오기
+        String userId = tokenManager.getUserId();
+        
+        RetrofitClient.getInstance()
+                .getApiService()
+                .getUserPersonalityProfile(userId)
+                .enqueue(new Callback<PersonalityProfileResponse>() {
+                    @Override
+                    public void onResponse(Call<PersonalityProfileResponse> call, Response<PersonalityProfileResponse> response) {
+                        if (response.isSuccessful() && response.body() != null) {
+                            PersonalityProfileResponse profile = response.body();
+                            Log.d("MypageProfileFragment", "성향 정보 로드 성공: " + profile.getProfileCode());
+                            
+                            // UI 업데이트
+                            if (getActivity() != null) {
+                                getActivity().runOnUiThread(() -> {
+                                    if (tvTeamTendency != null) {
+                                        tvTeamTendency.setText(profile.getProfileCode());
+                                    }
+                                });
+                            }
+                        } else {
+                            Log.e("MypageProfileFragment", "성향 정보 로드 실패: " + response.code());
+                            // 성향 정보가 없으면 "미완료" 표시
+                            if (getActivity() != null) {
+                                getActivity().runOnUiThread(() -> {
+                                    if (tvTeamTendency != null) {
+                                        tvTeamTendency.setText("미완료");
+                                    }
+                                });
+                            }
+                        }
+                    }
+                    
+                    @Override
+                    public void onFailure(Call<PersonalityProfileResponse> call, Throwable t) {
+                        Log.e("MypageProfileFragment", "성향 정보 로드 네트워크 오류: " + t.getMessage());
+                        // 네트워크 오류 시 "미완료" 표시
+                        if (getActivity() != null) {
+                            getActivity().runOnUiThread(() -> {
+                                if (tvTeamTendency != null) {
+                                    tvTeamTendency.setText("미완료");
+                                }
+                            });
+                        }
+                    }
+                });
+    }
+    
+    private void loadUserPersonalityProfile() {
+        // 현재 로그인된 사용자 ID 가져오기
+        String userId = tokenManager.getUserId();
+        
+        RetrofitClient.getInstance()
+                .getApiService()
+                .getUserPersonalityProfile(userId)
+                .enqueue(new Callback<PersonalityProfileResponse>() {
+                    @Override
+                    public void onResponse(Call<PersonalityProfileResponse> call, Response<PersonalityProfileResponse> response) {
+                        if (response.isSuccessful() && response.body() != null) {
+                            PersonalityProfileResponse profile = response.body();
+                            Log.d("MypageProfileFragment", "성향 프로필 조회 성공: " + profile.getProfileCode());
+                            
+                            // 성향 테스트 결과 Fragment로 이동
+                            PersonalityTestResultFragment resultFragment = new PersonalityTestResultFragment();
+                            Bundle args = new Bundle();
+                            args.putString("personalityType", profile.getProfileCode());
+                            args.putSerializable("personalityTraits", profile.getTraitsJson());
+                            resultFragment.setArguments(args);
+                            
+                            if (getActivity() instanceof MainActivity) {
+                                ((MainActivity) getActivity()).showFragment(resultFragment);
+                            }
+                        } else {
+                            Log.e("MypageProfileFragment", "성향 프로필 조회 실패: " + response.code());
+                            // 성향 테스트 결과가 없으면 테스트 Fragment로 이동
+                            PersonalityTestQuestionFragment questionFragment = new PersonalityTestQuestionFragment();
+                            if (getActivity() instanceof MainActivity) {
+                                ((MainActivity) getActivity()).showFragment(questionFragment);
+                            }
+                        }
+                    }
+                    
+                    @Override
+                    public void onFailure(Call<PersonalityProfileResponse> call, Throwable t) {
+                        Log.e("MypageProfileFragment", "성향 프로필 조회 네트워크 오류: " + t.getMessage());
+                        // 네트워크 오류 시 테스트 Fragment로 이동
+                        PersonalityTestQuestionFragment questionFragment = new PersonalityTestQuestionFragment();
+                        if (getActivity() instanceof MainActivity) {
+                            ((MainActivity) getActivity()).showFragment(questionFragment);
+                        }
+                    }
+                });
+    }
+    
     private boolean hasPersonalityTestResult() {
         // TODO: 실제로는 데이터베이스나 SharedPreferences에서 사용자의 성향 테스트 결과 여부를 확인
         // 현재는 임시로 false를 반환 (테스트를 위해 필요시 true로 변경)
