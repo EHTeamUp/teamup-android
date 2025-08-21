@@ -1,17 +1,22 @@
 package com.example.teamup.recruitment;
 
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
-import com.example.teamup.api.model.ContestInformation;
-import com.example.teamup.databinding.ItemTeamRecruitmentBinding;
-import java.util.Locale;
-import java.util.Objects;
 
-public class TeamRecruitmentAdapter extends ListAdapter<RecruitmentPostItem, TeamRecruitmentAdapter.ViewHolder> {
+import com.example.teamup.api.model.RecruitmentPostDTO;
+import com.example.teamup.databinding.ItemTeamRecruitmentBinding;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.util.Locale;
+
+public class TeamRecruitmentAdapter extends ListAdapter<RecruitmentPostDTO, TeamRecruitmentAdapter.ViewHolder> {
 
     private OnItemClickListener listener;
 
@@ -27,19 +32,16 @@ public class TeamRecruitmentAdapter extends ListAdapter<RecruitmentPostItem, Tea
         super(DIFF_CALLBACK);
     }
 
-    private static final DiffUtil.ItemCallback<RecruitmentPostItem> DIFF_CALLBACK = new DiffUtil.ItemCallback<RecruitmentPostItem>() {
+    private static final DiffUtil.ItemCallback<RecruitmentPostDTO> DIFF_CALLBACK = new DiffUtil.ItemCallback<RecruitmentPostDTO>() {
         @Override
-        public boolean areItemsTheSame(@NonNull RecruitmentPostItem oldItem, @NonNull RecruitmentPostItem newItem) {
+        public boolean areItemsTheSame(@NonNull RecruitmentPostDTO oldItem, @NonNull RecruitmentPostDTO newItem) {
             return oldItem.getRecruitmentPostId() == newItem.getRecruitmentPostId();
         }
 
         @Override
-        public boolean areContentsTheSame(@NonNull RecruitmentPostItem oldItem, @NonNull RecruitmentPostItem newItem) {
-            // RecruitmentPostItem에 equals()를 구현하거나, 모든 필드를 수동으로 비교합니다.
-            return Objects.equals(oldItem.getTitle(), newItem.getTitle()) &&
-                    Objects.equals(oldItem.getUserId(), newItem.getUserId()) &&
-                    oldItem.getCurrentMembers() == newItem.getCurrentMembers() &&
-                    oldItem.getRecruitmentCount() == newItem.getRecruitmentCount();
+        public boolean areContentsTheSame(@NonNull RecruitmentPostDTO oldItem, @NonNull RecruitmentPostDTO newItem) {
+            // DTO 클래스에 equals()가 구현되어 있어야 합니다.
+            return oldItem.equals(newItem);
         }
     };
 
@@ -69,19 +71,39 @@ public class TeamRecruitmentAdapter extends ListAdapter<RecruitmentPostItem, Tea
             });
         }
 
-        public void bind(RecruitmentPostItem item) {
-            ContestInformation contestInfo = item.getContestInformation();
-            if (contestInfo != null) {
-                binding.titleText.setText(contestInfo.getName());
-                binding.dDayText.setText(contestInfo.getdDayText());
-            } else {
-                binding.titleText.setText("공모전 정보 로딩 중...");
-                binding.dDayText.setText("D-?");
-            }
+        public void bind(RecruitmentPostDTO post) {
+            binding.titleText.setText(post.getTitle());
+            binding.organizerText.setText("모집자: " + post.getUserId());
 
-            binding.organizerText.setText("모집자: " + item.getUserId());
-            String peopleInfo = String.format(Locale.getDefault(), "모집 인원: %d / %d", item.getCurrentMembers(), item.getRecruitmentCount());
+            String peopleInfo = String.format(Locale.getDefault(), "모집 인원: %d / %d",
+                    post.getAcceptedCount(), post.getRecruitmentCount());
             binding.peopleText.setText(peopleInfo);
+
+            // D-Day 계산 로직을 ViewHolder 안으로 가져옵니다.
+            binding.dDayText.setText(calculateDday(post.getDueDate()));
+        }
+
+        private String calculateDday(String dueDateString) {
+            if (dueDateString == null || dueDateString.isEmpty()) {
+                return "-";
+            }
+            try {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                LocalDate dueDate = LocalDate.parse(dueDateString, formatter);
+                LocalDate today = LocalDate.now();
+                long daysRemaining = ChronoUnit.DAYS.between(today, dueDate);
+
+                if (daysRemaining < 0) {
+                    return "마감";
+                } else if (daysRemaining == 0) {
+                    return "D-Day";
+                } else {
+                    return "D-" + daysRemaining;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                return "-";
+            }
         }
     }
 }
