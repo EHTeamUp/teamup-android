@@ -197,6 +197,12 @@ public class MainActivity extends AppCompatActivity implements ExperienceFragmen
         showMypageProfileFragment();
     }
     
+    @Override
+    public void onFormContentChanged(boolean hasContent) {
+        // MainActivity에서는 사용하지 않음 (마이페이지 모드에서만 사용)
+        // 회원가입 모드에서만 사용되는 기능
+    }
+    
     /**
      * MypageProfileFragment 표시
      */

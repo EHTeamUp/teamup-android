@@ -52,7 +52,7 @@ public class PersonalityQuestionAdapter extends RecyclerView.Adapter<Personality
 
     public class QuestionViewHolder extends RecyclerView.ViewHolder {
         private TextView tvQuestion;
-        private MaterialButton btnOptionA, btnOptionB, btnOptionC, btnOptionD;
+        private MaterialButton btnOptionA, btnOptionB;
         private int currentPosition;
 
         public QuestionViewHolder(@NonNull View itemView) {
@@ -60,36 +60,22 @@ public class PersonalityQuestionAdapter extends RecyclerView.Adapter<Personality
             tvQuestion = itemView.findViewById(R.id.tv_question);
             btnOptionA = itemView.findViewById(R.id.btn_option_a);
             btnOptionB = itemView.findViewById(R.id.btn_option_b);
-            btnOptionC = itemView.findViewById(R.id.btn_option_c);
-            btnOptionD = itemView.findViewById(R.id.btn_option_d);
 
             btnOptionA.setOnClickListener(v -> {
-                selectOption(btnOptionA, btnOptionB, btnOptionC, btnOptionD);
+                selectOption(btnOptionA, btnOptionB);
                 if (listener != null) {
-                    listener.onOptionSelected(currentPosition, "A", questions.get(currentPosition).getTypeA());
+                    listener.onOptionSelected(currentPosition, questions.get(currentPosition).getOptionA(), questions.get(currentPosition).getTypeA());
                 }
             });
 
             btnOptionB.setOnClickListener(v -> {
-                selectOption(btnOptionB, btnOptionA, btnOptionC, btnOptionD);
+                selectOption(btnOptionB, btnOptionA);
                 if (listener != null) {
-                    listener.onOptionSelected(currentPosition, "B", questions.get(currentPosition).getTypeB());
+                    listener.onOptionSelected(currentPosition, questions.get(currentPosition).getOptionB(), questions.get(currentPosition).getTypeB());
                 }
             });
 
-            btnOptionC.setOnClickListener(v -> {
-                selectOption(btnOptionC, btnOptionA, btnOptionB, btnOptionD);
-                if (listener != null) {
-                    listener.onOptionSelected(currentPosition, "C", questions.get(currentPosition).getTypeC());
-                }
-            });
 
-            btnOptionD.setOnClickListener(v -> {
-                selectOption(btnOptionD, btnOptionA, btnOptionB, btnOptionC);
-                if (listener != null) {
-                    listener.onOptionSelected(currentPosition, "D", questions.get(currentPosition).getTypeD());
-                }
-            });
         }
 
         public void bind(PersonalityQuestion question, int position) {
@@ -97,23 +83,17 @@ public class PersonalityQuestionAdapter extends RecyclerView.Adapter<Personality
             tvQuestion.setText((position + 1) + ". " + question.getQuestion());
             btnOptionA.setText("A. " + question.getOptionA());
             btnOptionB.setText("B. " + question.getOptionB());
-            btnOptionC.setText("C. " + question.getOptionC());
-            btnOptionD.setText("D. " + question.getOptionD());
 
             // 버튼 상태 초기화
             resetButtonStates();
         }
 
-        private void selectOption(MaterialButton selectedButton, MaterialButton unselectedButton1, MaterialButton unselectedButton2, MaterialButton unselectedButton3) {
+        private void selectOption(MaterialButton selectedButton, MaterialButton unselectedButton1) {
             // 모든 버튼을 선택되지 않은 상태로 초기화
             selectedButton.setBackgroundTintList(itemView.getContext().getColorStateList(android.R.color.white));
             selectedButton.setTextColor(itemView.getContext().getColor(android.R.color.black));
             unselectedButton1.setBackgroundTintList(itemView.getContext().getColorStateList(android.R.color.white));
             unselectedButton1.setTextColor(itemView.getContext().getColor(android.R.color.black));
-            unselectedButton2.setBackgroundTintList(itemView.getContext().getColorStateList(android.R.color.white));
-            unselectedButton2.setTextColor(itemView.getContext().getColor(android.R.color.black));
-            unselectedButton3.setBackgroundTintList(itemView.getContext().getColorStateList(android.R.color.white));
-            unselectedButton3.setTextColor(itemView.getContext().getColor(android.R.color.black));
 
             // 선택된 버튼을 선택된 상태로 설정
             selectedButton.setBackgroundTintList(itemView.getContext().getColorStateList(android.R.color.darker_gray));
@@ -125,10 +105,6 @@ public class PersonalityQuestionAdapter extends RecyclerView.Adapter<Personality
             btnOptionA.setTextColor(itemView.getContext().getColor(android.R.color.black));
             btnOptionB.setBackgroundTintList(itemView.getContext().getColorStateList(android.R.color.white));
             btnOptionB.setTextColor(itemView.getContext().getColor(android.R.color.black));
-            btnOptionC.setBackgroundTintList(itemView.getContext().getColorStateList(android.R.color.white));
-            btnOptionC.setTextColor(itemView.getContext().getColor(android.R.color.black));
-            btnOptionD.setBackgroundTintList(itemView.getContext().getColorStateList(android.R.color.white));
-            btnOptionD.setTextColor(itemView.getContext().getColor(android.R.color.black));
         }
     }
 } 

@@ -11,14 +11,21 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.teamup.R;
 import com.example.teamup.api.RetrofitClient;
 import com.example.teamup.api.model.PersonalityQuestionResponse;
 import com.example.teamup.api.model.ApiPersonalityQuestion;
 import com.example.teamup.api.model.PersonalityOption;
+import com.example.teamup.api.model.PersonalityProfileResponse;
+import com.example.teamup.api.model.PersonalityTestSubmitRequest;
+import com.example.teamup.api.model.PersonalityTestAnswer;
 import com.example.teamup.MainActivity;
+import com.example.teamup.auth.SignupTestBaseActivity;
 import com.google.android.material.button.MaterialButton;
+import com.google.gson.Gson;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -33,19 +40,29 @@ public class PersonalityTestQuestionFragment extends Fragment implements Persona
     private static final String TAG = "PersonalityTestQuestionFragment";
 
     private List<PersonalityQuestion> questions;
+    private PersonalityQuestionAdapter adapter;
     private MaterialButton btnResult;
     private Map<Integer, String> selectedAnswers;
     private Map<Integer, String> selectedTypes;
+    private String userId;
+    private boolean fromSignup;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.item_personality_question, container, false);
+        return inflater.inflate(R.layout.fragment_personality_test_question, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        // Bundle에서 데이터 받기
+        Bundle args = getArguments();
+        if (args != null) {
+            userId = args.getString("userId");
+            fromSignup = args.getBoolean("fromSignup", false);
+        }
 
         // 초기화
         selectedAnswers = new HashMap<>();
@@ -54,8 +71,8 @@ public class PersonalityTestQuestionFragment extends Fragment implements Persona
         // 질문 데이터 로드
         loadQuestions();
         
-        // Setup question display
-        setupQuestionDisplay(view);
+        // Setup RecyclerView
+        setupRecyclerView(view);
         
         // Setup result button
         setupResultButton(view);
@@ -65,10 +82,7 @@ public class PersonalityTestQuestionFragment extends Fragment implements Persona
      * 질문 데이터를 로드하는 메서드
      */
     private void loadQuestions() {
-        // 먼저 더미 데이터로 초기화
-        questions = loadDummyQuestions();
-        
-        // 그 다음 API에서 질문 데이터를 받아오기
+        // API에서 질문 데이터를 받아오기
         loadQuestionsFromAPI();
     }
     
@@ -107,25 +121,22 @@ public class PersonalityTestQuestionFragment extends Fragment implements Persona
                                 getActivity().runOnUiThread(() -> {
                                     if (questions != null && !questions.isEmpty()) {
                                         Log.d(TAG, "API 질문으로 UI 업데이트");
-                                        displayQuestion(getView(), questions.get(0));
-                                    } else {
-                                        Log.d(TAG, "API 질문이 비어있어서 더미 데이터 사용");
-                                        questions = loadDummyQuestions();
-                                        if (!questions.isEmpty()) {
-                                            displayQuestion(getView(), questions.get(0));
+                                        if (adapter != null) {
+                                            adapter.updateQuestions(questions);
+                                            adapter.notifyDataSetChanged();
                                         }
+                                    } else {
+                                        Log.e(TAG, "API에서 받은 질문이 비어있습니다");
+                                        Toast.makeText(requireContext(), "질문을 불러올 수 없습니다.", Toast.LENGTH_SHORT).show();
                                     }
                                 });
                             }
                         } else {
                             Log.e(TAG, "API 호출 실패: " + response.code());
-                            // API 호출 실패 시 더미 데이터 사용
+                            // API 호출 실패 시 오류 메시지 표시
                             if (getActivity() != null) {
                                 getActivity().runOnUiThread(() -> {
-                                    questions = loadDummyQuestions();
-                                    if (!questions.isEmpty()) {
-                                        displayQuestion(getView(), questions.get(0));
-                                    }
+                                    Toast.makeText(requireContext(), "질문을 불러올 수 없습니다.", Toast.LENGTH_SHORT).show();
                                 });
                             }
                         }
@@ -133,13 +144,11 @@ public class PersonalityTestQuestionFragment extends Fragment implements Persona
                     
                     @Override
                     public void onFailure(Call<PersonalityQuestionResponse> call, Throwable t) {
-                        // 네트워크 오류 시 더미 데이터 사용
+                        // 네트워크 오류 시 오류 메시지 표시
+                        Log.e(TAG, "네트워크 오류", t);
                         if (getActivity() != null) {
                             getActivity().runOnUiThread(() -> {
-                                questions = loadDummyQuestions();
-                                if (!questions.isEmpty()) {
-                                    displayQuestion(getView(), questions.get(0));
-                                }
+                                Toast.makeText(requireContext(), "네트워크 오류가 발생했습니다.", Toast.LENGTH_SHORT).show();
                             });
                         }
                     }
@@ -173,23 +182,14 @@ public class PersonalityTestQuestionFragment extends Fragment implements Persona
                 String typeA = options.get(0).getType();
                 String typeB = options.get(1).getType();
                 
-                // 2개 옵션만 있는 경우 C, D는 빈 문자열로 설정
-                String optionC = options.size() >= 3 ? options.get(2).getText() : "";
-                String optionD = options.size() >= 4 ? options.get(3).getText() : "";
-                
-                String typeC = options.size() >= 3 ? options.get(2).getType() : "";
-                String typeD = options.size() >= 4 ? options.get(3).getType() : "";
-                
                 Log.d(TAG, "옵션 A: " + optionA + " (" + typeA + ")");
                 Log.d(TAG, "옵션 B: " + optionB + " (" + typeB + ")");
-                if (options.size() >= 3) Log.d(TAG, "옵션 C: " + optionC + " (" + typeC + ")");
-                if (options.size() >= 4) Log.d(TAG, "옵션 D: " + optionD + " (" + typeD + ")");
                 
                 PersonalityQuestion localQuestion = new PersonalityQuestion(
                     apiQuestion.getId(),
                     apiQuestion.getText(),
-                    optionA, optionB, optionC, optionD,
-                    typeA, typeB, typeC, typeD
+                    optionA, optionB, "", "",
+                    typeA, typeB, "", ""
                 );
                 
                 localQuestions.add(localQuestion);
@@ -203,61 +203,48 @@ public class PersonalityTestQuestionFragment extends Fragment implements Persona
         return localQuestions;
     }
     
-    private void setupQuestionDisplay(View view) {
-        // 첫 번째 질문만 표시 (단일 질문 화면이므로)
-        if (questions != null && !questions.isEmpty()) {
-            PersonalityQuestion question = questions.get(0);
-            displayQuestion(view, question);
+    private void setupRecyclerView(View view) {
+        RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
+        if (recyclerView != null) {
+            // 빈 리스트로 초기화 (API 로딩 전까지)
+            questions = new ArrayList<>();
+            adapter = new PersonalityQuestionAdapter(questions, this);
+            recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+            recyclerView.setAdapter(adapter);
         }
     }
     
-    private void displayQuestion(View view, PersonalityQuestion question) {
-        TextView tvQuestion = view.findViewById(R.id.tv_question);
-        MaterialButton btnOptionA = view.findViewById(R.id.btn_option_a);
-        MaterialButton btnOptionB = view.findViewById(R.id.btn_option_b);
-        MaterialButton btnOptionC = view.findViewById(R.id.btn_option_c);
-        MaterialButton btnOptionD = view.findViewById(R.id.btn_option_d);
-        
-        // 질문 텍스트 설정
-        tvQuestion.setText(question.getQuestion());
-        
-        // 옵션 버튼 설정
-        btnOptionA.setText(question.getOptionA());
-        btnOptionB.setText(question.getOptionB());
-        
-        // C, D 옵션이 비어있으면 숨기기
-        if (question.getOptionC() != null && !question.getOptionC().isEmpty()) {
-            btnOptionC.setVisibility(View.VISIBLE);
-            btnOptionC.setText(question.getOptionC());
-            btnOptionC.setOnClickListener(v -> onOptionSelected(0, question.getOptionC(), question.getTypeC()));
-        } else {
-            btnOptionC.setVisibility(View.GONE);
-        }
-        
-        if (question.getOptionD() != null && !question.getOptionD().isEmpty()) {
-            btnOptionD.setVisibility(View.VISIBLE);
-            btnOptionD.setText(question.getOptionD());
-            btnOptionD.setOnClickListener(v -> onOptionSelected(0, question.getOptionD(), question.getTypeD()));
-        } else {
-            btnOptionD.setVisibility(View.GONE);
-        }
-        
-        // A, B 옵션 클릭 리스너 설정
-        btnOptionA.setOnClickListener(v -> onOptionSelected(0, question.getOptionA(), question.getTypeA()));
-        btnOptionB.setOnClickListener(v -> onOptionSelected(0, question.getOptionB(), question.getTypeB()));
-    }
+
     
     private void setupResultButton(View view) {
         btnResult = view.findViewById(R.id.btn_result);
         if (btnResult != null) {
-            // 버튼을 항상 활성화 상태로 설정
-            btnResult.setEnabled(true);
+            // 초기에는 모든 질문이 답변되지 않았으므로 비활성화
+            btnResult.setEnabled(false);
+            btnResult.setAlpha(0.7f);
             btnResult.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     checkAndNavigateToResult();
                 }
             });
+        }
+    }
+    
+    /**
+     * 결과 버튼의 활성화/비활성화 상태를 업데이트하는 메서드
+     */
+    private void updateResultButtonState() {
+        if (btnResult != null) {
+            if (selectedAnswers.size() == questions.size()) {
+                // 모든 질문이 답변됨
+                btnResult.setEnabled(true);
+                btnResult.setAlpha(1.0f);
+            } else {
+                // 모든 질문이 답변되지 않음
+                btnResult.setEnabled(false);
+                btnResult.setAlpha(0.7f);
+            }
         }
     }
 
@@ -268,25 +255,112 @@ public class PersonalityTestQuestionFragment extends Fragment implements Persona
         
         Log.d(TAG, "선택된 답변: " + questionIndex + "번 질문 - " + option + " (" + type + ")");
         
-        // 모든 질문에 답변했는지 확인
-        checkAndNavigateToResult();
+        // 결과 버튼 상태 업데이트
+        updateResultButtonState();
     }
     
     private void checkAndNavigateToResult() {
+        // 모든 질문에 답변했는지 확인
         if (selectedAnswers.size() == questions.size()) {
-            // 모든 질문에 답변했으면 결과 화면으로 이동
-            String personalityType = analyzePersonality();
-            
-            // PersonalityTestResultFragment로 이동
-            PersonalityTestResultFragment resultFragment = new PersonalityTestResultFragment();
-            Bundle args = new Bundle();
-            args.putString("personalityType", personalityType);
-            resultFragment.setArguments(args);
-            
-            if (getActivity() instanceof MainActivity) {
-                ((MainActivity) getActivity()).showFragment(resultFragment);
-            }
+            // 모든 질문에 답변했으면 API로 결과 제출
+            submitPersonalityTestToAPI();
+        } else {
+            // 모든 질문이 답변되지 않으면 Toast 메시지
+            Toast.makeText(requireContext(), "모든 질문에 답변해주세요.", Toast.LENGTH_SHORT).show();
         }
+    }
+    
+    private void submitPersonalityTestToAPI() {
+        // 답변 데이터를 API 형식으로 변환
+        List<PersonalityTestAnswer> answers = new ArrayList<>();
+        
+        Log.d(TAG, "=== 성향 테스트 답변 데이터 ===");
+        for (int i = 0; i < questions.size(); i++) {
+            PersonalityQuestion question = questions.get(i);
+            String selectedAnswer = selectedAnswers.get(i);
+            
+            Log.d(TAG, "질문 " + (i + 1) + ": " + question.getQuestion());
+            Log.d(TAG, "선택된 답변: " + selectedAnswer);
+            Log.d(TAG, "A: " + question.getOptionA() + ", B: " + question.getOptionB());
+            
+            int optionId = 1; // 기본값
+            if (selectedAnswer != null) {
+                if (selectedAnswer.equals(question.getOptionA())) {
+                    optionId = 1;
+                    Log.d(TAG, "→ A 옵션 선택 (option_id: 1)");
+                } else if (selectedAnswer.equals(question.getOptionB())) {
+                    optionId = 2;
+                    Log.d(TAG, "→ B 옵션 선택 (option_id: 2)");
+                }
+            }
+            
+            answers.add(new PersonalityTestAnswer(question.getId(), optionId));
+            Log.d(TAG, "→ 최종: question_id=" + question.getId() + ", option_id=" + optionId);
+        }
+        
+        // API 요청 객체 생성
+        PersonalityTestSubmitRequest request = new PersonalityTestSubmitRequest(userId, answers);
+        Log.d(TAG, "API 요청: userId=" + userId + ", answers count=" + answers.size());
+        
+        // API 호출
+        RetrofitClient.getInstance()
+                .getApiService()
+                .submitPersonalityTest(request)
+                .enqueue(new Callback<PersonalityProfileResponse>() {
+                    @Override
+                    public void onResponse(Call<PersonalityProfileResponse> call, Response<PersonalityProfileResponse> response) {
+                        Log.d(TAG, "API 응답: " + response.code() + " " + response.message());
+                        
+                        if (response.isSuccessful() && response.body() != null) {
+                            // API 호출 성공: 결과 Fragment로 이동
+                            PersonalityProfileResponse profile = response.body();
+                            Log.d(TAG, "성향 프로필 받음: " + profile.getProfileCode());
+                            
+                            if (fromSignup && getActivity() instanceof SignupTestBaseActivity) {
+                                // 회원가입에서 온 경우: SignupTestBaseActivity로 결과 전달
+                                Gson gson = new Gson();
+                                String traitsJson = gson.toJson(profile.getTraitsJson());
+                                ((SignupTestBaseActivity) getActivity()).onPersonalityTestCompleted(
+                                    profile.getProfileCode(), 
+                                    traitsJson
+                                );
+                            } else {
+                                // 일반적인 경우: 결과 Fragment로 이동
+                                PersonalityTestResultFragment resultFragment = new PersonalityTestResultFragment();
+                                Bundle args = new Bundle();
+                                args.putString("personalityType", profile.getProfileCode());
+                                Gson gson = new Gson();
+                                String traitsJson = gson.toJson(profile.getTraitsJson());
+                                args.putString("personalityTraitsJson", traitsJson);
+                                resultFragment.setArguments(args);
+                                
+                                if (getActivity() instanceof MainActivity) {
+                                    ((MainActivity) getActivity()).showFragment(resultFragment);
+                                }
+                            }
+                        } else {
+                            // API 호출 실패
+                            String errorMessage = "테스트 결과 저장에 실패했습니다.";
+                            if (response.errorBody() != null) {
+                                try {
+                                    String errorBody = response.errorBody().string();
+                                    Log.e(TAG, "API 오류 응답: " + errorBody);
+                                    errorMessage += " (" + errorBody + ")";
+                                } catch (Exception e) {
+                                    Log.e(TAG, "오류 응답 읽기 실패", e);
+                                }
+                            }
+                            Log.e(TAG, "API 실패: " + response.code() + " - " + errorMessage);
+                            Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                    
+                    @Override
+                    public void onFailure(Call<PersonalityProfileResponse> call, Throwable t) {
+                        // 네트워크 오류
+                        Toast.makeText(requireContext(), "네트워크 오류가 발생했습니다.", Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
     
     private String analyzePersonality() {

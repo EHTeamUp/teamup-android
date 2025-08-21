@@ -44,40 +44,9 @@
         android:padding="16dp" />
 
     <!-- Option C -->
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btn_option_c"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="옵션 C"
-        android:textColor="@android:color/black"
-        android:backgroundTint="@android:color/white"
-        app:cornerRadius="8dp"
-        android:layout_marginBottom="8dp"
-        android:textAlignment="textStart"
-        android:padding="16dp" />
 
     <!-- Option D -->
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btn_option_d"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="옵션 D"
-        android:textColor="@android:color/black"
-        android:backgroundTint="@android:color/white"
-        app:cornerRadius="8dp"
-        android:textAlignment="textStart"
-        android:padding="16dp" />
 
     <!-- Result Button -->
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btn_result"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="결과 보기"
-        android:textColor="@android:color/white"
-        android:backgroundTint="@android:color/black"
-        app:cornerRadius="8dp"
-        android:layout_marginTop="24dp"
-        android:padding="16dp" />
 
 </LinearLayout> 

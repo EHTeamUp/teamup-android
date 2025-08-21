@@ -81,12 +81,20 @@ public class RegistrationManager {
     public void verifyEmail(String email, String verificationCode, EmailVerificationCallback callback) {
         EmailVerificationCode request = new EmailVerificationCode(email, verificationCode);
         
+        // 디버깅 로그 추가
+        Log.d(TAG, "이메일 인증 검증 요청 시작");
+        Log.d(TAG, "요청 이메일: " + email);
+        Log.d(TAG, "요청 인증번호: " + verificationCode);
+        Log.d(TAG, "요청 객체: " + request.toString());
+        
         RetrofitClient.getInstance()
                 .getApiService()
                 .verifyEmail(request)
                 .enqueue(new Callback<EmailVerificationResponse>() {
                     @Override
                     public void onResponse(Call<EmailVerificationResponse> call, Response<EmailVerificationResponse> response) {
+                        Log.d(TAG, "이메일 인증 응답 받음 - HTTP " + response.code());
+                        
                         if (response.isSuccessful() && response.body() != null) {
                             Log.d(TAG, "이메일 인증 성공: " + response.body().getMessage());
                             callback.onSuccess(response.body().getMessage());
@@ -96,6 +104,17 @@ public class RegistrationManager {
                                 errorMessage = "인증번호가 올바르지 않거나 만료되었습니다.";
                             }
                             Log.e(TAG, "이메일 인증 실패 - HTTP " + response.code());
+                            
+                            // 에러 응답 바디 로깅
+                            try {
+                                if (response.errorBody() != null) {
+                                    String errorBody = response.errorBody().string();
+                                    Log.e(TAG, "에러 응답 바디: " + errorBody);
+                                }
+                            } catch (Exception e) {
+                                Log.e(TAG, "에러 응답 바디 읽기 실패: " + e.getMessage());
+                            }
+                            
                             callback.onError(errorMessage);
                         }
                     }
@@ -211,6 +230,9 @@ public class RegistrationManager {
     public void completeStep1(String userId, String name, String email, String password, String verificationCode, StepCallback callback) {
         RegistrationStep1 step1 = new RegistrationStep1(userId, name, email, password, verificationCode);
         
+        // 요청 데이터 로그
+        Log.d(TAG, "1단계 요청 데이터: " + step1.toString());
+        
         RetrofitClient.getInstance()
                 .getApiService()
                 .completeStep1(step1)
@@ -226,7 +248,15 @@ public class RegistrationManager {
                             if (response.code() == 400) {
                                 errorMessage = "입력 정보가 올바르지 않습니다.";
                             }
-                            Log.e(TAG, "1단계 완료 실패 - HTTP " + response.code());
+                            
+                            // 오류 응답 바디 로그
+                            try {
+                                String errorBody = response.errorBody() != null ? response.errorBody().string() : "응답 바디 없음";
+                                Log.e(TAG, "1단계 완료 실패 - HTTP " + response.code() + ", 에러 바디: " + errorBody);
+                            } catch (Exception e) {
+                                Log.e(TAG, "1단계 완료 실패 - HTTP " + response.code() + ", 에러 바디 읽기 실패: " + e.getMessage());
+                            }
+                            
                             callback.onError(errorMessage);
                         }
                     }

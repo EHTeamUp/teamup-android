@@ -68,4 +68,15 @@ public class RegistrationStep1 {
     public void setVerificationCode(String verificationCode) {
         this.verificationCode = verificationCode;
     }
+    
+    @Override
+    public String toString() {
+        return "RegistrationStep1{" +
+                "userId='" + userId + '\'' +
+                ", name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", password='" + (password != null ? "***" : "null") + '\'' +
+                ", verificationCode='" + verificationCode + '\'' +
+                '}';
+    }
 }

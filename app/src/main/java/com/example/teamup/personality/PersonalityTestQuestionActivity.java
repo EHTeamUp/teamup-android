@@ -2,6 +2,7 @@ package com.example.teamup.personality;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -47,7 +48,7 @@ public class PersonalityTestQuestionActivity extends AppCompatActivity implement
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_personality_test_question);
+        setContentView(R.layout.fragment_personality_test_question);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -62,30 +63,16 @@ public class PersonalityTestQuestionActivity extends AppCompatActivity implement
         selectedAnswers = new HashMap<>();
         selectedTypes = new HashMap<>();
         
-        // 더미데이터 로드, 나중에 백엔드에서 로드
-        loadQuestions();
-        
+
         // Setup RecyclerView
         setupRecyclerView();
         
         // Setup result button
         setupResultButton();
-    }
-    
-    /**
-     * 질문 데이터를 로드하는 메서드
-     */
-    private void loadQuestions() {
-        // 먼저 더미 데이터로 초기화
-        questions = loadDummyQuestions();
-        
-        // 그 다음 API에서 질문 데이터를 받아오기
         loadQuestionsFromAPI();
+
     }
-    
-    /**
-     * 더미 질문 데이터를 로드하는 메서드
-     */
+
     private List<PersonalityQuestion> loadDummyQuestions() {
         return PersonalityQuestion.loadQuestions(this);
     }
@@ -177,8 +164,9 @@ public class PersonalityTestQuestionActivity extends AppCompatActivity implement
     
     private void setupResultButton() {
         btnResult = findViewById(R.id.btn_result);
-        // 버튼을 항상 활성화 상태로 설정
-        btnResult.setEnabled(true);
+        // 초기에는 모든 질문이 답변되지 않았으므로 비활성화
+        btnResult.setEnabled(false);
+        btnResult.setAlpha(0.7f);
         btnResult.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -191,12 +179,29 @@ public class PersonalityTestQuestionActivity extends AppCompatActivity implement
      * 모든 질문이 답변되었는지 확인하고 결과 페이지로 이동하는 메서드
      */
     private void checkAndNavigateToResult() {
+        // 디버그 로그 추가
+        Log.d("PersonalityTest", "Selected answers: " + selectedAnswers.size() + ", Questions: " + questions.size());
+        
         if (selectedAnswers.size() == questions.size()) {
-            // API로 성향 테스트 결과 제출
-            submitPersonalityTestToAPI();
+            // 모든 질문이 답변되었는지 한 번 더 확인
+            boolean allAnswered = true;
+            for (int i = 0; i < questions.size(); i++) {
+                if (!selectedAnswers.containsKey(i) || selectedAnswers.get(i) == null || selectedAnswers.get(i).isEmpty()) {
+                    allAnswered = false;
+                    Log.d("PersonalityTest", "Question " + i + " not answered");
+                    break;
+                }
+            }
+            
+            if (allAnswered) {
+                // API로 성향 테스트 결과 제출
+                submitPersonalityTestToAPI();
+            } else {
+                Toast.makeText(PersonalityTestQuestionActivity.this, "모든 질문에 답변해주세요.", Toast.LENGTH_SHORT).show();
+            }
         } else {
             // 모든 질문이 답변되지 않으면 Toast 메시지
-            Toast.makeText(PersonalityTestQuestionActivity.this, "모든 항목이 선택되어 있지 않습니다", Toast.LENGTH_SHORT).show();
+            Toast.makeText(PersonalityTestQuestionActivity.this, "모든 질문에 답변해주세요.", Toast.LENGTH_SHORT).show();
         }
     }
     
@@ -208,17 +213,13 @@ public class PersonalityTestQuestionActivity extends AppCompatActivity implement
             PersonalityQuestion question = questions.get(i);
             String selectedAnswer = selectedAnswers.get(i);
             
-            // 선택된 답변에 따라 option_id 결정
-            int optionId = 0; // 기본값
+            // 선택된 답변에 따라 option_id 결정 (1부터 시작)
+            int optionId = 1; // 기본값
             if (selectedAnswer != null) {
                 if (selectedAnswer.equals(question.getOptionA())) {
-                    optionId = 0;
-                } else if (selectedAnswer.equals(question.getOptionB())) {
                     optionId = 1;
-                } else if (selectedAnswer.equals(question.getOptionC())) {
+                } else if (selectedAnswer.equals(question.getOptionB())) {
                     optionId = 2;
-                } else if (selectedAnswer.equals(question.getOptionD())) {
-                    optionId = 3;
                 }
             }
             
@@ -235,25 +236,48 @@ public class PersonalityTestQuestionActivity extends AppCompatActivity implement
                 .enqueue(new Callback<PersonalityProfileResponse>() {
                     @Override
                     public void onResponse(Call<PersonalityProfileResponse> call, Response<PersonalityProfileResponse> response) {
+                        Log.d("PersonalityTest", "API Response: " + response.code() + ", Success: " + response.isSuccessful());
+                        
                         if (response.isSuccessful() && response.body() != null) {
                             // API 호출 성공: 결과 페이지로 이동
                             PersonalityProfileResponse profile = response.body();
+                            Log.d("PersonalityTest", "Profile received: " + profile.getProfileCode());
                             
-                            Intent intent = new Intent(PersonalityTestQuestionActivity.this, PersonalityTestResultActivity.class);
-                            intent.putExtra("personalityType", profile.getProfileCode());
-                            intent.putExtra("personalityTraits", profile.getTraitsJson());
-                            intent.putExtra("userId", userId);
-                            intent.putExtra("fromSignup", fromSignup);
-                            startActivity(intent);
+                            if (fromSignup) {
+                                // 회원가입에서 온 경우: SignupTestBaseActivity로 결과 전달
+                                Intent intent = new Intent();
+                                intent.putExtra("personalityType", profile.getProfileCode());
+                                intent.putExtra("personalityTraits", profile.getTraitsJson());
+                                setResult(RESULT_OK, intent);
+                                finish();
+                            } else {
+                                // 일반적인 경우: 결과 Activity로 이동
+                                Intent intent = new Intent(PersonalityTestQuestionActivity.this, PersonalityTestResultActivity.class);
+                                intent.putExtra("personalityType", profile.getProfileCode());
+                                intent.putExtra("personalityTraits", profile.getTraitsJson());
+                                intent.putExtra("userId", userId);
+                                intent.putExtra("fromSignup", fromSignup);
+                                startActivity(intent);
+                            }
                         } else {
                             // API 호출 실패
-                            Toast.makeText(PersonalityTestQuestionActivity.this, "테스트 결과 저장에 실패했습니다.", Toast.LENGTH_SHORT).show();
+                            String errorMessage = "테스트 결과 저장에 실패했습니다.";
+                            if (response.errorBody() != null) {
+                                try {
+                                    errorMessage += " (" + response.errorBody().string() + ")";
+                                } catch (Exception e) {
+                                    Log.e("PersonalityTest", "Error reading error body", e);
+                                }
+                            }
+                            Log.e("PersonalityTest", "API failed: " + errorMessage);
+                            Toast.makeText(PersonalityTestQuestionActivity.this, errorMessage, Toast.LENGTH_SHORT).show();
                         }
                     }
                     
                     @Override
                     public void onFailure(Call<PersonalityProfileResponse> call, Throwable t) {
                         // 네트워크 오류
+                        Log.e("PersonalityTest", "Network error", t);
                         Toast.makeText(PersonalityTestQuestionActivity.this, "네트워크 오류가 발생했습니다.", Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -316,9 +340,18 @@ public class PersonalityTestQuestionActivity extends AppCompatActivity implement
         if (selectedAnswers.size() == questions.size()) {
             // 모든 질문이 답변됨 
             btnResult.setAlpha(1.0f);
+            btnResult.setEnabled(true);
         } else {
             // 모든 질문이 답변되지 않음
             btnResult.setAlpha(0.7f);
+            btnResult.setEnabled(false);
         }
+    }
+    
+    /**
+     * 모든 질문이 답변되었는지 확인하는 메서드
+     */
+    private boolean areAllQuestionsAnswered() {
+        return selectedAnswers.size() == questions.size();
     }
 } 

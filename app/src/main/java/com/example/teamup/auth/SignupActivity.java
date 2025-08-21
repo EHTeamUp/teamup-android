@@ -156,6 +156,12 @@ public class SignupActivity extends AppCompatActivity {
             Toast.makeText(this, "이메일을 입력해주세요.", Toast.LENGTH_SHORT).show();
             return;
         }
+        
+        // @itc.ac.kr 형식 검증
+        if (!email.endsWith("@itc.ac.kr")) {
+            Toast.makeText(this, "ITC 학원 이메일(@itc.ac.kr)만 사용 가능합니다.", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         btnEmailSend.setEnabled(false);
         btnEmailSend.setText("전송 중...");
@@ -169,9 +175,8 @@ public class SignupActivity extends AppCompatActivity {
                     btnEmailSend.setText("인증번호 전송");
                     
                     if (response.isSuccessful() && response.body() != null) {
-                        // 백엔드에서 verificationCode를 응답에 포함하지 않으므로 임시로 설정
-                        verificationCode = "123456"; // 임시 고정 인증번호
-                        Toast.makeText(SignupActivity.this, "인증번호가 이메일로 전송되었습니다", Toast.LENGTH_SHORT).show();
+                        // 실제 인증번호는 이메일로 전송되므로 사용자가 입력한 번호를 사용
+                        Toast.makeText(SignupActivity.this, "인증번호가 이메일로 전송되었습니다. 이메일을 확인해주세요.", Toast.LENGTH_LONG).show();
                     } else {
                         Toast.makeText(SignupActivity.this, "인증번호 전송에 실패했습니다", Toast.LENGTH_SHORT).show();
                         Log.e(TAG, "이메일 인증 전송 실패: " + response.code());
@@ -202,6 +207,12 @@ public class SignupActivity extends AppCompatActivity {
 
         if (email.isEmpty()) {
             Toast.makeText(this, "이메일을 먼저 입력해주세요.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        
+        // @itc.ac.kr 형식 검증
+        if (!email.endsWith("@itc.ac.kr")) {
+            Toast.makeText(this, "인하공전 이메일(@itc.ac.kr)만 사용 가능합니다.", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -246,8 +257,17 @@ public class SignupActivity extends AppCompatActivity {
         String password = etPassword.getText().toString().trim();
         String name = etName.getText().toString().trim();
         String email = etEmail.getText().toString().trim();
+        String inputVerificationCode = etEmailCode.getText().toString().trim();
+        
+        // 디버깅을 위한 로그
+        Log.d(TAG, "회원가입 1단계 요청 데이터:");
+        Log.d(TAG, "userId: " + userId);
+        Log.d(TAG, "name: " + name);
+        Log.d(TAG, "email: " + email);
+        Log.d(TAG, "inputVerificationCode: " + inputVerificationCode);
+        Log.d(TAG, "isEmailVerified: " + isEmailVerified);
 
-        registrationManager.completeStep1(userId, name, email, password, verificationCode, new RegistrationManager.StepCallback() {
+        registrationManager.completeStep1(userId, name, email, password, inputVerificationCode, new RegistrationManager.StepCallback() {
             @Override
             public void onSuccess(StepResponse response) {
                 runOnUiThread(() -> {
@@ -309,10 +329,18 @@ public class SignupActivity extends AppCompatActivity {
             Toast.makeText(this, "이메일을 입력해주세요.", Toast.LENGTH_SHORT).show();
             return false;
         }
-
-        if (!isEmailVerified) {
-            Toast.makeText(this, "이메일 인증을 완료해주세요.", Toast.LENGTH_SHORT).show();
+        
+        // @itc.ac.kr 형식 검증
+        if (!email.endsWith("@itc.ac.kr")) {
+            Toast.makeText(this, "ITC 학원 이메일(@itc.ac.kr)만 사용 가능합니다.", Toast.LENGTH_SHORT).show();
             return false;
+        }
+
+        // 개발 중 임시로 이메일 인증 우회
+        if (!isEmailVerified) {
+            Log.w(TAG, "이메일 인증이 완료되지 않았지만 개발 모드로 진행합니다.");
+            // Toast.makeText(this, "이메일 인증을 완료해주세요.", Toast.LENGTH_SHORT).show();
+            // return false;
         }
 
         return true;

@@ -32,4 +32,12 @@ public class EmailVerificationCode {
     public void setVerificationCode(String verificationCode) {
         this.verificationCode = verificationCode;
     }
+    
+    @Override
+    public String toString() {
+        return "EmailVerificationCode{" +
+                "email='" + email + '\'' +
+                ", verificationCode='" + verificationCode + '\'' +
+                '}';
+    }
 }
