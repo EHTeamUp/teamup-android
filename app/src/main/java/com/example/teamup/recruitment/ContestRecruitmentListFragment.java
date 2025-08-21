@@ -97,7 +97,8 @@ public class ContestRecruitmentListFragment extends Fragment {
                     post.getRecruitmentPostId(),
                     post.getTitle(),
                     post.getUserId(),
-                    post.getRecruitmentCount()
+                    post.getRecruitmentCount(),
+                    post.getContestId()
             ));
         }
         adapter.submitList(items);
@@ -111,8 +112,9 @@ public class ContestRecruitmentListFragment extends Fragment {
         AtomicInteger counter = new AtomicInteger(items.size());
 
         for (RecruitmentPostItem item : items) {
+            int contestId = item.getContestId();
             // 각 아이템에 대해 공모전 정보와 현재 팀원 수를 가져옵니다.
-            apiService.getContestDetail(item.getContestInformation().getContestId()).enqueue(new Callback<ContestInformation>() {
+            apiService.getContestDetail(contestId).enqueue(new Callback<ContestInformation>() {
                 @Override
                 public void onResponse(@NonNull Call<ContestInformation> call, @NonNull Response<ContestInformation> response) {
                     if (response.isSuccessful()) {

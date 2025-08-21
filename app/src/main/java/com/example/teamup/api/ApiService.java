@@ -8,6 +8,7 @@ import com.example.teamup.api.model.CommentResponse;
 import com.example.teamup.api.model.CommentUpdate;
 import com.example.teamup.api.model.CommentWithReplies;
 import com.example.teamup.api.model.ContestsListResponse;
+import com.example.teamup.api.model.FilterItem;
 import com.example.teamup.api.model.RecruitmentPostDTO;
 import com.example.teamup.api.model.RecruitmentPostRequest;
 import com.example.teamup.api.model.RecruitmentPostResponse;
@@ -84,6 +85,14 @@ public interface ApiService {
     @GET("api/v1/recruitments/contest/{contest_id}")
     Call<List<RecruitmentPostDTO>> getRecruitmentPostsByContest(@Path("contest_id") int contestId);
 
+    // 새로 추가된 필터 목록 조회 API
+    @GET("api/v1/contests/filters")
+    Call<List<FilterItem>> getFilters();
+
+    // 새로 추가된 특정 필터로 공모전 조회 API
+    @GET("api/v1/contests/filter/{filter_id}")
+    Call<ContestsListResponse> getContestsByFilter(@Path("filter_id") int filterId);
+
     // ==================== ContestRecruitmentDetailActivity에 필요한 API들 ====================
 
     // 1. 모집글 상세 정보 조회 (기존에 정의했지만, 여기서 사용됩니다)
@@ -139,4 +148,6 @@ public interface ApiService {
      */
     @DELETE("api/v1/comments/{comment_id}")
     Call<Void> deleteComment(@Path("comment_id") int commentId);
+
+
 }
