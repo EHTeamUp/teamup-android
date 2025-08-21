@@ -67,10 +67,8 @@ public class ContestRecruitmentDetailFragment extends Fragment implements Commen
         if (getArguments() != null) {
             recruitmentPostId = getArguments().getInt("POST_ID", -1);
         }
-        // ==================== 수정된 부분: TokenManager 연동 ====================
         // Fragment가 생성될 때 TokenManager를 통해 실제 사용자 ID를 가져옵니다.
         currentUserId = TokenManager.getInstance(requireContext()).getUserId();
-        // =====================================================================
     }
 
     @Nullable
@@ -95,13 +93,11 @@ public class ContestRecruitmentDetailFragment extends Fragment implements Commen
         setupCommentInput();
         loadInitialRecruitmentPost();
 
-        // ==================== 추가된 부분: 뒤로가기 버튼 기능 ====================
         binding.llContestTitleBar.setOnClickListener(v -> {
             if (getActivity() != null) {
                 getActivity().getSupportFragmentManager().popBackStack();
             }
         });
-        // =====================================================================
     }
 
     private void setupRecyclerViews() {
@@ -209,7 +205,7 @@ public class ContestRecruitmentDetailFragment extends Fragment implements Commen
                     List<ApplicationResponse> teamMembers = response.body();
                     teamMemberAdapter.submitList(teamMembers);
 
-                    int currentMembersCount = teamMembers.size() + 1;
+                    int currentMembersCount = teamMembers.size();
                     String memberCountText = String.format(Locale.getDefault(), "팀원 (%d / %d)", currentMembersCount, totalRecruitmentCount);
                     binding.teamMemberCount.setText(memberCountText);
 
