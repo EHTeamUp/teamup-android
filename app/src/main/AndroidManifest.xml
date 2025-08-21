@@ -58,21 +58,6 @@
             android:name=".personality.PersonalityTestQuestionActivity"
             android:exported="false" />
         <activity
-            android:name=".recruitment.ContestRecruitmentListActivity"
-            android:exported="false" />
-        <activity
-            android:name=".recruitment.ContestRecruitmentDetailActivity"
-            android:exported="false" />
-        <activity
-            android:name=".contest.ContestListActivity"
-            android:exported="false" />
-        <activity
-            android:name=".contest.ContestInformationDetailActivity"
-            android:exported="false" />
-        <activity
-            android:name=".recruitment.RecruitmentPostActivity"
-            android:exported="false" />
-        <activity
             android:name=".MypageActivity"
             android:exported="false"/>
         <activity
