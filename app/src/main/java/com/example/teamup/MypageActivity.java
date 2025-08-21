@@ -17,6 +17,7 @@ import com.example.teamup.auth.TokenManager;
 import com.example.teamup.mypage.MypageUserinfoActivity;
 import com.example.teamup.R;
 import com.example.teamup.mypage.MypageProfileActivity;
+import com.example.teamup.notification.FcmTokenManager;
 
 
 public class MypageActivity extends AppCompatActivity {

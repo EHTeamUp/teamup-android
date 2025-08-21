@@ -130,7 +130,7 @@ public class ApplicantListFragment extends Fragment {
             
             // 선택된 지원자들의 user_id 목록 생성
             List<String> selectedUserIds = new ArrayList<>();
-            Log.d(TAG, "=== 선택된 지원자 정보 ===");
+//            Log.d(TAG, "=== 선택된 지원자 정보 ===");
             for (Application applicant : selectedApplicants) {
                 String applicantId = applicant.getUserId();
                 selectedUserIds.add(applicantId);

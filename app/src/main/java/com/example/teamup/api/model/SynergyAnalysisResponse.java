@@ -78,15 +78,15 @@ public class SynergyAnalysisResponse {
     }
 
     public static class TeamAnalysis {
-        private double team_synergy_score;
+        private Double team_synergy_score;
         private String analysis_summary;
         private List<String> recommendations;
 
-        public double getTeamSynergyScore() {
+        public Double getTeamSynergyScore() {
             return team_synergy_score;
         }
 
-        public void setTeamSynergyScore(double team_synergy_score) {
+        public void setTeamSynergyScore(Double team_synergy_score) {
             this.team_synergy_score = team_synergy_score;
         }
 
