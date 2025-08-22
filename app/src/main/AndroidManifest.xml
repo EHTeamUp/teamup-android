@@ -20,7 +20,7 @@
         android:theme="@style/Theme.TeamUp"
         android:usesCleartextTraffic="true">
         <activity
-            android:name=".MainActivity"
+            android:name="kr.mojuk.teamup.MainActivity"
             android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -28,43 +28,43 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".auth.LoginActivity"
+            android:name="kr.mojuk.teamup.auth.LoginActivity"
             android:exported="false" />
         <activity
-            android:name=".auth.SignupActivity"
+            android:name="kr.mojuk.teamup.auth.SignupActivity"
             android:exported="false" />
         <activity
-            android:name=".auth.SignupInterestActivity"
+            android:name="kr.mojuk.teamup.auth.SignupInterestActivity"
             android:exported="false" />
         <activity
-            android:name=".auth.SignupTestBaseActivity"
+            android:name="kr.mojuk.teamup.auth.SignupTestBaseActivity"
             android:exported="false" />
         <activity
-            android:name=".auth.SignupExperienceActivity"
+            android:name="kr.mojuk.teamup.auth.SignupExperienceActivity"
             android:exported="false" />
         <activity
-            android:name=".auth.SignupFinishActivity"
+            android:name="kr.mojuk.teamup.auth.SignupFinishActivity"
             android:exported="false" />
 
         <activity
-            android:name=".personality.PersonalityTestResultActivity"
+            android:name="kr.mojuk.teamup.personality.PersonalityTestResultActivity"
             android:exported="false"/>
         <activity
 
-            android:name=".MypageActivity"
+            android:name="kr.mojuk.teamup.MypageActivity"
             android:exported="false"/>
         <activity
-            android:name=".mypage.MypageUserinfoEditActivity"
+            android:name="kr.mojuk.teamup.mypage.MypageUserinfoEditActivity"
             android:exported="false" />
 
         <activity
-            android:name=".mypage.MypageInterestActivity"
+            android:name="kr.mojuk.teamup.mypage.MypageInterestActivity"
             android:exported="false" />
         <activity
-            android:name=".mypage.MypageTestIngActivity"
+            android:name="kr.mojuk.teamup.mypage.MypageTestIngActivity"
             android:exported="false" />
         <activity
-            android:name=".mypage.MypageTestResultActivity"
+            android:name="kr.mojuk.teamup.mypage.MypageTestResultActivity"
             android:exported="false" />
             
         <!-- Firebase FCM 서비스 (Firebase 설정 완료 후 주석 해제) -->

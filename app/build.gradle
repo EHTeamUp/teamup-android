@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace 'com.example.teamup'
+    namespace 'kr.mojuk.teamup'
     compileSdk 34
 
     defaultConfig {
-        applicationId "com.example.teamup"
+        applicationId "kr.mojuk.teamup"
         minSdk 26
         targetSdk 34
         versionCode 1
