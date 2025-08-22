@@ -220,6 +220,12 @@ public interface ApiService {
      */
     @GET("api/v1/contests/{contest_id}")
     Call<ContestInformation> getContestDetail(@Path("contest_id") int contestId);
+
+    @GET("api/v1/contests/latest")
+    Call<List<ContestInformation>> getLatestContests();
+
+    @GET("api/v1/recruitments/latest")
+    Call<List<RecruitmentPostResponse>> getLatestRecruitments();
     
 
     
@@ -246,6 +252,8 @@ public interface ApiService {
     @GET("api/v1/users/me")
     Call<UserDTO> getCurrentUser(@Header("Authorization") String authorization);
 
+    // ===== 회원가입 관련 API =====
+
     /**
      * 회원정보 수정 API (이름, 비밀번호)
      * PUT /api/v1/users/mypage
@@ -253,7 +261,6 @@ public interface ApiService {
     @PUT("api/v1/users/mypage")
     Call<UserDTO> updateUserInfo(@Header("Authorization") String authorization, @Body UserUpdateRequest userInfo);
 
-    // ===== 회원가입 관련 API =====
 
     /**
      * 이메일 인증번호 발송
@@ -404,6 +411,8 @@ public interface ApiService {
 
     @GET("api/v1/personality/user-profile/{user_id}")
     Call<PersonalityProfileResponse> getUserPersonalityProfile(@Path("user_id") String userId);
+
+
 
 
 
