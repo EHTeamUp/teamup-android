@@ -18,7 +18,7 @@ import com.example.teamup.MainActivity;
 import com.example.teamup.R;
 import com.example.teamup.auth.TokenManager;
 import com.example.teamup.auth.UserManager;
-import com.example.teamup.api.model.UserDTO;
+import com.example.teamup.api.model.LoginRequest;
 
 public class MypageUserinfoFragment extends Fragment {
 
@@ -31,7 +31,7 @@ public class MypageUserinfoFragment extends Fragment {
     // Manager 인스턴스들
     private TokenManager tokenManager;
     private UserManager userManager;
-    private UserDTO currentUser;
+    private LoginRequest currentUser;
 
     @Nullable
     @Override
@@ -89,7 +89,7 @@ public class MypageUserinfoFragment extends Fragment {
     private void loadUserInfo() {
         userManager.getCurrentUser(requireContext(), new UserManager.UserCallback() {
             @Override
-            public void onSuccess(UserDTO user) {
+            public void onSuccess(LoginRequest user) {
                 Log.d(TAG, "사용자 정보 로드 성공: " + user.getUserId());
                 currentUser = user;
                 
@@ -99,12 +99,7 @@ public class MypageUserinfoFragment extends Fragment {
                         if (tvUserId != null) {
                             tvUserId.setText(user.getUserId() != null ? user.getUserId() : "");
                         }
-                        if (tvUserEmail != null) {
-                            tvUserEmail.setText(user.getEmail() != null ? user.getEmail() : "");
-                        }
-                        if (tvUserName != null) {
-                            tvUserName.setText(user.getName() != null ? user.getName() : "");
-                        }
+
                     });
                 }
             }

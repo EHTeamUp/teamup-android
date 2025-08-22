@@ -5,6 +5,9 @@
     <!-- 인터넷 권한 -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    
+    <!-- 알림 권한 -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:allowBackup="true"
@@ -42,15 +45,11 @@
         <activity
             android:name=".auth.SignupFinishActivity"
             android:exported="false" />
-        <activity
-            android:name=".applicant.ApplicantListActivity"
-            android:exported="false"/>
-        <activity
-            android:name=".recruitment.TeamSynergyScoreActivity"
-            android:exported="false"/>
+
+
         <activity
             android:name=".personality.MainPersonalityTestActivity"
-            android:exported="false" />
+            android:exported="false"/>
         <activity
             android:name=".personality.PersonalityTestResultActivity"
             android:exported="false"/>
@@ -87,5 +86,16 @@
         <activity
             android:name=".mypage.MypageTestResultActivity"
             android:exported="false" />
+            
+        <!-- Firebase FCM 서비스 (Firebase 설정 완료 후 주석 해제) -->
+        <!--
+        <service
+            android:name=".notification.FirebaseMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+        -->
     </application>
 </manifest>

@@ -17,9 +17,9 @@ import androidx.fragment.app.Fragment;
 
 import com.example.teamup.MainActivity;
 import com.example.teamup.R;
+import com.example.teamup.api.model.LoginRequest;
 import com.example.teamup.auth.TokenManager;
 import com.example.teamup.auth.UserManager;
-import com.example.teamup.api.model.UserDTO;
 
 public class MypageUserinfoEditFragment extends Fragment {
 
@@ -32,7 +32,7 @@ public class MypageUserinfoEditFragment extends Fragment {
     // Manager 인스턴스들
     private TokenManager tokenManager;
     private UserManager userManager;
-    private UserDTO currentUser;
+    private LoginRequest currentUser;
 
     @Nullable
     @Override

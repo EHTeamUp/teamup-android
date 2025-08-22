@@ -19,7 +19,7 @@ public class PersonalityQuestionAdapter extends RecyclerView.Adapter<Personality
     private OnOptionSelectedListener listener;
 
     public interface OnOptionSelectedListener {
-        void onOptionSelected(int questionIndex, String option, String type);
+        void onOptionSelected(int questionIndex, String option);
     }
 
     public PersonalityQuestionAdapter(List<PersonalityQuestion> questions, OnOptionSelectedListener listener) {
@@ -46,6 +46,9 @@ public class PersonalityQuestionAdapter extends RecyclerView.Adapter<Personality
         return questions.size();
     }
     
+    /**
+     * 질문 목록을 업데이트하는 메서드
+     */
     public void updateQuestions(List<PersonalityQuestion> newQuestions) {
         this.questions = newQuestions;
     }
@@ -64,18 +67,16 @@ public class PersonalityQuestionAdapter extends RecyclerView.Adapter<Personality
             btnOptionA.setOnClickListener(v -> {
                 selectOption(btnOptionA, btnOptionB);
                 if (listener != null) {
-                    listener.onOptionSelected(currentPosition, questions.get(currentPosition).getOptionA(), questions.get(currentPosition).getTypeA());
+                    listener.onOptionSelected(currentPosition, "A");
                 }
             });
 
             btnOptionB.setOnClickListener(v -> {
                 selectOption(btnOptionB, btnOptionA);
                 if (listener != null) {
-                    listener.onOptionSelected(currentPosition, questions.get(currentPosition).getOptionB(), questions.get(currentPosition).getTypeB());
+                    listener.onOptionSelected(currentPosition, "B");
                 }
             });
-
-
         }
 
         public void bind(PersonalityQuestion question, int position) {
@@ -88,12 +89,12 @@ public class PersonalityQuestionAdapter extends RecyclerView.Adapter<Personality
             resetButtonStates();
         }
 
-        private void selectOption(MaterialButton selectedButton, MaterialButton unselectedButton1) {
-            // 모든 버튼을 선택되지 않은 상태로 초기화
+        private void selectOption(MaterialButton selectedButton, MaterialButton unselectedButton) {
+            // 두 버튼 모두 선택되지 않은 상태로 초기화
             selectedButton.setBackgroundTintList(itemView.getContext().getColorStateList(android.R.color.white));
             selectedButton.setTextColor(itemView.getContext().getColor(android.R.color.black));
-            unselectedButton1.setBackgroundTintList(itemView.getContext().getColorStateList(android.R.color.white));
-            unselectedButton1.setTextColor(itemView.getContext().getColor(android.R.color.black));
+            unselectedButton.setBackgroundTintList(itemView.getContext().getColorStateList(android.R.color.white));
+            unselectedButton.setTextColor(itemView.getContext().getColor(android.R.color.black));
 
             // 선택된 버튼을 선택된 상태로 설정
             selectedButton.setBackgroundTintList(itemView.getContext().getColorStateList(android.R.color.darker_gray));

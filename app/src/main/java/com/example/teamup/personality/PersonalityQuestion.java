@@ -1,85 +1,124 @@
 package com.example.teamup.personality;
 
 import android.content.Context;
+import android.util.Log;
+
+import com.example.teamup.R;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
 public class PersonalityQuestion {
     private int id;
     private String question;
-    private String optionA, optionB, optionC, optionD;
-    private String typeA, typeB, typeC, typeD;
-    
-    public PersonalityQuestion(int id, String question, String optionA, String optionB, String optionC, String optionD,
-                              String typeA, String typeB, String typeC, String typeD) {
+    private String optionA;
+    private String optionB;
+    private int optionAId;  // A 옵션의 실제 ID
+    private int optionBId;  // B 옵션의 실제 ID
+
+    public PersonalityQuestion(int id, String question, String optionA, String optionB) {
         this.id = id;
         this.question = question;
         this.optionA = optionA;
         this.optionB = optionB;
-        this.optionC = optionC;
-        this.optionD = optionD;
-        this.typeA = typeA;
-        this.typeB = typeB;
-        this.typeC = typeC;
-        this.typeD = typeD;
+        this.optionAId = 1;  // 기본값
+        this.optionBId = 2;  // 기본값
     }
     
-    // Getters
-    public int getId() { return id; }
-    public String getQuestion() { return question; }
-    public String getOptionA() { return optionA; }
-    public String getOptionB() { return optionB; }
-    public String getOptionC() { return optionC; }
-    public String getOptionD() { return optionD; }
-    public String getTypeA() { return typeA; }
-    public String getTypeB() { return typeB; }
-    public String getTypeC() { return typeC; }
-    public String getTypeD() { return typeD; }
+    public PersonalityQuestion(int id, String question, String optionA, String optionB, int optionAId, int optionBId) {
+        this.id = id;
+        this.question = question;
+        this.optionA = optionA;
+        this.optionB = optionB;
+        this.optionAId = optionAId;
+        this.optionBId = optionBId;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getQuestion() {
+        return question;
+    }
+
+    public String getOptionA() {
+        return optionA;
+    }
+
+    public String getOptionB() {
+        return optionB;
+    }
     
-    // Setters
-    public void setId(int id) { this.id = id; }
-    public void setQuestion(String question) { this.question = question; }
-    public void setOptionA(String optionA) { this.optionA = optionA; }
-    public void setOptionB(String optionB) { this.optionB = optionB; }
-    public void setOptionC(String optionC) { this.optionC = optionC; }
-    public void setOptionD(String optionD) { this.optionD = optionD; }
-    public void setTypeA(String typeA) { this.typeA = typeA; }
-    public void setTypeB(String typeB) { this.typeB = typeB; }
-    public void setTypeC(String typeC) { this.typeC = typeC; }
-    public void setTypeD(String typeD) { this.typeD = typeD; }
+    public int getOptionAId() {
+        return optionAId;
+    }
     
-    // 더미 데이터 로드 메서드
+    public int getOptionBId() {
+        return optionBId;
+    }
+
+    /**
+     * 질문 데이터를 로드하는 메서드
+     * 현재는 더미 데이터를 사용하지만, 나중에 백엔드에서 받아올 예정
+     */
     public static List<PersonalityQuestion> loadQuestions(Context context) {
+        // TODO: 백엔드에서 질문 데이터를 받아올 예정
+        // return loadQuestionsFromAPI();
+        
+        // 임시로 더미 데이터 사용
+        return loadDummyQuestions(context);
+    }
+
+    /**
+     * 더미 질문 데이터를 로드하는 메서드
+     */
+    public static List<PersonalityQuestion> loadDummyQuestions(Context context) {
         List<PersonalityQuestion> questions = new ArrayList<>();
-        
-        questions.add(new PersonalityQuestion(
-            1, "팀 프로젝트에서 나는...",
-            "계획을 세우고 체계적으로 진행한다", "즉흥적으로 문제를 해결한다",
-            "창의적인 아이디어를 제안한다", "팀원들과 협력하여 진행한다",
-            "분석형", "실행형", "창의형", "협력형"
-        ));
-        
-        questions.add(new PersonalityQuestion(
-            2, "문제가 발생했을 때 나는...",
-            "원인을 분석하고 해결책을 찾는다", "빠르게 행동하여 해결한다",
-            "새로운 접근 방법을 시도한다", "다른 사람의 의견을 듣는다",
-            "분석형", "실행형", "창의형", "협력형"
-        ));
-        
-        questions.add(new PersonalityQuestion(
-            3, "새로운 기술을 배울 때 나는...",
-            "기본 원리를 이해하고 체계적으로 학습한다", "실습을 통해 직접 경험한다",
-            "다양한 방법으로 창의적으로 접근한다", "다른 사람과 함께 학습한다",
-            "분석형", "실행형", "창의형", "협력형"
-        ));
-        
-        questions.add(new PersonalityQuestion(
-            4, "팀 회의에서 나는...",
-            "논리적으로 분석하여 의견을 제시한다", "구체적인 실행 방안을 제안한다",
-            "혁신적인 아이디어를 제안한다", "팀원들의 의견을 조율한다",
-            "분석형", "실행형", "창의형", "협력형"
-        ));
-        
+
+        try {
+            // 더미 데이터 JSON 파일 로드
+            InputStream inputStream = context.getResources().openRawResource(R.raw.personality_questions);
+            int size = inputStream.available();
+            byte[] buffer = new byte[size];
+            inputStream.read(buffer);
+            inputStream.close();
+
+            String jsonString = new String(buffer, StandardCharsets.UTF_8);
+            JSONObject jsonObject = new JSONObject(jsonString);
+            JSONArray questionsArray = jsonObject.getJSONArray("questions");
+
+            for (int i = 0; i < questionsArray.length(); i++) {
+                JSONObject questionObj = questionsArray.getJSONObject(i);
+                int id = questionObj.getInt("id");
+                String question = questionObj.getString("question");
+                String optionA = questionObj.getString("optionA");
+                String optionB = questionObj.getString("optionB");
+
+                questions.add(new PersonalityQuestion(id, question, optionA, optionB));
+            }
+
+        } catch (IOException | JSONException e) {
+            Log.e("PersonalityQuestion", "Error loading dummy questions", e);
+        }
+
         return questions;
+    }
+
+    /**
+     * 백엔드에서 질문 데이터를 받아오는 메서드 
+     */
+    public static List<PersonalityQuestion> loadQuestionsFromAPI() {
+        // TODO: 백엔드 API 호출로 질문 데이터 받아오기
+        
+        // 실패시 빈 리스트 반환 
+        return new ArrayList<>();
     }
 } 

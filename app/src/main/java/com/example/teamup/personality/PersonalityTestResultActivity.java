@@ -14,8 +14,8 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.teamup.MainActivity;
 import com.example.teamup.R;
+import com.google.android.material.button.MaterialButton;
 import com.example.teamup.api.model.PersonalityTraits;
-
 public class PersonalityTestResultActivity extends AppCompatActivity {
 
     private LinearLayout llBackNavigation;
@@ -23,6 +23,14 @@ public class PersonalityTestResultActivity extends AppCompatActivity {
     private boolean fromSignup;
     private String personalityType;
     private PersonalityTraits personalityTraits;
+
+    private MaterialButton btnFinishTest;
+    private TextView tvResultTitle;
+
+    // CardView 내부 TextView들
+    private TextView tvCardProfileCode;
+    private TextView tvCardDescription;
+    private TextView tvCardTraits;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +51,7 @@ public class PersonalityTestResultActivity extends AppCompatActivity {
 
         // 뷰 초기화
         llBackNavigation = findViewById(R.id.ll_back_navigation);
-        
+
         // 성향 결과 표시
         displayPersonalityResult();
 
@@ -66,7 +74,7 @@ public class PersonalityTestResultActivity extends AppCompatActivity {
             }
         });
     }
-    
+
     private void displayPersonalityResult() {
         TextView tvResultTitle = findViewById(R.id.tv_result_title);
         TextView tvTraitGoal = findViewById(R.id.tv_trait_goal);
@@ -74,14 +82,14 @@ public class PersonalityTestResultActivity extends AppCompatActivity {
         TextView tvTraitTime = findViewById(R.id.tv_trait_time);
         TextView tvTraitProblem = findViewById(R.id.tv_trait_problem);
         TextView tvDescription = findViewById(R.id.tv_description);
-        
+
         // 성향 타입 설정
         if (personalityType != null && !personalityType.isEmpty()) {
             tvResultTitle.setText(personalityType);
         } else {
             tvResultTitle.setText("CAREFUL_SUPPORTER");
         }
-        
+
         // Traits 정보 설정 (API 데이터 사용)
         if (personalityTraits != null) {
             tvTraitGoal.setText("Goal: " + getGoalFromProfileCode(personalityType));
@@ -95,14 +103,14 @@ public class PersonalityTestResultActivity extends AppCompatActivity {
             tvTraitTime.setText("Time: NIGHT");
             tvTraitProblem.setText("Problem: ANALYTIC");
         }
-        
+
         // 설명 설정 (성향 타입에 따른 동적 설명)
         tvDescription.setText(getDescriptionFromProfileCode(personalityType));
     }
-    
+
     private String getGoalFromProfileCode(String profileCode) {
         if (profileCode == null) return "QUALITY";
-        
+
         switch (profileCode) {
             case "STRATEGIC_LEADER":
                 return "STRATEGY";
@@ -116,10 +124,10 @@ public class PersonalityTestResultActivity extends AppCompatActivity {
                 return "QUALITY";
         }
     }
-    
+
     private String getProblemFromProfileCode(String profileCode) {
         if (profileCode == null) return "ANALYTIC";
-        
+
         switch (profileCode) {
             case "STRATEGIC_LEADER":
                 return "STRATEGIC";
@@ -133,10 +141,10 @@ public class PersonalityTestResultActivity extends AppCompatActivity {
                 return "ANALYTIC";
         }
     }
-    
+
     private String getDescriptionFromProfileCode(String profileCode) {
         if (profileCode == null) return "당신은 신중하며, 분석적이고 목표 지향적인 성향을 가진 지원자 타입입니다.";
-        
+
         switch (profileCode) {
             case "STRATEGIC_LEADER":
                 return "당신은 전략적 사고와 리더십을 갖춘 지도자 타입입니다. 큰 그림을 그리고 팀을 이끄는 능력이 뛰어납니다.";
@@ -150,4 +158,4 @@ public class PersonalityTestResultActivity extends AppCompatActivity {
                 return "당신은 신중하며, 분석적이고 목표 지향적인 성향을 가진 지원자 타입입니다.";
         }
     }
-} 
+}
