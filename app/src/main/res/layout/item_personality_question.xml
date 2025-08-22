@@ -39,7 +39,14 @@
         android:textColor="@android:color/black"
         android:backgroundTint="@android:color/white"
         app:cornerRadius="8dp"
+        android:layout_marginBottom="8dp"
         android:textAlignment="textStart"
         android:padding="16dp" />
+
+    <!-- Option C -->
+
+    <!-- Option D -->
+
+    <!-- Result Button -->
 
 </LinearLayout> 

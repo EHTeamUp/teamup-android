@@ -11,7 +11,16 @@ public class PersonalityOption {
     
     @SerializedName("value")
     private String value;
-    
+
+    @SerializedName("type")
+    private String type;
+
+    public PersonalityOption(int id, String text, String type) {
+        this.id = id;
+        this.text = text;
+        this.type = type;
+    }
+
     public int getId() {
         return id;
     }
@@ -34,5 +43,13 @@ public class PersonalityOption {
     
     public void setValue(String value) {
         this.value = value;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

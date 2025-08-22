@@ -1,36 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFFFFF"
+    android:orientation="vertical"
+    android:padding="24dp"
     tools:context=".MainActivity">
-
-    <!-- Header - TeamUp Title -->
-    <TextView
-        android:id="@+id/tv_header_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/app_name"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:textColor="@android:color/black"
-        android:layout_marginTop="32dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
 
     <!-- Main Content Container -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="32dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginEnd="24dp"
-        android:layout_marginBottom="24dp"
-        app:layout_constraintTop_toBottomOf="@id/tv_header_title"
-        app:layout_constraintBottom_toBottomOf="parent">
+        android:layout_weight="1"
+        android:layout_marginTop="16dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -46,7 +30,10 @@
                 android:background="@drawable/mypage_menu_item_background"
                 android:padding="16dp"
                 android:gravity="center_vertical"
-                android:layout_marginBottom="16dp">
+                android:layout_marginBottom="16dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?android:attr/selectableItemBackground">
 
                 <TextView
                     android:id="@+id/tv_back_arrow"
@@ -58,10 +45,11 @@
                     android:layout_marginEnd="12dp" />
 
                 <TextView
+                    android:id="@+id/tv_user_id"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="hong_gil"
+                    android:text=""
                     android:textStyle="bold"
                     android:textSize="16sp"
                     android:textColor="@android:color/black"
@@ -69,7 +57,7 @@
 
             </LinearLayout>
 
-            <!-- 관심있는 언어, 기술/역할 Section -->
+            <!-- 사용 가능한 기술/역할 Section -->
             <LinearLayout
                 android:id="@+id/ll_languages_and_roles"
                 android:layout_width="match_parent"
@@ -94,16 +82,17 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="관심있는 언어, 기술/역할"
+                            android:text="기술/역할"
                             android:textSize="16sp"
                             android:textStyle="bold"
                             android:textColor="@android:color/black"
                             android:layout_marginBottom="4dp" />
 
                         <TextView
+                            android:id="@+id/tv_user_skills_and_roles"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Python, Java, 웹/앱 / 백엔드"
+                            android:text=""
                             android:textSize="14sp"
                             android:textColor="@android:color/black" />
 
@@ -120,7 +109,7 @@
 
             </LinearLayout>
 
-            <!-- 자신의 경험 Section -->
+            <!-- 경험 Section -->
             <LinearLayout
                 android:id="@+id/ll_experience"
                 android:layout_width="match_parent"
@@ -152,17 +141,10 @@
                             android:layout_marginBottom="4dp" />
 
                         <TextView
+                            android:id="@+id/tv_user_experiences"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="배리어프리 앱 개발 콘테스트 1차 서류 합격"
-                            android:textSize="14sp"
-                            android:textColor="@android:color/black"
-                            android:layout_marginBottom="2dp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="교내 해커톤 우수상"
+                            android:text=""
                             android:textSize="14sp"
                             android:textColor="@android:color/black" />
 
@@ -179,7 +161,7 @@
 
             </LinearLayout>
 
-            <!-- 팀원 성향 Section -->
+            <!-- 팀 성향 Section -->
             <LinearLayout
                 android:id="@+id/ll_team_tendency"
                 android:layout_width="match_parent"
@@ -204,16 +186,17 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="성향"
+                            android:text="팀원 성향"
                             android:textSize="16sp"
                             android:textStyle="bold"
                             android:textColor="@android:color/black"
                             android:layout_marginBottom="4dp" />
 
                         <TextView
+                            android:id="@+id/tv_team_tendency"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="아직 테스트를 보지 않았어요!"
+                            android:text=""
                             android:textSize="14sp"
                             android:textColor="@android:color/black" />
 
@@ -232,17 +215,5 @@
 
         </LinearLayout>
     </ScrollView>
-    <!-- Bottom Navigation -->
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottom_navigation"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="0dp"
-        android:layout_marginEnd="0dp"
-        android:background="@android:color/white"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:menu="@menu/bottom_nav_menu" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

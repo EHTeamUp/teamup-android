@@ -1,406 +1,223 @@
 package com.example.teamup.auth;
 
-import android.annotation.SuppressLint;
-import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.LayoutInflater;
+import android.util.Log;
 import android.view.View;
+
+import android.app.DatePickerDialog;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.Calendar;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.teamup.R;
+import com.example.teamup.api.model.Experience;
+import com.example.teamup.api.model.RegistrationStep3;
+import com.example.teamup.api.model.StepResponse;
+import com.example.teamup.fragments.ExperienceFragment;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
-import java.util.Locale;
 
-public class SignupExperienceActivity extends AppCompatActivity {
+public class SignupExperienceActivity extends AppCompatActivity implements ExperienceFragment.ExperienceFragmentListener {
     
-    private EditText etContestName, etAwardTitle, etExperience;
-    private TextView btnNext, tvPrevious;
-    private LinearLayout llExperienceSection;
-    private Button btnAddExperience;
-    
-    // 동적으로 추가된 입력 폼들을 관리
-    private List<View> additionalForms = new ArrayList<>();
-    
-    // 이전 액티비티에서 전달받은 데이터
-    private String userId, userPassword, userName, userEmail;
-    private String[] languages, roles;
+    private static final String TAG = "SignupExperienceActivity";
+
+    private String userId;
+    private RegistrationManager registrationManager;
+
+    private TextView btnPrevious, btnNext;
+    private ExperienceFragment experienceFragment;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup_experience);
         
-        // 이전 액티비티에서 데이터 받기
-        receiveDataFromPreviousActivity();
-        
-        // 뷰 초기화
+        // userId 받기
+        userId = getIntent().getStringExtra("userId");
+        if (userId == null) {
+            Toast.makeText(this, "사용자 정보를 찾을 수 없습니다.", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+
+        registrationManager = RegistrationManager.getInstance();
         initViews();
         
-        // 클릭 리스너 설정
-        setClickListeners();
+        // ExperienceFragment 생성 (회원가입 모드)
+        experienceFragment = ExperienceFragment.newInstance(false, userId);
+        
+        // Fragment 추가
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, experienceFragment)
+                .commit();
     }
-    
-    private void receiveDataFromPreviousActivity() {
-        Intent intent = getIntent();
-        userId = intent.getStringExtra("id");
-        userPassword = intent.getStringExtra("password");
-        userName = intent.getStringExtra("name");
-        userEmail = intent.getStringExtra("email");
-        languages = intent.getStringArrayExtra("languages");
-        roles = intent.getStringArrayExtra("roles");
-    }
-    
-    @SuppressLint("WrongViewCast")
+
     private void initViews() {
-        etContestName = findViewById(R.id.et_contest_name);
-        etAwardTitle = findViewById(R.id.et_award_title);
-        etExperience = findViewById(R.id.et_description);
-        btnNext = findViewById(R.id.tv_skip);
-        tvPrevious = findViewById(R.id.tv_previous);
-        llExperienceSection = findViewById(R.id.ll_experience_section);
-        btnAddExperience = findViewById(R.id.btn_add_experience);
+        btnPrevious = findViewById(R.id.btn_previous);
+        btnNext = findViewById(R.id.btn_next);
+
+        btnPrevious.setOnClickListener(v -> goToPreviousStep());
+        btnNext.setOnClickListener(v -> handleNextButtonClick());
         
-        // btnNext는 TextView이므로 클릭 가능하도록 설정
-        btnNext.setClickable(true);
-        btnNext.setFocusable(true);
+        // 초기에는 Skip 버튼으로 설정
+        btnNext.setText("Skip");
+    }
+
+    // 이 메서드는 ExperienceFragment에서 처리하므로 제거
+
+    // 이 메서드는 ExperienceFragment에서 처리하므로 제거
+    
+    // 이 메서드들은 ExperienceFragment에서 처리하므로 제거
+    
+    private void handleNextButtonClick() {
+        // ExperienceFragment에서 선택된 경험들 확인
+        List<Experience> selectedExperiences = experienceFragment.getSelectedExperiences();
         
-        // 첫 번째 폼의 날짜 필드에 DatePicker 설정
-        setupDatePicker();
+        // 모든 form을 검사하여 내용이 있는지 확인
+        boolean hasAnyContent = experienceFragment.hasAnyFormContent();
         
-        // 첫 번째 폼의 입력 상태를 실시간으로 감지
-        setupTextWatchers();
+        if (hasAnyContent) {
+            // form에 내용이 있으면 유효성 검사 후 API 호출
+            if (validateExperiences(selectedExperiences)) {
+                proceedToNextStep();
+            }
+        } else {
+            // form에 내용이 없으면 Skip
+            goToFinishStep();
+        }
     }
     
-    private void setupTextWatchers() {
-        android.text.TextWatcher textWatcher = new android.text.TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+    /**
+     * 경험 데이터 유효성 검사
+     */
+    private boolean validateExperiences(List<Experience> experiences) {
+        // 모든 form을 검사하여 부분적으로 입력된 form이 있는지 확인
+        List<View> formViews = experienceFragment.getExperienceFormViews();
+        
+        for (int i = 0; i < formViews.size(); i++) {
+            View formView = formViews.get(i);
+            EditText etContestName = formView.findViewById(R.id.et_contest_name_additional);
+            Spinner spinnerCategory = formView.findViewById(R.id.spinner_category);
+            EditText etDate = formView.findViewById(R.id.et_date_additional);
+            EditText etDescription = formView.findViewById(R.id.et_description_additional);
             
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            String contestName = etContestName.getText().toString().trim();
+            String category = spinnerCategory.getSelectedItem().toString();
+            String date = etDate.getText().toString().trim();
+            String description = etDescription.getText().toString().trim();
             
-            @Override
-            public void afterTextChanged(android.text.Editable s) {
-                updateButtonText();
-            }
-        };
-        
-        etContestName.addTextChangedListener(textWatcher);
-        etAwardTitle.addTextChangedListener(textWatcher);
-        etExperience.addTextChangedListener(textWatcher);
-    }
-    
-    private void setClickListeners() {
-        // Previous 버튼
-        tvPrevious.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // SignupTestActivity로 이동
-                Intent intent = new Intent(SignupExperienceActivity.this, SignupTestActivity.class);
-                intent.putExtra("id", userId);
-                intent.putExtra("password", userPassword);
-                intent.putExtra("name", userName);
-                intent.putExtra("email", userEmail);
-                intent.putExtra("languages", languages);
-                intent.putExtra("roles", roles);
-                startActivity(intent);
-                finish(); // 현재 액티비티 종료
-            }
-        });
-        
-        // 추가 버튼
-        btnAddExperience.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                addExperienceForm();
-            }
-        });
-        
-        // Next/Skip 버튼
-        btnNext.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String buttonText = btnNext.getText().toString();
+            // 하나라도 내용이 있으면 모든 필수 필드 검사
+            if (!contestName.isEmpty() || 
+                !category.equals("카테고리 선택") || 
+                !date.isEmpty() || 
+                !description.isEmpty()) {
                 
-                if (buttonText.equals("Next →")) {
-                    // Next 버튼일 때는 첫 번째 폼 + 추가 폼들의 유효성 검사 수행
-                    if (validateInput() && validateAdditionalForms()) {
-                        // 다음 액티비티로 이동 (SignupFinishActivity)
-                        Intent intent = new Intent(SignupExperienceActivity.this, SignupFinishActivity.class);
-                        intent.putExtra("id", userId);
-                        intent.putExtra("password", userPassword);
-                        intent.putExtra("name", userName);
-                        intent.putExtra("email", userEmail);
-                        intent.putExtra("languages", languages);
-                        intent.putExtra("roles", roles);
-                        intent.putExtra("contestName", etContestName.getText().toString().trim());
-                        intent.putExtra("awardTitle", etAwardTitle.getText().toString().trim());
-                        intent.putExtra("experience", etExperience.getText().toString().trim());
-                        startActivity(intent);
-                    }
-                } else {
-                    // Skip 버튼일 때는 유효성 검사 없이 바로 이동
-                    Intent intent = new Intent(SignupExperienceActivity.this, SignupFinishActivity.class);
-                    intent.putExtra("id", userId);
-                    intent.putExtra("password", userPassword);
-                    intent.putExtra("name", userName);
-                    intent.putExtra("email", userEmail);
-                    intent.putExtra("languages", languages);
-                    intent.putExtra("roles", roles);
-                    intent.putExtra("contestName", etContestName.getText().toString().trim());
-                    intent.putExtra("awardTitle", etAwardTitle.getText().toString().trim());
-                    intent.putExtra("experience", etExperience.getText().toString().trim());
-                    startActivity(intent);
+                // 공모전명 필수
+                if (contestName.isEmpty()) {
+                    Toast.makeText(this, "공모전명을 입력해주세요.", Toast.LENGTH_SHORT).show();
+                    return false;
+                }
+                
+                // 카테고리 필수
+                if (category.equals("카테고리 선택")) {
+                    Toast.makeText(this, "카테고리를 선택해주세요.", Toast.LENGTH_SHORT).show();
+                    return false;
+                }
+                
+                // 날짜 필수
+                if (date.isEmpty()) {
+                    Toast.makeText(this, "날짜를 입력해주세요.", Toast.LENGTH_SHORT).show();
+                    return false;
+                }
+                
+                // 설명 필수
+                if (description.isEmpty()) {
+                    Toast.makeText(this, "설명을 입력해주세요.", Toast.LENGTH_SHORT).show();
+                    return false;
                 }
             }
-        });
-        
-        // 초기 버튼 상태 설정
-        updateButtonText();
-    }
-    
-    private boolean validateInput() {
-        String contestName = etContestName.getText().toString().trim();
-        String awardTitle = etAwardTitle.getText().toString().trim();
-        String experience = etExperience.getText().toString().trim();
-        
-        EditText etDate = findViewById(R.id.et_date);
-        String date = etDate.getText().toString().trim();
-        
-        if (contestName.isEmpty()) {
-            Toast.makeText(this, "공모전명을 입력해주세요.", Toast.LENGTH_SHORT).show();
-            return false;
-        }
-        
-        if (awardTitle.isEmpty()) {
-            Toast.makeText(this, "수상명을 입력해주세요.", Toast.LENGTH_SHORT).show();
-            return false;
-        }
-        
-        if (date.isEmpty()) {
-            Toast.makeText(this, "날짜를 선택해주세요.", Toast.LENGTH_SHORT).show();
-            return false;
-        }
-        
-        if (experience.isEmpty()) {
-            Toast.makeText(this, "설명을 입력해주세요.", Toast.LENGTH_SHORT).show();
-            return false;
         }
         
         return true;
     }
-
-    private boolean validateAdditionalForms() {
-        for (View form : additionalForms) {
-            EditText etContestName = form.findViewById(R.id.et_contest_name_additional);
-            EditText etAwardTitle = form.findViewById(R.id.et_award_title_additional);
-            EditText etDescription = form.findViewById(R.id.et_description_additional);
-            EditText etDate = form.findViewById(R.id.et_date_additional);
-
-            if (etContestName.getText().toString().trim().isEmpty() ||
-                etAwardTitle.getText().toString().trim().isEmpty() ||
-                etDate.getText().toString().trim().isEmpty() ||
-                etDescription.getText().toString().trim().isEmpty()) {
-                Toast.makeText(this, "모든 경험 입력 폼을 완료해주세요.", Toast.LENGTH_SHORT).show();
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private void addExperienceForm() {
-        // 새로운 입력 폼을 위한 레이아웃 생성
-        View newForm = LayoutInflater.from(this).inflate(R.layout.item_experience_form, llExperienceSection, false);
-        
-        // 구분선 추가
-        View divider = new View(this);
-        divider.setLayoutParams(new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                2
-        ));
-        divider.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
-        
-        // 삭제 버튼에 클릭 리스너 추가
-        TextView tvRemoveForm = newForm.findViewById(R.id.tv_remove_form);
-        tvRemoveForm.setClickable(true);
-        tvRemoveForm.setFocusable(true);
-        tvRemoveForm.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                removeExperienceForm(newForm, divider);
-            }
-        });
-        
-        // 추가된 폼의 EditText들에 TextWatcher 설정
-        setupAdditionalFormTextWatchers(newForm);
-        
-        // 추가 버튼 앞에 새로운 폼과 구분선 추가
-        int addButtonIndex = llExperienceSection.indexOfChild(btnAddExperience);
-        llExperienceSection.addView(divider, addButtonIndex);
-        llExperienceSection.addView(newForm, addButtonIndex + 1);
-        
-        // 추가된 폼을 리스트에 저장
-        additionalForms.add(newForm);
-        
-        // 버튼 텍스트 업데이트
-        updateButtonText();
-        
-        Toast.makeText(this, "새로운 경험 입력 폼이 추가되었습니다.", Toast.LENGTH_SHORT).show();
-    }
     
-    private void removeExperienceForm(View form, View divider) {
-        // 폼과 구분선 제거
-        llExperienceSection.removeView(form);
-        llExperienceSection.removeView(divider);
-        
-        // 리스트에서도 제거
-        additionalForms.remove(form);
-        
-        // 버튼 텍스트 업데이트
-        updateButtonText();
-        
-        Toast.makeText(this, "경험 입력 폼이 삭제되었습니다.", Toast.LENGTH_SHORT).show();
+    private void goToFinishStep() {
+        Intent intent = new Intent(SignupExperienceActivity.this, SignupTestBaseActivity.class);
+        intent.putExtra("userId", userId);
+        startActivity(intent);
     }
 
-    private void updateButtonText() {
-        // 첫 번째 폼이 완성되었는지 확인
-        boolean firstFormComplete = isFirstFormComplete();
+    private void proceedToNextStep() {
+        // ExperienceFragment에서 선택된 경험들 가져오기
+        List<Experience> selectedExperiences = experienceFragment.getSelectedExperiences();
         
-        // 첫 번째 폼이 완성되면 "Next", 아니면 "Skip"
-        if (firstFormComplete) {
-            btnNext.setText("Next →");
-        } else {
-            btnNext.setText("Skip →");
+        // Step 3 등록 - API 호출
+        if (selectedExperiences.isEmpty()) {
+            // 경험이 없으면 바로 finish로
+            goToFinishStep();
+            return;
         }
-    }
-    
-    private boolean isFirstFormComplete() {
-        String contestName = etContestName.getText().toString().trim();
-        String awardTitle = etAwardTitle.getText().toString().trim();
-        String experience = etExperience.getText().toString().trim();
         
-        EditText etDate = findViewById(R.id.et_date);
-        String date = etDate.getText().toString().trim();
-        
-        return !contestName.isEmpty() && !awardTitle.isEmpty() && !date.isEmpty() && !experience.isEmpty();
-    }
-
-    private void setupAdditionalFormTextWatchers(View form) {
-        EditText etContestName = form.findViewById(R.id.et_contest_name_additional);
-        EditText etAwardTitle = form.findViewById(R.id.et_award_title_additional);
-        EditText etDescription = form.findViewById(R.id.et_description_additional);
-        EditText etDate = form.findViewById(R.id.et_date_additional);
-        
-        android.text.TextWatcher textWatcher = new android.text.TextWatcher() {
+        registrationManager.completeStep3(userId, selectedExperiences, new RegistrationManager.StepCallback() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {}
-            
-            @Override
-            public void afterTextChanged(android.text.Editable s) {
-                updateButtonText();
+            public void onSuccess(StepResponse response) {
+                runOnUiThread(() -> {
+                    Toast.makeText(SignupExperienceActivity.this, "경험 등록이 완료되었습니다.", Toast.LENGTH_SHORT).show();
+                    
+                    // 다음 단계로 이동 (성향 테스트)
+                    Intent intent = new Intent(SignupExperienceActivity.this, SignupTestBaseActivity.class);
+                    intent.putExtra("userId", userId);
+                    startActivity(intent);
+                });
             }
-        };
-        
-        etContestName.addTextChangedListener(textWatcher);
-        etAwardTitle.addTextChangedListener(textWatcher);
-        etDescription.addTextChangedListener(textWatcher);
-        
-        // 추가된 폼의 날짜 필드에 DatePicker 설정
-        setupAdditionalFormDatePicker(etDate);
-    }
 
-    private void setupDatePicker() {
-        EditText etDate = findViewById(R.id.et_date);
-        
-        // 오늘 날짜를 최대 날짜로 설정
-        Calendar calendar = Calendar.getInstance();
-        int maxYear = calendar.get(Calendar.YEAR);
-        int maxMonth = calendar.get(Calendar.MONTH);
-        int maxDay = calendar.get(Calendar.DAY_OF_MONTH);
-        
-        etDate.setFocusable(false);
-        etDate.setClickable(true);
-        
-        etDate.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                DatePickerDialog datePickerDialog = new DatePickerDialog(
-                    SignupExperienceActivity.this,
-                    new DatePickerDialog.OnDateSetListener() {
-                        @Override
-                        public void onDateSet(android.widget.DatePicker view, int year, int month, int dayOfMonth) {
-                            Calendar selectedDate = Calendar.getInstance();
-                            selectedDate.set(year, month, dayOfMonth);
-                            
-                            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-                            String selectedDateString = dateFormat.format(selectedDate.getTime());
-                            etDate.setText(selectedDateString);
-                            
-                            // 날짜 선택 후 버튼 텍스트 업데이트
-                            updateButtonText();
-                        }
-                    },
-                    maxYear, maxMonth, maxDay
-                );
-                
-                // 오늘 날짜까지만 선택 가능하도록 설정
-                datePickerDialog.getDatePicker().setMaxDate(calendar.getTimeInMillis());
-                
-                datePickerDialog.show();
+            public void onError(String error) {
+                runOnUiThread(() -> {
+                    Toast.makeText(SignupExperienceActivity.this, "경험 등록 중 오류가 발생했습니다: " + error, Toast.LENGTH_SHORT).show();
+                });
             }
         });
     }
 
-    private void setupAdditionalFormDatePicker(EditText etDate) {
-        // 오늘 날짜를 최대 날짜로 설정
-        Calendar calendar = Calendar.getInstance();
-        int maxYear = calendar.get(Calendar.YEAR);
-        int maxMonth = calendar.get(Calendar.MONTH);
-        int maxDay = calendar.get(Calendar.DAY_OF_MONTH);
-        
-        etDate.setFocusable(false);
-        etDate.setClickable(true);
-        
-        etDate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                DatePickerDialog datePickerDialog = new DatePickerDialog(
-                    SignupExperienceActivity.this,
-                    new DatePickerDialog.OnDateSetListener() {
-                        @Override
-                        public void onDateSet(android.widget.DatePicker view, int year, int month, int dayOfMonth) {
-                            Calendar selectedDate = Calendar.getInstance();
-                            selectedDate.set(year, month, dayOfMonth);
-                            
-                            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-                            String selectedDateString = dateFormat.format(selectedDate.getTime());
-                            etDate.setText(selectedDateString);
-                            
-                            // 날짜 선택 후 버튼 텍스트 업데이트
-                            updateButtonText();
-                        }
-                    },
-                    maxYear, maxMonth, maxDay
-                );
-                
-                // 오늘 날짜까지만 선택 가능하도록 설정
-                datePickerDialog.getDatePicker().setMaxDate(calendar.getTimeInMillis());
-                
-                datePickerDialog.show();
+    private void goToPreviousStep() {
+        finish(); // 이전 Activity로 돌아가기
+    }
+    
+    // ===== ExperienceFragmentListener 구현 =====
+    
+    @Override
+    public void onBackPressed() {
+        // 이전 단계로 돌아가기
+        goToPreviousStep();
+        super.onBackPressed();
+    }
+    
+    @Override
+    public void onExperienceUpdated() {
+        // 회원가입에서는 사용하지 않음
+    }
+    
+    @Override
+    public void onFormContentChanged(boolean hasContent) {
+        runOnUiThread(() -> {
+            if (hasContent) {
+                // form에 내용이 있으면 Next 버튼으로 변경
+                btnNext.setText("Next");
+            } else {
+                // form에 내용이 없으면 Skip 버튼으로 변경
+                btnNext.setText("Skip");
             }
         });
     }

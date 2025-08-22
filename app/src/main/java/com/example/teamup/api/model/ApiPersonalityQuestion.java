@@ -6,7 +6,7 @@ import java.util.List;
 public class ApiPersonalityQuestion {
     @SerializedName("id")
     private int id;
-    
+
     @SerializedName("order_no")
     private int orderNo;
     
@@ -22,7 +22,7 @@ public class ApiPersonalityQuestion {
     public int getId() {
         return id;
     }
-    
+
     public void setId(int id) {
         this.id = id;
     }
@@ -58,4 +58,13 @@ public class ApiPersonalityQuestion {
     public void setOptions(List<PersonalityOption> options) {
         this.options = options;
     }
+
+    public ApiPersonalityQuestion(int orderNo, String keyName, String text, int id, List<PersonalityOption> options) {
+        this.orderNo = orderNo;
+        this.keyName = keyName;
+        this.text = text;
+        this.id = id;
+        this.options = options;
+    }
+
 }

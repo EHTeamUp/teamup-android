@@ -10,8 +10,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import com.example.teamup.MainActivity;
-import com.example.teamup.MypageActivity;
 import com.example.teamup.R;
+import com.example.teamup.personality.PersonalityTestResultActivity;
 
 public class MypageTestIngActivity extends AppCompatActivity {
 
@@ -22,7 +22,7 @@ public class MypageTestIngActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_mypage_test_ing);
+        setContentView(R.layout.fragment_personality_test_question);
 
         initViews();
         setClickListeners();
@@ -32,14 +32,14 @@ public class MypageTestIngActivity extends AppCompatActivity {
     private void initViews() {
         bottomNavigationView = findViewById(R.id.bottom_navigation);
         cvNavigation = findViewById(R.id.cv_navigation);
-        btnSubmit = findViewById(R.id.btn_submit);
+        btnSubmit = findViewById(R.id.btn_result);
     }
 
     private void setClickListeners() {
         cvNavigation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MypageTestIngActivity.this, MypageProfileActivity.class);
+                Intent intent = new Intent(MypageTestIngActivity.this, MainActivity.class);
                 startActivity(intent);
                 finish();
             }
@@ -49,7 +49,7 @@ public class MypageTestIngActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // 성향 테스트 결과 화면으로 이동
-                Intent intent = new Intent(MypageTestIngActivity.this, MypageTestResultActivity.class);
+                Intent intent = new Intent(MypageTestIngActivity.this, PersonalityTestResultActivity.class);
                 startActivity(intent);
                 finish();
             }
@@ -76,7 +76,7 @@ public class MypageTestIngActivity extends AppCompatActivity {
                 return true;
             } else if (itemId == R.id.navigation_profile) {
                 // 마이페이지 메인으로 이동
-                Intent intent = new Intent(MypageTestIngActivity.this, MypageActivity.class);
+                Intent intent = new Intent(MypageTestIngActivity.this, MainActivity.class);
                 startActivity(intent);
                 finish();
                 return true;

@@ -14,9 +14,9 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.example.teamup.auth.LoginActivity;
 import com.example.teamup.auth.LoginManager;
 import com.example.teamup.auth.TokenManager;
-import com.example.teamup.mypage.MypageUserinfoActivity;
 import com.example.teamup.R;
-import com.example.teamup.mypage.MypageProfileActivity;
+import com.example.teamup.fragments.MypageUserinfoFragment;
+import com.example.teamup.fragments.MypageProfileFragment;
 import com.example.teamup.notification.FcmTokenManager;
 
 
@@ -33,7 +33,7 @@ public class MypageActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_mypage);
+        setContentView(R.layout.fragment_mypage);
 
         // TokenManager 초기화
         tokenManager = TokenManager.getInstance(this);
@@ -63,7 +63,7 @@ public class MypageActivity extends AppCompatActivity {
         llMemberInfo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MypageActivity.this, MypageUserinfoActivity.class);
+                Intent intent = new Intent(MypageActivity.this, MypageUserinfoFragment.class);
                 startActivity(intent);
             }
         });
@@ -72,7 +72,7 @@ public class MypageActivity extends AppCompatActivity {
         llProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MypageActivity.this, MypageProfileActivity.class);
+                Intent intent = new Intent(MypageActivity.this, MypageProfileFragment.class);
                 startActivity(intent);
             }
         });
