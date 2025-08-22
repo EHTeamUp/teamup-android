@@ -77,6 +77,13 @@ public interface ApiService {
     @POST("api/v1/users/login")
     Call<LoginResponse> login(@Body LoginRequest loginRequest);
 
+    /**
+     * 사용자 로그아웃 API
+     * POST /api/v1/users/logout
+     */
+    @POST("api/v1/users/logout")
+    Call<ApiResponse> logout();
+
     @GET("api/v1/contests/")
     Call<ContestsListResponse> getContests();
 
@@ -229,6 +236,8 @@ public interface ApiService {
      */
     @PUT("api/v1/notifications/fcm-token")
     Call<ApiResponse> updateFcmToken(@Body FcmTokenRequest request);
+
+
 
     /**
      * 현재 사용자 정보 조회 API
