@@ -8,6 +8,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import kr.mojuk.teamup.R;
+import kr.mojuk.teamup.notification.FcmTokenManager;
 
 public class SignupFinishActivity extends AppCompatActivity {
 
@@ -23,6 +24,9 @@ public class SignupFinishActivity extends AppCompatActivity {
 
     private void initViews() {
         btnGoToLogin = findViewById(R.id.btn_go_to_login);
+        
+        // 회원가입 완료 시 FCM 토큰 초기화
+        FcmTokenManager.getInstance(this).clearFcmTokenOnSignup();
         
         btnGoToLogin.setOnClickListener(v -> {
             Toast.makeText(this, "로그인 화면으로 이동합니다.", Toast.LENGTH_SHORT).show();
