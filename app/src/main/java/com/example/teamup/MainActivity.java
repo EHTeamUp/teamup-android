@@ -14,12 +14,11 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.example.teamup.auth.LoginActivity;
-import com.example.teamup.auth.LoginManager;
 import com.example.teamup.auth.TokenManager;
+
+import com.example.teamup.contest.ContestListFragment;
+import com.example.teamup.recruitment.ContestRecruitmentListFragment;
 import com.example.teamup.fragment.HomeFragment;
-import com.example.teamup.fragment.ContestFragment;
-import com.example.teamup.fragment.BoardFragment;
 import com.example.teamup.fragment.ProfileFragment;
 import com.example.teamup.fragments.MypageFragment;
 import com.example.teamup.fragments.ExperienceFragment;
@@ -28,6 +27,7 @@ import com.example.teamup.applicant.ApplicantListFragment;
 import com.example.teamup.recruitment.TeamSynergyScoreFragment;
 import com.example.teamup.notification.FcmTokenManager;
 import com.example.teamup.notification.NotificationPermissionHelper;
+
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity implements ExperienceFragment.ExperienceFragmentListener {
@@ -50,9 +50,8 @@ public class MainActivity extends AppCompatActivity implements ExperienceFragmen
             return insets;
         });
 
-        // TokenManager 초기화
         tokenManager = TokenManager.getInstance(this);
-
+      
         // FCM 토큰 매니저 초기화
         FcmTokenManager.getInstance(this);
 
@@ -106,8 +105,8 @@ public class MainActivity extends AppCompatActivity implements ExperienceFragmen
                         .commit();
             }
         }
-
-        // Setup navigation listener
+      
+        // 하단 탭 선택 리스너 설정
         navView.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
             Fragment selectedFragment = null;
@@ -126,9 +125,9 @@ public class MainActivity extends AppCompatActivity implements ExperienceFragmen
             } else if (itemId == R.id.navigation_home) {
                 selectedFragment = new HomeFragment();
             } else if (itemId == R.id.navigation_contest) {
-                selectedFragment = new ContestFragment();
+                selectedFragment = new ContestListFragment();
             } else if (itemId == R.id.navigation_board) {
-                selectedFragment = new BoardFragment();
+                selectedFragment = new ContestRecruitmentListFragment();
             }
 
             if (selectedFragment != null) {

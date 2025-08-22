@@ -10,7 +10,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
  */
 public class RetrofitClient {
     private static final String BASE_URL = "http://10.0.2.2:8000/"; // Android 에뮬레이터에서 로컬 서버 접근
-    // 실제 디바이스 사용 시: "http://192.168.1.100:8000/" (실제 서버 IP 주소)
+    //실제 디바이스 사용 시: "http://192.168.1.100:8000/" (실제 서버 IP 주소)
     
     private static RetrofitClient instance;
     private Retrofit retrofit;

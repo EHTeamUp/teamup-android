@@ -23,7 +23,7 @@ import com.example.teamup.api.model.ApplicationStatusUpdate;
 import com.example.teamup.api.model.ApplicationReject;
 import com.example.teamup.api.model.ApiResponse;
 import com.example.teamup.api.model.RecruitmentPostResponse;
-import com.example.teamup.api.model.ContestResponse;
+import com.example.teamup.api.model.ContestInformation;
 import com.example.teamup.auth.JwtUtils;
 import com.example.teamup.auth.TokenManager;
 import com.example.teamup.recruitment.TeamSynergyScoreFragment;
@@ -47,7 +47,25 @@ public class ApplicantListFragment extends Fragment {
     private MaterialButton btnSynergyCheck;
     private MaterialButton btnAcceptSelected;
     private ApiService apiService;
-    private int currentRecruitmentPostId = 3; // 현재 게시글 ID
+    private int currentRecruitmentPostId; // 현재 게시글 ID
+
+    // Fragment 인스턴스를 생성하고 arguments를 설정하는 정적 메서드
+    public static ApplicantListFragment newInstance(int recruitmentPostId) {
+        ApplicantListFragment fragment = new ApplicantListFragment();
+        Bundle args = new Bundle();
+        args.putInt("RECRUITMENT_POST_ID", recruitmentPostId);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        // Arguments에서 recruitmentPostId를 가져옴
+        if (getArguments() != null) {
+            currentRecruitmentPostId = getArguments().getInt("RECRUITMENT_POST_ID", 3);
+        }
+    }
 
     @Nullable
     @Override
@@ -207,13 +225,13 @@ public class ApplicantListFragment extends Fragment {
      * 공모전 정보를 로드하는 메서드
      */
     private void loadContestInfo(int contestId) {
-        Call<ContestResponse> call = apiService.getContestDetail(contestId);
+        Call<ContestInformation> call = apiService.getContestDetail(contestId);
         
-        call.enqueue(new Callback<ContestResponse>() {
+        call.enqueue(new Callback<ContestInformation>() {
             @Override
-            public void onResponse(Call<ContestResponse> call, Response<ContestResponse> response) {
+            public void onResponse(Call<ContestInformation> call, Response<ContestInformation> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    ContestResponse contest = response.body();
+                    ContestInformation contest = response.body();
 //                    Log.d(TAG, "공모전 ID: " + contest.getContestId());
 //                    Log.d(TAG, "공모전 이름: " + contest.getName());
 //                    Log.d(TAG, "공모전 URL: " + contest.getContestUrl());
@@ -233,7 +251,7 @@ public class ApplicantListFragment extends Fragment {
             }
             
             @Override
-            public void onFailure(Call<ContestResponse> call, Throwable t) {
+            public void onFailure(Call<ContestInformation> call, Throwable t) {
                 // 네트워크 오류시 기본 텍스트 사용
                 tvNavigationText.setText(" 배리어프리 앱 개발 콘테스트");
                 Log.d(TAG, "공모전 API 네트워크 오류: " + t.getMessage());
