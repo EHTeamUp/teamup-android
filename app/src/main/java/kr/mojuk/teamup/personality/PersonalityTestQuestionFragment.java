@@ -282,6 +282,7 @@ public class PersonalityTestQuestionFragment extends Fragment implements Persona
         List<PersonalityAnswer> answers = new ArrayList<>();
         
         Log.d(TAG, "=== 성향 테스트 답변 데이터 ===");
+        Log.d(TAG, "전체 선택된 답변: " + selectedAnswers.toString());
         for (int i = 0; i < questions.size(); i++) {
             PersonalityQuestion question = questions.get(i);
             String selectedAnswer = selectedAnswers.get(i);
@@ -292,13 +293,17 @@ public class PersonalityTestQuestionFragment extends Fragment implements Persona
             
             int optionId = 1; // 기본값
             if (selectedAnswer != null) {
-                if (selectedAnswer.equals(question.getOptionA())) {
+                if (selectedAnswer.equals("A")) {
                     optionId = 1;
                     Log.d(TAG, "→ A 옵션 선택 (option_id: 1)");
-                } else if (selectedAnswer.equals(question.getOptionB())) {
+                } else if (selectedAnswer.equals("B")) {
                     optionId = 2;
                     Log.d(TAG, "→ B 옵션 선택 (option_id: 2)");
+                } else {
+                    Log.e(TAG, "알 수 없는 선택: " + selectedAnswer);
                 }
+            } else {
+                Log.e(TAG, "선택된 답변이 null입니다");
             }
             
                          answers.add(new PersonalityAnswer(question.getId(), optionId));
