@@ -230,6 +230,8 @@ public interface ApiService {
     @PUT("api/v1/notifications/fcm-token")
     Call<ApiResponse> updateFcmToken(@Body FcmTokenRequest request);
 
+
+
     /**
      * 현재 사용자 정보 조회 API
      * GET /api/v1/users/me
