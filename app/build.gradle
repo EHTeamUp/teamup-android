@@ -52,6 +52,9 @@ dependencies {
     implementation libs.okhttp
     implementation libs.okhttp.logging.interceptor
     implementation libs.gson
+
+    implementation libs.glide
+    annotationProcessor libs.glide.compiler
     
     // Firebase FCM 관련 의존성 (Firebase 설정 완료 후 주석 해제)
     // implementation platform('com.google.firebase:firebase-bom:32.7.0')
