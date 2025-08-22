@@ -124,6 +124,9 @@ public class LoginActivity extends AppCompatActivity {
                             String userId = JwtUtils.getUserIdFromToken(loginResponse.getAccessToken());
                             
                             Log.d(TAG, "로그인 성공: " + userId);
+                            Log.d(TAG, "저장된 JWT 토큰: " + loginResponse.getAccessToken().substring(0, Math.min(20, loginResponse.getAccessToken().length())) + "...");
+                            Log.d(TAG, "TokenManager 로그인 상태: " + tokenManager.isLoggedIn());
+                            Log.d(TAG, "TokenManager에서 가져온 토큰: " + (tokenManager.getAccessToken() != null ? tokenManager.getAccessToken().substring(0, Math.min(20, tokenManager.getAccessToken().length())) + "..." : "null"));
                             
                             // 로그인 상태 업데이트
                             LoginManager.setLoggedIn(true);

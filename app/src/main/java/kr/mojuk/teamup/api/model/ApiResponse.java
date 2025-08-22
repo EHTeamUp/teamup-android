@@ -3,11 +3,14 @@ package kr.mojuk.teamup.api.model;
 import com.google.gson.annotations.SerializedName;
 
 /**
- * API 응답 모델
+ * 일반적인 API 응답 모델
  */
 public class ApiResponse {
     @SerializedName("message")
     private String message;
+
+    public ApiResponse() {
+    }
 
     public ApiResponse(String message) {
         this.message = message;
@@ -21,5 +24,3 @@ public class ApiResponse {
         this.message = message;
     }
 }
-
-

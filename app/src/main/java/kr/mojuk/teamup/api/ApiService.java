@@ -228,7 +228,7 @@ public interface ApiService {
      * PUT /api/v1/notifications/fcm-token
      */
     @PUT("api/v1/notifications/fcm-token")
-    Call<String> updateFcmToken(@Body FcmTokenRequest request);
+    Call<ApiResponse> updateFcmToken(@Body FcmTokenRequest request);
 
     /**
      * 현재 사용자 정보 조회 API
