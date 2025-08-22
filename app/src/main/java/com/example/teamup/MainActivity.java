@@ -12,9 +12,19 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.teamup.auth.TokenManager;
+
 import com.example.teamup.contest.ContestListFragment;
 import com.example.teamup.recruitment.ContestRecruitmentListFragment;
-import com.example.teamup.util.PlaceholderFragment; // 임시 프래그먼트 import
+import com.example.teamup.util.PlaceholderFragment;
+import com.example.teamup.fragment.HomeFragment;
+import com.example.teamup.fragment.ContestFragment;
+import com.example.teamup.fragment.BoardFragment;
+import com.example.teamup.fragment.ProfileFragment;
+import com.example.teamup.applicant.ApplicantListFragment;
+import com.example.teamup.recruitment.TeamSynergyScoreFragment;
+import com.example.teamup.notification.FcmTokenManager;
+import com.example.teamup.notification.NotificationPermissionHelper;
+
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
@@ -33,31 +43,50 @@ public class MainActivity extends AppCompatActivity {
         });
 
         tokenManager = TokenManager.getInstance(this);
+      
+        // FCM 토큰 매니저 초기화
+        FcmTokenManager.getInstance(this);
+
+        // 알림 권한 요청
+        NotificationPermissionHelper.requestNotificationPermission(this);
+
+        // Setup Bottom Navigation
         BottomNavigationView navView = findViewById(R.id.bottom_navigation);
 
-        // 기본 화면 설정 (임시 홈 화면)
-        if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, PlaceholderFragment.newInstance("홈"))
-                    .commit();
+        // Intent에서 Fragment 로드 요청 확인
+        Intent intent = getIntent();
+        if (intent != null && intent.hasExtra("FRAGMENT_TO_LOAD")) {
+            String fragmentToLoad = intent.getStringExtra("FRAGMENT_TO_LOAD");
+            if ("ApplicantListFragment".equals(fragmentToLoad)) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, new ApplicantListFragment())
+                        .commit();
+            } else if ("TeamSynergyScoreFragment".equals(fragmentToLoad)) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, new TeamSynergyScoreFragment())
+                        .commit();
+            }
+        } else {
+            // 기본적으로 Home Fragment 표시
+            if (savedInstanceState == null) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, new HomeFragment())
+                        .commit();
+            }
         }
-
+      
         // 하단 탭 선택 리스너 설정
         navView.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
             Fragment selectedFragment = null;
 
             if (itemId == R.id.navigation_profile) {
-                // 마이페이지는 임시 프래그먼트로 처리
-                selectedFragment = PlaceholderFragment.newInstance("마이페이지");
+                selectedFragment = new ProfileFragment();
             } else if (itemId == R.id.navigation_home) {
-                // 홈은 임시 프래그먼트로 처리
-                selectedFragment = PlaceholderFragment.newInstance("홈");
+                selectedFragment = new HomeFragment();
             } else if (itemId == R.id.navigation_contest) {
-                // 공모전은 ContestListFragment로 처리
-                selectedFragment = new ContestListFragment();
+                selectedFragment = new ContestListFragment()
             } else if (itemId == R.id.navigation_board) {
-                // 게시판은 ContestRecruitmentListFragment로 처리
                 selectedFragment = new ContestRecruitmentListFragment();
             }
 

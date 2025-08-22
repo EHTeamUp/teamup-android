@@ -13,19 +13,25 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- Title Row with Arrow -->
+        <!-- Title Row with Checkbox -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
+            <CheckBox
+                android:id="@+id/cb_applicant_select"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp" />
+
             <TextView
                 android:id="@+id/tv_application_title"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="배리어프리 앱 개발 콘테스트 지원"
+                android:text="z_one_1"
                 android:textColor="@android:color/black"
                 android:textSize="16sp"
                 android:textStyle="bold" />
@@ -37,71 +43,51 @@
                 android:src="@drawable/ic_arrow_right"
                 android:contentDescription="View details" />
         </LinearLayout>
-
-        <!-- Applicant Info -->
+        
+        <!-- Applicant Message -->
         <TextView
-            android:id="@+id/tv_applicant_info"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="지원자: z_one_1"
-            android:textColor="@android:color/black"
-            android:textSize="14sp" />
-
-        <!-- Role Tag -->
-        <TextView
-            android:id="@+id/tv_role_tag"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:background="@drawable/tag_background"
-            android:paddingHorizontal="12dp"
-            android:paddingVertical="4dp"
-            android:text="풀스택 개발자"
-            android:textColor="@android:color/black"
-            android:textSize="12sp" />
-
-        <!-- Skill Tags -->
-        <LinearLayout
+            android:id="@+id/tv_applicant_message"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
+            android:background="@drawable/edittext_background"
+            android:padding="12dp"
+            android:text="안녕하세요! 저는 풀스택 개발자로서 다양한 프로젝트 경험을 가지고 있습니다. 팀워크를 중요시하며, 사용자 중심의 서비스를 개발하는데 관심이 많습니다. 함께 멋진 앱을 만들어보고 싶습니다!"
+            android:textColor="@android:color/black"
+            android:textSize="14sp" />
+
+        <!-- Action Buttons -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
             android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/tv_skill_python"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:background="@drawable/tag_background"
-                android:paddingHorizontal="12dp"
-                android:paddingVertical="4dp"
-                android:text="파이썬"
-                android:textColor="@android:color/black"
-                android:textSize="12sp" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_accept_team"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="4dp"
+                android:text="팀원 수락"
+                android:textColor="@android:color/white"
+                android:textSize="12sp"
+                android:backgroundTint="@android:color/black"
+                app:cornerRadius="8dp" />
 
-            <TextView
-                android:id="@+id/tv_skill_spring"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:background="@drawable/tag_background"
-                android:paddingHorizontal="12dp"
-                android:paddingVertical="4dp"
-                android:text="Spring Boot"
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_reject"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_weight="1"
+                android:layout_marginStart="4dp"
+                android:text="거절"
                 android:textColor="@android:color/black"
-                android:textSize="12sp" />
-
-            <TextView
-                android:id="@+id/tv_skill_planning"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/tag_background"
-                android:paddingHorizontal="12dp"
-                android:paddingVertical="4dp"
-                android:text="기획"
-                android:textColor="@android:color/black"
-                android:textSize="12sp" />
+                android:textSize="12sp"
+                android:backgroundTint="@android:color/white"
+                app:cornerRadius="8dp"
+                app:strokeColor="@android:color/black"
+                app:strokeWidth="1dp" />
         </LinearLayout>
     </LinearLayout>
 </androidx.cardview.widget.CardView> 
