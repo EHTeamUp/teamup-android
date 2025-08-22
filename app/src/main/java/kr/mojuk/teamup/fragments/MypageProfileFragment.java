@@ -54,6 +54,9 @@ public class MypageProfileFragment extends Fragment {
     // 전체 스킬/역할 목록 (ID를 이름으로 변환하기 위해)
     private List<Skill> allSkills;
     private List<Role> allRoles;
+    
+    // 대상 사용자 ID (다른 사용자의 프로필을 볼 때 사용)
+    private String targetUserId;
 
     @Nullable
     @Override
@@ -69,6 +72,11 @@ public class MypageProfileFragment extends Fragment {
         tokenManager = TokenManager.getInstance(requireContext());
         profileManager = ProfileManager.getInstance(requireContext());
         registrationManager = RegistrationManager.getInstance();
+        
+        // 대상 사용자 ID 가져오기
+        if (getArguments() != null) {
+            targetUserId = getArguments().getString("TARGET_USER_ID");
+        }
 
         initViews(view);
         setClickListeners();
@@ -95,10 +103,10 @@ public class MypageProfileFragment extends Fragment {
      * 프로필 정보 로드
      */
     private void loadProfileInfo() {
-        // 사용자 ID 표시
-        String userId = tokenManager.getUserId();
-        if (tvUserId != null && userId != null) {
-            tvUserId.setText("ID: " + userId);
+        // 사용자 ID 표시 (대상 사용자 ID가 있으면 해당 ID, 없으면 현재 로그인한 사용자 ID)
+        String displayUserId = (targetUserId != null) ? targetUserId : tokenManager.getUserId();
+        if (tvUserId != null && displayUserId != null) {
+            tvUserId.setText("ID: " + displayUserId);
         }
         
         // 통합된 기술/역할 정보 로드
@@ -165,6 +173,9 @@ public class MypageProfileFragment extends Fragment {
      * 사용자 데이터 로드 (전체 목록 로드 후 호출)
      */
     private void loadUserData() {
+        // 대상 사용자 ID가 있으면 해당 사용자의 정보를 로드, 없으면 현재 사용자의 정보를 로드
+        String userId = (targetUserId != null) ? targetUserId : tokenManager.getUserId();
+        
         // 사용자 스킬 정보 로드
         profileManager.getUserSkills(requireContext(), new ProfileManager.UserSkillsCallback() {
             @Override
@@ -396,6 +407,9 @@ public class MypageProfileFragment extends Fragment {
      * 사용자 경험 정보 로드
      */
     private void loadUserExperiences() {
+        // 대상 사용자 ID가 있으면 해당 사용자의 정보를 로드, 없으면 현재 사용자의 정보를 로드
+        String userId = (targetUserId != null) ? targetUserId : tokenManager.getUserId();
+        
         profileManager.getUserExperiences(requireContext(), new ProfileManager.UserExperiencesCallback() {
             @Override
             public void onSuccess(List<Experience> experiences) {
@@ -438,55 +452,65 @@ public class MypageProfileFragment extends Fragment {
             }
         });
 
-        llUserId.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // 마이페이지 메인으로 돌아가기
-                if (getActivity() != null) {
-                    // MainActivity의 MypageFragment로 이동
-                    ((MainActivity) getActivity()).showFragment(new MypageFragment());
+        // 다른 사용자의 프로필을 볼 때는 편집 기능을 비활성화
+        if (targetUserId == null) {
+            // 현재 사용자의 프로필일 때만 편집 기능 활성화
+            llUserId.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // 마이페이지 메인으로 돌아가기
+                    if (getActivity() != null) {
+                        // MainActivity의 MypageFragment로 이동
+                        ((MainActivity) getActivity()).showFragment(new MypageFragment());
+                    }
                 }
-            }
-        });
+            });
 
-                       llLanguagesAndRoles.setOnClickListener(new View.OnClickListener() {
-                   @Override
-                   public void onClick(View v) {
-                       // 스킬/역할 수정 화면으로 이동 (마이페이지 모드)
-                       if (getActivity() instanceof MainActivity) {
-                           String userId = tokenManager.getUserId();
-                           MypageInterestFragment fragment = MypageInterestFragment.newInstance(
-                               MypageInterestFragment.SOURCE_MYPAGE, 
-                               userId
-                           );
-                           ((MainActivity) getActivity()).showFragment(fragment);
-                       }
-                   }
-               });
-
-        llExperience.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // ExperienceFragment로 이동 (마이페이지 모드)
-                showExperienceFragment();
-            }
-        });
-
-        llTeamTendency.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // 성향 테스트 Fragment로 이동
-                if (getActivity() instanceof MainActivity) {
-                    // 사용자 성향 프로필 조회
-                    loadUserPersonalityProfile();
+            llLanguagesAndRoles.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // 스킬/역할 수정 화면으로 이동 (마이페이지 모드)
+                    if (getActivity() instanceof MainActivity) {
+                        String userId = tokenManager.getUserId();
+                        MypageInterestFragment fragment = MypageInterestFragment.newInstance(
+                            MypageInterestFragment.SOURCE_MYPAGE, 
+                            userId
+                        );
+                        ((MainActivity) getActivity()).showFragment(fragment);
+                    }
                 }
-            }
-        });
+            });
+
+            llExperience.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // ExperienceFragment로 이동 (마이페이지 모드)
+                    showExperienceFragment();
+                }
+            });
+
+            llTeamTendency.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // 성향 테스트 Fragment로 이동
+                    if (getActivity() instanceof MainActivity) {
+                        // 사용자 성향 프로필 조회
+                        loadUserPersonalityProfile();
+                    }
+                }
+            });
+        } else {
+            // 다른 사용자의 프로필일 때는 편집 기능 비활성화
+            llUserId.setClickable(false);
+            llLanguagesAndRoles.setClickable(false);
+            llExperience.setClickable(false);
+            llTeamTendency.setClickable(false);
+        }
     }
 
     private void loadUserPersonalityInfo() {
-        // 현재 로그인된 사용자 ID 가져오기
-        String userId = tokenManager.getUserId();
+        // 대상 사용자 ID가 있으면 해당 사용자의 정보를 로드, 없으면 현재 사용자의 정보를 로드
+        String userId = (targetUserId != null) ? targetUserId : tokenManager.getUserId();
         
         RetrofitClient.getInstance()
                 .getApiService()
@@ -535,8 +559,8 @@ public class MypageProfileFragment extends Fragment {
     }
     
     private void loadUserPersonalityProfile() {
-        // 현재 로그인된 사용자 ID 가져오기
-        String userId = tokenManager.getUserId();
+        // 대상 사용자 ID가 있으면 해당 사용자의 정보를 로드, 없으면 현재 사용자의 정보를 로드
+        String userId = (targetUserId != null) ? targetUserId : tokenManager.getUserId();
         
         RetrofitClient.getInstance()
                 .getApiService()

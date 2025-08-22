@@ -27,6 +27,7 @@ import kr.mojuk.teamup.api.model.ContestInformation;
 import kr.mojuk.teamup.auth.JwtUtils;
 import kr.mojuk.teamup.auth.TokenManager;
 import kr.mojuk.teamup.recruitment.TeamSynergyScoreFragment;
+import kr.mojuk.teamup.fragments.MypageProfileFragment;
 import com.google.android.material.button.MaterialButton;
 
 import java.util.ArrayList;
@@ -44,6 +45,7 @@ public class ApplicantListFragment extends Fragment {
     private List<Application> applicantList;
     private TextView tvSelectedCount;
     private TextView tvNavigationText;
+    private TextView tvNoApplicants; // 지원자가 없을 때 표시할 텍스트
     private MaterialButton btnSynergyCheck;
     private MaterialButton btnAcceptSelected;
     private ApiService apiService;
@@ -88,8 +90,12 @@ public class ApplicantListFragment extends Fragment {
         recyclerView = view.findViewById(R.id.rv_applicant_list);
         tvSelectedCount = view.findViewById(R.id.tv_selected_count);
         tvNavigationText = view.findViewById(R.id.tv_navigation_text);
+        tvNoApplicants = view.findViewById(R.id.tv_no_applicants); // 지원자 없음 메시지
         btnSynergyCheck = view.findViewById(R.id.btn_synergy_check);
         btnAcceptSelected = view.findViewById(R.id.btn_accept_selected);
+        
+        // 네비게이션 텍스트를 '지원자 리스트'로 설정
+        tvNavigationText.setText("지원자 리스트");
         
         // API 서비스 초기화
         apiService = RetrofitClient.getInstance().getApiService();
@@ -102,9 +108,6 @@ public class ApplicantListFragment extends Fragment {
         adapter = new ApplicantAdapter(applicantList, this);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
-        
-        // 모집 게시글 정보 로드 후 공모전 정보 로드
-        loadRecruitmentPostInfo();
         
         // API에서 지원자 목록 로드
         loadApplicantsFromApi();
@@ -192,6 +195,28 @@ public class ApplicantListFragment extends Fragment {
         int totalCount = adapter.getTotalSelectedCount();
         int acceptedCount = adapter.getAcceptedCount();
         tvSelectedCount.setText(totalCount + "명 선택됨");
+    }
+    
+    /**
+     * 지원자 목록이 비어있을 때 UI 업데이트
+     */
+    private void updateEmptyState() {
+        if (applicantList.isEmpty()) {
+            if (tvNoApplicants != null) {
+                tvNoApplicants.setVisibility(View.VISIBLE);
+                tvNoApplicants.setText("아직 지원자가 없습니다!");
+            }
+            if (recyclerView != null) {
+                recyclerView.setVisibility(View.GONE);
+            }
+        } else {
+            if (tvNoApplicants != null) {
+                tvNoApplicants.setVisibility(View.GONE);
+            }
+            if (recyclerView != null) {
+                recyclerView.setVisibility(View.VISIBLE);
+            }
+        }
     }
     
     /**
@@ -285,6 +310,8 @@ public class ApplicantListFragment extends Fragment {
                     adapter.notifyDataSetChanged();
                     // 선택된 개수 업데이트
                     updateSelectedCount();
+                    // 빈 상태 업데이트
+                    updateEmptyState();
                     
                     // 로딩 성공 메시지
 //                    Toast.makeText(getContext(),
@@ -341,6 +368,26 @@ public class ApplicantListFragment extends Fragment {
         adapter.notifyDataSetChanged();
         // 선택된 개수 업데이트
         updateSelectedCount();
+        // 빈 상태 업데이트
+        updateEmptyState();
+    }
+    
+    /**
+     * 지원자 프로필 페이지로 이동하는 메서드
+     */
+    public void navigateToProfile(String userId) {
+        if (getActivity() != null) {
+            MypageProfileFragment fragment = new MypageProfileFragment();
+            Bundle args = new Bundle();
+            args.putString("TARGET_USER_ID", userId);
+            fragment.setArguments(args);
+            
+            getActivity().getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragment_container, fragment)
+                .addToBackStack(null)
+                .commit();
+        }
     }
     
     /**
@@ -485,6 +532,8 @@ public class ApplicantListFragment extends Fragment {
                 adapter.notifyDataSetChanged();
                 // 선택된 개수 업데이트
                 updateSelectedCount();
+                // 빈 상태 업데이트
+                updateEmptyState();
                 break;
             }
         }
@@ -558,6 +607,11 @@ public class ApplicantListFragment extends Fragment {
                     selectedItems.set(position, isChecked);
                     fragment.updateSelectedCount();
                 }
+            });
+            
+            // 지원자 카드 클릭 시 프로필 페이지로 이동
+            holder.itemView.setOnClickListener(v -> {
+                fragment.navigateToProfile(data.getUserId());
             });
             
             // 버튼 리스너들 - 개별 수락과 거절 버튼 표시

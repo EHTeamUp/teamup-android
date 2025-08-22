@@ -128,9 +128,9 @@ public class LoginActivity extends AppCompatActivity {
                             Log.d(TAG, "TokenManager 로그인 상태: " + tokenManager.isLoggedIn());
                             Log.d(TAG, "TokenManager에서 가져온 토큰: " + (tokenManager.getAccessToken() != null ? tokenManager.getAccessToken().substring(0, Math.min(20, tokenManager.getAccessToken().length())) + "..." : "null"));
                             
-                            // 로그인 상태 업데이트
+                                                        // 로그인 상태 업데이트
                             LoginManager.setLoggedIn(true);
-                            
+
                             // FCM 토큰을 서버에 전송
                             FcmTokenManager.getInstance(LoginActivity.this).sendFcmTokenOnLogin();
                             
@@ -139,7 +139,7 @@ public class LoginActivity extends AppCompatActivity {
                             
                             // MainActivity로 이동
                             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             startActivity(intent);
                             finish();
                             
