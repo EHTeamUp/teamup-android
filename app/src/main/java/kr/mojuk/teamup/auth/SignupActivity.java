@@ -334,13 +334,6 @@ public class SignupActivity extends AppCompatActivity {
             return false;
         }
 
-        // 개발 중 임시로 이메일 인증 우회
-        if (!isEmailVerified) {
-            Log.w(TAG, "이메일 인증이 완료되지 않았지만 개발 모드로 진행합니다.");
-            // Toast.makeText(this, "이메일 인증을 완료해주세요.", Toast.LENGTH_SHORT).show();
-            // return false;
-        }
-
         return true;
     }
 }

@@ -1,36 +1,55 @@
-<?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
+<ScrollView android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white"
-    android:paddingStart="16dp"
-    android:paddingEnd="16dp">
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- Header - TeamUp Title -->
-    <TextView
-        android:id="@+id/tv_header_title"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/app_name"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:textColor="@android:color/black"
-        android:layout_marginTop="32dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        android:padding="12dp">
 
-    <!-- Main Content Area -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="홈 화면"
-        android:textSize="18sp"
-        android:textColor="@android:color/black"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        <!-- 공모전 영역 -->
+        <TextView
+            android:id="@+id/btn_contest_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="진행중인 공모전 목록"
+            android:background="@drawable/profile_card_background"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:padding="8dp" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="none"
+            android:paddingHorizontal="4dp">
+            
+            <LinearLayout
+                android:id="@+id/containerContests"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal" />
+                
+        </HorizontalScrollView>
+
+        <!-- 팀원 모집 영역 -->
+        <TextView
+            android:id="@+id/btn_recruitment_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="최신 팀원 모집 게시글"
+            android:background="@drawable/profile_card_background"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:padding="8dp"
+            android:layout_marginTop="20dp"/>
+
+        <LinearLayout
+            android:id="@+id/containerRecruitments"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+
+    </LinearLayout>
+</ScrollView>
