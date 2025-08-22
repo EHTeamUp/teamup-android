@@ -46,23 +46,13 @@
             android:name=".auth.SignupFinishActivity"
             android:exported="false" />
 
-
-        <activity
-            android:name=".personality.MainPersonalityTestActivity"
-            android:exported="false"/>
         <activity
             android:name=".personality.PersonalityTestResultActivity"
             android:exported="false"/>
         <activity
-            android:name=".personality.PersonalityTestQuestionActivity"
-            android:exported="false" />
-        <activity
 
             android:name=".MypageActivity"
             android:exported="false"/>
-        <activity
-            android:name=".mypage.MypageUserinfoActivity"
-            android:exported="false" />
         <activity
             android:name=".mypage.MypageUserinfoEditActivity"
             android:exported="false" />

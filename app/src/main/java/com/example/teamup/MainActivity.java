@@ -14,12 +14,12 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.example.teamup.auth.LoginActivity;
 import com.example.teamup.auth.TokenManager;
 
 import com.example.teamup.contest.ContestListFragment;
 import com.example.teamup.recruitment.ContestRecruitmentListFragment;
 import com.example.teamup.fragment.HomeFragment;
-import com.example.teamup.fragment.ProfileFragment;
 import com.example.teamup.fragments.MypageFragment;
 import com.example.teamup.fragments.ExperienceFragment;
 import com.example.teamup.fragments.MypageProfileFragment;
@@ -58,8 +58,11 @@ public class MainActivity extends AppCompatActivity implements ExperienceFragmen
         // 알림 권한 요청
         NotificationPermissionHelper.requestNotificationPermission(this);
 
+        // 로그인 상태 확인 (테스트용으로 주석 처리)
+        // checkLoginStatus();
+
         // Setup Bottom Navigation
-        setupBottomNavigation();
+        setupBottomNavigation(savedInstanceState);
 
     }
 
@@ -81,7 +84,7 @@ public class MainActivity extends AppCompatActivity implements ExperienceFragmen
     /**
      * 하단 네비게이션 설정
      */
-    private void setupBottomNavigation() {
+    private void setupBottomNavigation(Bundle savedInstanceState) {
         BottomNavigationView navView = findViewById(R.id.bottom_navigation);
 
         // Intent에서 Fragment 로드 요청 확인
@@ -114,12 +117,12 @@ public class MainActivity extends AppCompatActivity implements ExperienceFragmen
             if (itemId == R.id.navigation_profile) {
                 // 로그인 상태에 따라 다르게 동작
                 if (tokenManager.isLoggedIn()) {
-                    // 마이페이지는 ProfileFragment로 처리
-                    selectedFragment = new ProfileFragment();
+                    // 마이페이지는 MypageFragment로 처리
+                    selectedFragment = new MypageFragment();
                 } else {
                     // 로그인되지 않은 경우 로그인 페이지로 이동
-                    Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-                    startActivity(intent);
+                    Intent loginIntent = new Intent(MainActivity.this, LoginActivity.class);
+                    startActivity(loginIntent);
                 }
 
             } else if (itemId == R.id.navigation_home) {
@@ -214,6 +217,12 @@ public class MainActivity extends AppCompatActivity implements ExperienceFragmen
     public void onExperienceUpdated() {
         // 경험 정보가 업데이트되면 MypageProfileFragment로 돌아가기
         showMypageProfileFragment();
+    }
+
+    @Override
+    public void onFormContentChanged(boolean hasContent) {
+        // 폼 내용 변경 감지 - MainActivity에서는 특별한 처리가 필요하지 않음
+        Log.d(TAG, "폼 내용 변경 감지: " + hasContent);
     }
 
     /**

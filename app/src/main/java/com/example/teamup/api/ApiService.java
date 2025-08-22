@@ -28,7 +28,6 @@ import com.example.teamup.api.model.ApiResponse;
 import com.example.teamup.api.model.PersonalityProfileResponse;
 import com.example.teamup.api.model.ProfileUpdateResponse;
 import com.example.teamup.api.model.RecruitmentPostResponse;
-import com.example.teamup.api.model.ContestResponse;
 import com.example.teamup.api.model.PersonalityQuestionResponse;
 import com.example.teamup.api.model.PersonalityTestRequest;
 import com.example.teamup.api.model.PersonalityTestResponse;
@@ -46,6 +45,7 @@ import com.example.teamup.api.model.SynergyAnalysisRequest;
 import com.example.teamup.api.model.SynergyAnalysisResponse;
 import com.example.teamup.api.model.FcmTokenRequest;
 import com.example.teamup.api.model.UserCreateWithVerification;
+import com.example.teamup.api.model.UserDTO;
 import com.example.teamup.api.model.UserIdCheckRequest;
 import com.example.teamup.api.model.UserIdCheckResponse;
 import com.example.teamup.api.model.UserRolesResponse;
@@ -215,19 +215,7 @@ public interface ApiService {
     @GET("api/v1/contests/{contest_id}")
     Call<ContestInformation> getContestDetail(@Path("contest_id") int contestId);
     
-    /**
-     * 성향 테스트 질문 조회 API
-     * GET /api/v1/personality/questions
-     */
-    @GET("api/v1/personality/questions")
-    Call<PersonalityQuestionResponse> getPersonalityQuestions();
-    
-    /**
-     * 성향 테스트 제출 API
-     * POST /api/v1/personality/test
-     */
-    @POST("api/v1/personality/test")
-    Call<PersonalityTestResponse> submitPersonalityTest(@Body PersonalityTestRequest request);
+
     
     /**
      * 시너지 분석 API
@@ -248,14 +236,14 @@ public interface ApiService {
      * GET /api/v1/users/me
      */
     @GET("api/v1/users/me")
-    Call<LoginRequest> getCurrentUser(@Header("Authorization") String authorization);
+    Call<UserDTO> getCurrentUser(@Header("Authorization") String authorization);
 
     /**
      * 회원정보 수정 API (이름, 비밀번호)
      * PUT /api/v1/users/mypage
      */
     @PUT("api/v1/users/mypage")
-    Call<LoginRequest> updateUserInfo(@Header("Authorization") String authorization, @Body UserUpdateRequest userInfo);
+    Call<UserDTO> updateUserInfo(@Header("Authorization") String authorization, @Body UserUpdateRequest userInfo);
 
     // ===== 회원가입 관련 API =====
 
@@ -404,6 +392,7 @@ public interface ApiService {
      */
     @POST("api/v1/personality/test")
     Call<PersonalityTestResponse> submitPersonalityTest(@Body PersonalityTestRequest request);
+
 
     @GET("api/v1/personality/user-profile/{user_id}")
     Call<PersonalityProfileResponse> getUserPersonalityProfile(@Path("user_id") String userId);
