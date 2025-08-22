@@ -9,7 +9,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import com.example.teamup.MainActivity;
-import com.example.teamup.MypageActivity;
 import com.example.teamup.R;
 
 public class MypageTestResultActivity extends AppCompatActivity {
@@ -20,7 +19,7 @@ public class MypageTestResultActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_mypage_test_result);
+        setContentView(R.layout.fragment_personality_test_result);
 
         initViews();
         setClickListeners();
@@ -36,7 +35,7 @@ public class MypageTestResultActivity extends AppCompatActivity {
         cvNavigation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MypageTestResultActivity.this, MypageProfileActivity.class);
+                Intent intent = new Intent(MypageTestResultActivity.this, MainActivity.class);
                 startActivity(intent);
                 finish();
             }
@@ -63,7 +62,7 @@ public class MypageTestResultActivity extends AppCompatActivity {
                 return true;
             } else if (itemId == R.id.navigation_profile) {
                 // 마이페이지 메인으로 이동
-                Intent intent = new Intent(MypageTestResultActivity.this, MypageActivity.class);
+                Intent intent = new Intent(MypageTestResultActivity.this, MainActivity.class);
                 startActivity(intent);
                 finish();
                 return true;

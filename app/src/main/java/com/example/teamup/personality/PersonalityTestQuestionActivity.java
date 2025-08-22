@@ -2,6 +2,7 @@ package com.example.teamup.personality;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -57,7 +58,7 @@ public class PersonalityTestQuestionActivity extends AppCompatActivity implement
         selectedAnswers = new HashMap<>();
         apiService = RetrofitClient.getInstance().getApiService();
         tokenManager = TokenManager.getInstance(this);
-        
+
         // API에서 질문 데이터 로드
         loadQuestionsFromAPI();
         
@@ -73,14 +74,14 @@ public class PersonalityTestQuestionActivity extends AppCompatActivity implement
      */
     private void loadQuestionsFromAPI() {
         Call<PersonalityQuestionResponse> call = apiService.getPersonalityQuestions();
-        
+
         call.enqueue(new Callback<PersonalityQuestionResponse>() {
             @Override
             public void onResponse(Call<PersonalityQuestionResponse> call, Response<PersonalityQuestionResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     PersonalityQuestionResponse questionResponse = response.body();
                     questions = convertApiQuestionsToLocalQuestions(questionResponse.getQuestions());
-                    
+
                     // UI 업데이트
                     runOnUiThread(() -> {
                         adapter.updateQuestions(questions);
@@ -92,12 +93,12 @@ public class PersonalityTestQuestionActivity extends AppCompatActivity implement
                         questions = loadDummyQuestions();
                         adapter.updateQuestions(questions);
                         adapter.notifyDataSetChanged();
-                        Toast.makeText(PersonalityTestQuestionActivity.this, 
+                        Toast.makeText(PersonalityTestQuestionActivity.this,
                             "API 응답 실패. 기본 데이터를 사용합니다.", Toast.LENGTH_SHORT).show();
                     });
                 }
             }
-            
+
             @Override
             public void onFailure(Call<PersonalityQuestionResponse> call, Throwable t) {
                 // 네트워크 오류시 더미 데이터 사용
@@ -105,7 +106,7 @@ public class PersonalityTestQuestionActivity extends AppCompatActivity implement
                     questions = loadDummyQuestions();
                     adapter.updateQuestions(questions);
                     adapter.notifyDataSetChanged();
-                    Toast.makeText(PersonalityTestQuestionActivity.this, 
+                    Toast.makeText(PersonalityTestQuestionActivity.this,
                         "네트워크 오류. 기본 데이터를 사용합니다.", Toast.LENGTH_SHORT).show();
                 });
             }
@@ -117,21 +118,21 @@ public class PersonalityTestQuestionActivity extends AppCompatActivity implement
      */
     private List<PersonalityQuestion> convertApiQuestionsToLocalQuestions(List<com.example.teamup.api.model.ApiPersonalityQuestion> apiQuestions) {
         List<PersonalityQuestion> localQuestions = new ArrayList<>();
-        
+
         for (com.example.teamup.api.model.ApiPersonalityQuestion apiQuestion : apiQuestions) {
             if (apiQuestion.getOptions() != null && apiQuestion.getOptions().size() >= 2) {
                 String optionA = apiQuestion.getOptions().get(0).getText();
                 String optionB = apiQuestion.getOptions().get(1).getText();
-                
+
                 // API에서 받은 실제 옵션 ID들을 저장
                 int optionAId = apiQuestion.getOptions().get(0).getId();
                 int optionBId = apiQuestion.getOptions().get(1).getId();
-                
+
                 // 디버깅을 위한 로그 출력
                 System.out.println("Question " + apiQuestion.getId() + " (" + apiQuestion.getKeyName() + "): " + apiQuestion.getText());
                 System.out.println("  Option A (ID: " + optionAId + "): " + optionA);
                 System.out.println("  Option B (ID: " + optionBId + "): " + optionB);
-                
+
                 PersonalityQuestion localQuestion = new PersonalityQuestion(
                     apiQuestion.getId(),
                     apiQuestion.getText(),
@@ -143,17 +144,17 @@ public class PersonalityTestQuestionActivity extends AppCompatActivity implement
                 localQuestions.add(localQuestion);
             }
         }
-        
+
         return localQuestions;
     }
-    
+
     /**
      * 더미 질문 데이터를 로드하는 메서드 (API 실패시 사용)
      */
     private List<PersonalityQuestion> loadDummyQuestions() {
         return PersonalityQuestion.loadQuestions(this);
     }
-    
+
     private void setupRecyclerView() {
         RecyclerView recyclerView = findViewById(R.id.recycler_view);
         questions = new ArrayList<>(); // 초기화
@@ -176,6 +177,9 @@ public class PersonalityTestQuestionActivity extends AppCompatActivity implement
      * 모든 질문이 답변되었는지 확인하고 결과 페이지로 이동하는 메서드
      */
     private void checkAndNavigateToResult() {
+        // 디버그 로그 추가
+        Log.d("PersonalityTest", "Selected answers: " + selectedAnswers.size() + ", Questions: " + questions.size());
+
         if (selectedAnswers.size() == questions.size()) {
             // 모든 질문이 답변되면 API로 결과 제출
             submitPersonalityTest();
@@ -184,7 +188,7 @@ public class PersonalityTestQuestionActivity extends AppCompatActivity implement
             Toast.makeText(PersonalityTestQuestionActivity.this, "모든 항목이 선택되어 있지 않습니다", Toast.LENGTH_SHORT).show();
         }
     }
-    
+
     /**
      * 성향 테스트 결과를 API로 제출하는 메서드
      */
@@ -194,14 +198,14 @@ public class PersonalityTestQuestionActivity extends AppCompatActivity implement
         for (Map.Entry<Integer, Integer> entry : selectedAnswers.entrySet()) {
             answers.add(new PersonalityAnswer(entry.getKey(), entry.getValue()));
         }
-        
+
         // 디버깅을 위한 로그 출력
         System.out.println("=== 제출할 답변 데이터 ===");
         System.out.println("선택된 답변 개수: " + selectedAnswers.size());
         for (Map.Entry<Integer, Integer> entry : selectedAnswers.entrySet()) {
             System.out.println("Question ID: " + entry.getKey() + ", Option ID: " + entry.getValue());
         }
-        
+
         // 각 질문의 상세 정보도 출력
         System.out.println("=== 질문 상세 정보 ===");
         for (PersonalityQuestion question : questions) {
@@ -209,18 +213,18 @@ public class PersonalityTestQuestionActivity extends AppCompatActivity implement
             System.out.println("  Option A (ID: " + question.getOptionAId() + "): " + question.getOptionA());
             System.out.println("  Option B (ID: " + question.getOptionBId() + "): " + question.getOptionB());
         }
-        
+
         // 로그인된 사용자 ID 가져오기
         String userId = tokenManager.getUserId();
         if (userId == null) {
             Toast.makeText(this, "로그인이 필요합니다.", Toast.LENGTH_SHORT).show();
             return;
         }
-        
+
         System.out.println("User ID: " + userId);
-        
+
         PersonalityTestRequest request = new PersonalityTestRequest(userId, answers);
-        
+
         Call<PersonalityTestResponse> call = apiService.submitPersonalityTest(request);
         call.enqueue(new Callback<PersonalityTestResponse>() {
             @Override
@@ -232,7 +236,7 @@ public class PersonalityTestQuestionActivity extends AppCompatActivity implement
                     intent.putExtra("profile_code", result.getProfileCode());
                     intent.putExtra("display_name", result.getDisplayName());
                     intent.putExtra("description", result.getDescription());
-                    
+
                     // traits Map을 JSON 배열 형태의 문자열로 변환
                     StringBuilder traitsBuilder = new StringBuilder();
                     if (result.getTraits() != null) {
@@ -248,17 +252,17 @@ public class PersonalityTestQuestionActivity extends AppCompatActivity implement
                     startActivity(intent);
                 } else {
                     // API 실패시 기본 결과 페이지로 이동
-                    Toast.makeText(PersonalityTestQuestionActivity.this, 
+                    Toast.makeText(PersonalityTestQuestionActivity.this,
                         "결과 처리 중 오류가 발생했습니다.", Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(PersonalityTestQuestionActivity.this, PersonalityTestResultActivity.class);
                     startActivity(intent);
                 }
             }
-            
+
             @Override
             public void onFailure(Call<PersonalityTestResponse> call, Throwable t) {
                 // 네트워크 오류시 기본 결과 페이지로 이동
-                Toast.makeText(PersonalityTestQuestionActivity.this, 
+                Toast.makeText(PersonalityTestQuestionActivity.this,
                     "네트워크 오류가 발생했습니다.", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(PersonalityTestQuestionActivity.this, PersonalityTestResultActivity.class);
                 startActivity(intent);
@@ -277,7 +281,7 @@ public class PersonalityTestQuestionActivity extends AppCompatActivity implement
             } else {
                 optionId = question.getOptionBId();
             }
-            
+
             int questionId = question.getId();
             selectedAnswers.put(questionId, optionId);
         }
@@ -300,4 +304,4 @@ public class PersonalityTestQuestionActivity extends AppCompatActivity implement
             btnResult.setText("모든 항목을 선택해주세요 (" + selectedAnswers.size() + "/" + questions.size() + ")");
         }
     }
-} 
+}

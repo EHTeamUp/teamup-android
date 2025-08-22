@@ -14,6 +14,68 @@
     <string name="login_success">로그인이 완료되었습니다</string>
     <string name="login_failed">로그인에 실패했습니다</string>
     <string name="please_enter_id_password">ID와 비밀번호를 입력해주세요</string>
+    <string name="login_loading">로그인 중...</string>
+    <string name="logout_confirm_title">로그아웃</string>
+    <string name="logout_confirm_message">정말 로그아웃 하시겠습니까?</string>
+    <string name="logout_button">로그아웃</string>
+    <string name="cancel_button">취소</string>
+    <string name="logout_success">로그아웃되었습니다</string>
+    
+    <!-- Signup Activity -->
+    <string name="signup_title">회원가입</string>
+    <string name="signup_id">ID</string>
+    <string name="signup_password">비밀번호</string>
+    <string name="signup_confirm_password">비밀번호 확인</string>
+    <string name="signup_name">이름</string>
+    <string name="signup_email">이메일 주소</string>
+    <string name="signup_email_code">인증번호</string>
+    <string name="signup_check_id">중복 검사</string>
+    <string name="signup_send_email">인증번호 발송</string>
+    <string name="signup_verify_email">인증 확인</string>
+    <string name="signup_next">다음</string>
+    <string name="signup_processing">처리 중...</string>
+    <string name="signup_checking">확인 중...</string>
+    <string name="signup_sending">발송 중...</string>
+    <string name="signup_verifying">확인 중...</string>
+    
+    <!-- Signup Validation Messages -->
+    <string name="signup_enter_id">ID를 입력해주세요</string>
+    <string name="signup_id_min_length">ID는 4자 이상 입력해주세요</string>
+    <string name="signup_check_id_first">ID 중복 검사를 완료해주세요</string>
+    <string name="signup_enter_password">비밀번호를 입력해주세요</string>
+    <string name="signup_password_min_length">비밀번호는 8자 이상 입력해주세요</string>
+    <string name="signup_password_uppercase">비밀번호에 대문자를 포함해주세요</string>
+    <string name="signup_password_lowercase">비밀번호에 소문자를 포함해주세요</string>
+    <string name="signup_password_digit">비밀번호에 숫자를 포함해주세요</string>
+    <string name="signup_password_special">비밀번호에 특수문자를 포함해주세요</string>
+    <string name="signup_enter_confirm_password">비밀번호 확인을 입력해주세요</string>
+    <string name="signup_password_mismatch">비밀번호가 일치하지 않습니다</string>
+    <string name="signup_enter_name">이름을 입력해주세요</string>
+    <string name="signup_enter_email">이메일을 입력해주세요</string>
+    <string name="signup_invalid_email">올바른 이메일 형식을 입력해주세요</string>
+    <string name="signup_invalid_domain">@itc.ac.kr 도메인의 이메일만 사용 가능합니다</string>
+    <string name="signup_verify_email_first">이메일 인증을 완료해주세요</string>
+    
+    <!-- Profile Activity -->
+    <string name="profile_title">프로필</string>
+    <string name="profile_user_id">사용자 ID</string>
+    <string name="profile_skills">스킬</string>
+    <string name="profile_roles">역할</string>
+    <string name="profile_experiences">경험</string>
+    <string name="profile_no_skills">등록된 스킬이 없습니다</string>
+    <string name="profile_no_roles">등록된 역할이 없습니다</string>
+    <string name="profile_no_experiences">등록된 경험이 없습니다</string>
+    <string name="profile_existing_skills">기존 스킬</string>
+    <string name="profile_custom_skills">커스텀 스킬</string>
+    <string name="profile_existing_roles">기존 역할</string>
+    <string name="profile_custom_roles">커스텀 역할</string>
+    <string name="profile_contest_experiences">개의 공모전 수상 경험</string>
+    <string name="profile_load_failed">로드 실패</string>
+    <string name="profile_update_success">프로필이 성공적으로 수정되었습니다</string>
+    <string name="profile_update_failed">프로필 수정에 실패했습니다</string>
+    <string name="profile_min_skills_required">스킬을 최소 1개 이상 선택하거나 입력해주세요</string>
+    <string name="profile_min_roles_required">역할을 최소 1개 이상 선택하거나 입력해주세요</string>
+    <string name="profile_user_info_edit_coming_soon">사용자 정보 수정 기능은 준비 중입니다</string>
     
     <!-- Bottom Navigation -->
     <string name="nav_home">Home</string>

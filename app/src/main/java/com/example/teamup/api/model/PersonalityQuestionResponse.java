@@ -10,6 +10,11 @@ public class PersonalityQuestionResponse {
     @SerializedName("total_count")
     private int totalCount;
     
+    public PersonalityQuestionResponse(List<ApiPersonalityQuestion> questions, int totalCount) {
+        this.questions = questions;
+        this.totalCount = totalCount;
+    }
+    
     public List<ApiPersonalityQuestion> getQuestions() {
         return questions;
     }

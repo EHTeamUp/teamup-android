@@ -88,7 +88,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="24dp"
-                android:text="hong_gil"
+                android:text=""
                 android:textColor="@android:color/black"
                 android:textSize="16sp" />
 
@@ -108,7 +108,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="24dp"
-                android:text="202544000@itc.ac.kr"
+                android:text=""
                 android:textColor="@android:color/black"
                 android:textSize="16sp" />
 
@@ -128,7 +128,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:layout_marginBottom="24dp"
-                android:text="홍길동"
+                android:hint="이름을 입력하세요"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
                 android:textColor="@android:color/black"

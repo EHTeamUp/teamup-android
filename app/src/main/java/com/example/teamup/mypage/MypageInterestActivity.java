@@ -14,9 +14,7 @@ import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 
 import com.example.teamup.MainActivity;
-import com.example.teamup.MypageActivity;
 import com.example.teamup.R;
-import com.example.teamup.mypage.MypageProfileActivity;
 
 public class MypageInterestActivity extends AppCompatActivity {
 
@@ -64,7 +62,7 @@ public class MypageInterestActivity extends AppCompatActivity {
         tvBackArrow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MypageInterestActivity.this, MypageProfileActivity.class);
+                Intent intent = new Intent(MypageInterestActivity.this, MainActivity.class);
                 startActivity(intent);
                 finish();
             }
@@ -73,7 +71,7 @@ public class MypageInterestActivity extends AppCompatActivity {
         cvNavigation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MypageInterestActivity.this, MypageProfileActivity.class);
+                Intent intent = new Intent(MypageInterestActivity.this, MainActivity.class);
                 startActivity(intent);
                 finish();
             }
@@ -134,7 +132,7 @@ public class MypageInterestActivity extends AppCompatActivity {
                 return true;
             } else if (itemId == R.id.navigation_profile) {
                 // 마이페이지 메인으로 이동
-                Intent intent = new Intent(MypageInterestActivity.this, MypageActivity.class);
+                Intent intent = new Intent(MypageInterestActivity.this, MainActivity.class);
                 startActivity(intent);
                 finish();
                 return true;
