@@ -4,7 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.example.teamup.api.RetrofitClient;
-import com.example.teamup.api.model.UserDTO;
+import com.example.teamup.api.model.LoginRequest;
 import com.example.teamup.api.model.UserUpdateRequest;
 
 import retrofit2.Call;
@@ -20,7 +20,7 @@ public class UserManager {
     private static final String TAG = "UserManager";
     private static UserManager instance;
     private TokenManager tokenManager;
-    private UserDTO currentUser;
+    private LoginRequest currentUser;
     
     private UserManager(Context context) {
         tokenManager = TokenManager.getInstance(context);
@@ -51,9 +51,9 @@ public class UserManager {
         RetrofitClient.getInstance()
                 .getApiService()
                 .getCurrentUser(fullToken)
-                .enqueue(new Callback<UserDTO>() {
+                .enqueue(new Callback<LoginRequest>() {
                     @Override
-                    public void onResponse(Call<UserDTO> call, Response<UserDTO> response) {
+                    public void onResponse(Call<LoginRequest> call, Response<LoginRequest> response) {
                         if (response.isSuccessful() && response.body() != null) {
                             currentUser = response.body();
                             Log.d(TAG, "사용자 정보 조회 성공: " + currentUser.getUserId());
@@ -71,7 +71,7 @@ public class UserManager {
                     }
 
                     @Override
-                    public void onFailure(Call<UserDTO> call, Throwable t) {
+                    public void onFailure(Call<LoginRequest> call, Throwable t) {
                         String errorMessage = "네트워크 오류가 발생했습니다.";
                         Log.e(TAG, "사용자 정보 조회 네트워크 오류: " + t.getMessage(), t);
                         callback.onError(errorMessage);
@@ -105,9 +105,9 @@ public class UserManager {
         RetrofitClient.getInstance()
                 .getApiService()
                 .updateUserInfo(fullToken, updateRequest)
-                .enqueue(new Callback<UserDTO>() {
+                .enqueue(new Callback<LoginRequest>() {
                     @Override
-                    public void onResponse(Call<UserDTO> call, Response<UserDTO> response) {
+                    public void onResponse(Call<LoginRequest> call, Response<LoginRequest> response) {
                         if (response.isSuccessful() && response.body() != null) {
                             currentUser = response.body();
                             Log.d(TAG, "사용자 정보 업데이트 성공: " + currentUser.getUserId());
@@ -126,7 +126,7 @@ public class UserManager {
                     }
 
                     @Override
-                    public void onFailure(Call<UserDTO> call, Throwable t) {
+                    public void onFailure(Call<LoginRequest> call, Throwable t) {
                         String errorMessage = "네트워크 오류가 발생했습니다.";
                         Log.e(TAG, "사용자 정보 업데이트 네트워크 오류: " + t.getMessage(), t);
                         callback.onError(errorMessage);
@@ -137,7 +137,7 @@ public class UserManager {
     /**
      * 현재 캐시된 사용자 정보 가져오기
      */
-    public UserDTO getCurrentUser() {
+    public LoginRequest getCurrentUser() {
         return currentUser;
     }
     
@@ -152,7 +152,7 @@ public class UserManager {
      * 사용자 정보 콜백 인터페이스
      */
     public interface UserCallback {
-        void onSuccess(UserDTO user);
+        void onSuccess(LoginRequest user);
         void onError(String errorMessage);
     }
 }

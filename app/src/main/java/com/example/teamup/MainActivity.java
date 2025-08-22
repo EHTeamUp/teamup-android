@@ -17,12 +17,17 @@ import androidx.fragment.app.FragmentTransaction;
 import com.example.teamup.auth.LoginActivity;
 import com.example.teamup.auth.LoginManager;
 import com.example.teamup.auth.TokenManager;
-import com.example.teamup.contest.ContestListActivity;
-import com.example.teamup.recruitment.ContestRecruitmentListActivity;
-import com.example.teamup.fragments.HomeFragment;
+import com.example.teamup.fragment.HomeFragment;
+import com.example.teamup.fragment.ContestFragment;
+import com.example.teamup.fragment.BoardFragment;
+import com.example.teamup.fragment.ProfileFragment;
 import com.example.teamup.fragments.MypageFragment;
 import com.example.teamup.fragments.ExperienceFragment;
 import com.example.teamup.fragments.MypageProfileFragment;
+import com.example.teamup.applicant.ApplicantListFragment;
+import com.example.teamup.recruitment.TeamSynergyScoreFragment;
+import com.example.teamup.notification.FcmTokenManager;
+import com.example.teamup.notification.NotificationPermissionHelper;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity implements ExperienceFragment.ExperienceFragmentListener {
@@ -48,14 +53,15 @@ public class MainActivity extends AppCompatActivity implements ExperienceFragmen
         // TokenManager 초기화
         tokenManager = TokenManager.getInstance(this);
 
-        // 로그인 상태 확인
-        checkLoginStatus();
+        // FCM 토큰 매니저 초기화
+        FcmTokenManager.getInstance(this);
+
+        // 알림 권한 요청
+        NotificationPermissionHelper.requestNotificationPermission(this);
 
         // Setup Bottom Navigation
         setupBottomNavigation();
 
-        // 기본적으로 홈 Fragment 표시
-        showHomeFragment();
     }
 
     /**
@@ -69,7 +75,7 @@ public class MainActivity extends AppCompatActivity implements ExperienceFragmen
             finish();
             return;
         }
-        
+
         Log.d(TAG, "로그인된 상태입니다. 사용자 ID: " + tokenManager.getUserId());
     }
 
@@ -78,47 +84,61 @@ public class MainActivity extends AppCompatActivity implements ExperienceFragmen
      */
     private void setupBottomNavigation() {
         BottomNavigationView navView = findViewById(R.id.bottom_navigation);
-        
+
+        // Intent에서 Fragment 로드 요청 확인
+        Intent intent = getIntent();
+        if (intent != null && intent.hasExtra("FRAGMENT_TO_LOAD")) {
+            String fragmentToLoad = intent.getStringExtra("FRAGMENT_TO_LOAD");
+            if ("ApplicantListFragment".equals(fragmentToLoad)) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, new ApplicantListFragment())
+                        .commit();
+            } else if ("TeamSynergyScoreFragment".equals(fragmentToLoad)) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, new TeamSynergyScoreFragment())
+                        .commit();
+            }
+        } else {
+            // 기본적으로 Home Fragment 표시
+            if (savedInstanceState == null) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, new HomeFragment())
+                        .commit();
+            }
+        }
+
+        // Setup navigation listener
         navView.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
-            
-            if (itemId == R.id.navigation_home) {
-                showHomeFragment();
-                return true;
-            } else if (itemId == R.id.navigation_contest) {
-                // 공모전 목록 Activity로 이동
-                Intent intent = new Intent(MainActivity.this, ContestListActivity.class);
-                startActivity(intent);
-                return true;
-            } else if (itemId == R.id.navigation_board) {
-                // 팀원 모집 게시판 Activity로 이동
-                Intent intent = new Intent(MainActivity.this, ContestRecruitmentListActivity.class);
-                startActivity(intent);
-                return true;
-            } else if (itemId == R.id.navigation_profile) {
+            Fragment selectedFragment = null;
+
+            if (itemId == R.id.navigation_profile) {
                 // 로그인 상태에 따라 다르게 동작
                 if (tokenManager.isLoggedIn()) {
-                    showMypageFragment();
+                    // 마이페이지는 ProfileFragment로 처리
+                    selectedFragment = new ProfileFragment();
                 } else {
                     // 로그인되지 않은 경우 로그인 페이지로 이동
                     Intent intent = new Intent(MainActivity.this, LoginActivity.class);
                     startActivity(intent);
                 }
+
+            } else if (itemId == R.id.navigation_home) {
+                selectedFragment = new HomeFragment();
+            } else if (itemId == R.id.navigation_contest) {
+                selectedFragment = new ContestFragment();
+            } else if (itemId == R.id.navigation_board) {
+                selectedFragment = new BoardFragment();
+            }
+
+            if (selectedFragment != null) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, selectedFragment)
+                        .commit();
                 return true;
             }
             return false;
         });
-    }
-
-    /**
-     * 홈 Fragment 표시
-     */
-    private void showHomeFragment() {
-        Fragment fragment = getSupportFragmentManager().findFragmentByTag(FRAGMENT_HOME);
-        if (fragment == null) {
-            fragment = new HomeFragment();
-        }
-        replaceFragment(fragment, FRAGMENT_HOME);
     }
 
     /**
@@ -138,12 +158,12 @@ public class MainActivity extends AppCompatActivity implements ExperienceFragmen
     private void replaceFragment(Fragment fragment, String tag) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
-        
+
         // 기존 Fragment들을 모두 숨기고 새로운 Fragment 추가
-        transaction.replace(R.id.content_container, fragment, tag);
-        
+        transaction.replace(R.id.fragment_container, fragment, tag);
+
         transaction.commit();
-        
+
         Log.d(TAG, "Fragment 교체: " + tag);
     }
 
@@ -153,15 +173,15 @@ public class MainActivity extends AppCompatActivity implements ExperienceFragmen
     public void showFragment(Fragment fragment) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
-        
+
         // 기존 Fragment들을 모두 숨기고 새로운 Fragment 추가
-        transaction.replace(R.id.content_container, fragment);
-        
+        transaction.replace(R.id.fragment_container, fragment);
+
         // 백 스택에 추가 (뒤로가기 버튼으로 이전 Fragment로 돌아갈 수 있도록)
         transaction.addToBackStack(null);
-        
+
         transaction.commit();
-        
+
         Log.d(TAG, "Fragment 표시: " + fragment.getClass().getSimpleName());
     }
 
@@ -176,9 +196,9 @@ public class MainActivity extends AppCompatActivity implements ExperienceFragmen
             finish();
         }
     }
-    
+
     // ===== ExperienceFragmentListener 구현 =====
-    
+
     @Override
     public void onBackPressed() {
         // 프래그먼트 백 스택에 항목이 있는지 확인
@@ -190,19 +210,13 @@ public class MainActivity extends AppCompatActivity implements ExperienceFragmen
             super.onBackPressed();
         }
     }
-    
+
     @Override
     public void onExperienceUpdated() {
         // 경험 정보가 업데이트되면 MypageProfileFragment로 돌아가기
         showMypageProfileFragment();
     }
-    
-    @Override
-    public void onFormContentChanged(boolean hasContent) {
-        // MainActivity에서는 사용하지 않음 (마이페이지 모드에서만 사용)
-        // 회원가입 모드에서만 사용되는 기능
-    }
-    
+
     /**
      * MypageProfileFragment 표시
      */
