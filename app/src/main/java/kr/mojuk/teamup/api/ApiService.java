@@ -77,6 +77,13 @@ public interface ApiService {
     @POST("api/v1/users/login")
     Call<LoginResponse> login(@Body LoginRequest loginRequest);
 
+    /**
+     * 사용자 로그아웃 API
+     * POST /api/v1/users/logout
+     */
+    @POST("api/v1/users/logout")
+    Call<ApiResponse> logout();
+
     @GET("api/v1/contests/")
     Call<ContestsListResponse> getContests();
 
