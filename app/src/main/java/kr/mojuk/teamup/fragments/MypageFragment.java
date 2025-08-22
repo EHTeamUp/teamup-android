@@ -23,6 +23,12 @@ import kr.mojuk.teamup.auth.TokenManager;
 import kr.mojuk.teamup.auth.UserManager;
 import kr.mojuk.teamup.fragments.MypageProfileFragment;
 import kr.mojuk.teamup.fragments.MypageUserinfoFragment;
+import kr.mojuk.teamup.notification.FcmTokenManager;
+import kr.mojuk.teamup.api.RetrofitClient;
+import kr.mojuk.teamup.api.model.ApiResponse;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * 마이페이지 화면 Fragment
@@ -122,6 +128,35 @@ public class MypageFragment extends Fragment {
      * 로그아웃 실행
      */
     private void performLogout() {
+        // 백엔드 로그아웃 API 호출 (FCM 토큰 삭제 포함)
+        RetrofitClient.getInstance(requireContext())
+                .getApiService()
+                .logout()
+                .enqueue(new Callback<ApiResponse>() {
+                    @Override
+                    public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
+                        if (response.isSuccessful()) {
+                            Log.d(TAG, "로그아웃 성공");
+                        } else {
+                            Log.e(TAG, "로그아웃 실패 - HTTP " + response.code());
+                        }
+                        // 백엔드 응답과 관계없이 로컬 로그아웃 진행
+                        completeLocalLogout();
+                    }
+                    
+                    @Override
+                    public void onFailure(Call<ApiResponse> call, Throwable t) {
+                        Log.e(TAG, "로그아웃 네트워크 오류: " + t.getMessage());
+                        // 네트워크 오류가 있어도 로컬 로그아웃 진행
+                        completeLocalLogout();
+                    }
+                });
+    }
+    
+    /**
+     * 로컬 로그아웃 완료
+     */
+    private void completeLocalLogout() {
         // 토큰 삭제
         tokenManager.clearToken();
         
