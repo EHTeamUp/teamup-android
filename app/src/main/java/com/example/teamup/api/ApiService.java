@@ -21,8 +21,6 @@ import com.example.teamup.api.model.Application;
 import com.example.teamup.api.model.ApplicationStatusUpdate;
 import com.example.teamup.api.model.ApplicationReject;
 import com.example.teamup.api.model.ApiResponse;
-import com.example.teamup.api.model.RecruitmentPostResponse;
-import com.example.teamup.api.model.ContestResponse;
 import com.example.teamup.api.model.PersonalityQuestionResponse;
 import com.example.teamup.api.model.PersonalityTestRequest;
 import com.example.teamup.api.model.PersonalityTestResponse;
@@ -55,10 +53,6 @@ public interface ApiService {
 
     @GET("api/v1/contests/")
     Call<ContestsListResponse> getContests();
-
-    // 공모전 상세 정보 조회
-    @GET("/api/v1/contests/{contest_id}")
-    Call<ContestInformation> getContestDetail(@Path("contest_id") int contestId);
 
     // --- 지원 관련 API ---
     // 특정 모집글의 수락된 지원자(팀원) 목록 조회
@@ -107,9 +101,7 @@ public interface ApiService {
 
     // ==================== ContestRecruitmentDetailActivity에 필요한 API들 ====================
 
-    // 1. 모집글 상세 정보 조회 (기존에 정의했지만, 여기서 사용됩니다)
-    @GET("api/v1/recruitments/{recruitment_post_id}")
-    Call<RecruitmentPostResponse> getRecruitmentPost(@Path("recruitment_post_id") int postId);
+
 
     // 2. 수락된 팀원 목록 조회 (기존에 정의했지만, 여기서 사용됩니다)
     @GET("api/v1/applications/post/{recruitment_post_id}/accepted")
@@ -187,14 +179,14 @@ public interface ApiService {
      * GET /api/v1/recruitments/{recruitment_post_id}
      */
     @GET("api/v1/recruitments/{recruitment_post_id}")
-    Call<RecruitmentPostResponse> getRecruitmentPost(@Path("recruitment_post_id") int recruitmentPostId);
+    Call<RecruitmentPostResponse> getRecruitmentPost(@Path("recruitment_post_id") int recruitment_post_id);
     
     /**
      * 공모전 상세 정보 조회 API
      * GET /api/v1/contests/{contest_id}
      */
     @GET("api/v1/contests/{contest_id}")
-    Call<ContestResponse> getContestDetail(@Path("contest_id") int contestId);
+    Call<ContestInformation> getContestDetail(@Path("contest_id") int contestId);
     
     /**
      * 성향 테스트 질문 조회 API

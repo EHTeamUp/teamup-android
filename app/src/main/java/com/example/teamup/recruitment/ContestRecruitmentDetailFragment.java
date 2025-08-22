@@ -26,6 +26,7 @@ import com.example.teamup.auth.TokenManager; // TokenManager import
 import com.example.teamup.databinding.FragmentContestRecruitmentDetailBinding;
 import com.example.teamup.databinding.PopupApplyFormBinding;
 import com.example.teamup.util.PlaceholderFragment; // 임시 PlaceholderFragment import
+import com.example.teamup.applicant.ApplicantListFragment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -294,7 +295,8 @@ public class ContestRecruitmentDetailFragment extends Fragment implements Commen
 
     private void setupAuthorButtons() {
         binding.tvViewApplicants.setOnClickListener(v -> {
-            navigateToFragment(PlaceholderFragment.newInstance("지원자 목록"));
+            // ApplicantListFragment로 이동
+            navigateToFragment(ApplicantListFragment.newInstance(recruitmentPostId));
         });
         binding.tvTeamSynergy.setOnClickListener(v -> {
             navigateToFragment(PlaceholderFragment.newInstance("팀 시너지 점수"));

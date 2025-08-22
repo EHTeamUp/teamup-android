@@ -2,7 +2,6 @@ package com.example.teamup;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,10 +14,7 @@ import com.example.teamup.auth.TokenManager;
 
 import com.example.teamup.contest.ContestListFragment;
 import com.example.teamup.recruitment.ContestRecruitmentListFragment;
-import com.example.teamup.util.PlaceholderFragment;
 import com.example.teamup.fragment.HomeFragment;
-import com.example.teamup.fragment.ContestFragment;
-import com.example.teamup.fragment.BoardFragment;
 import com.example.teamup.fragment.ProfileFragment;
 import com.example.teamup.applicant.ApplicantListFragment;
 import com.example.teamup.recruitment.TeamSynergyScoreFragment;
@@ -85,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
             } else if (itemId == R.id.navigation_home) {
                 selectedFragment = new HomeFragment();
             } else if (itemId == R.id.navigation_contest) {
-                selectedFragment = new ContestListFragment()
+                selectedFragment = new ContestListFragment();
             } else if (itemId == R.id.navigation_board) {
                 selectedFragment = new ContestRecruitmentListFragment();
             }
