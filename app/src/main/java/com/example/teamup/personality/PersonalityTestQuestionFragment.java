@@ -19,9 +19,9 @@ import com.example.teamup.api.RetrofitClient;
 import com.example.teamup.api.model.PersonalityQuestionResponse;
 import com.example.teamup.api.model.ApiPersonalityQuestion;
 import com.example.teamup.api.model.PersonalityOption;
-import com.example.teamup.api.model.PersonalityProfileResponse;
-import com.example.teamup.api.model.PersonalityTestSubmitRequest;
-import com.example.teamup.api.model.PersonalityTestAnswer;
+import com.example.teamup.api.model.PersonalityTestResponse;
+import com.example.teamup.api.model.PersonalityTestRequest;
+import com.example.teamup.api.model.PersonalityAnswer;
 import com.example.teamup.MainActivity;
 import com.example.teamup.auth.SignupTestBaseActivity;
 import com.google.android.material.button.MaterialButton;
@@ -185,12 +185,12 @@ public class PersonalityTestQuestionFragment extends Fragment implements Persona
                 Log.d(TAG, "옵션 A: " + optionA + " (" + typeA + ")");
                 Log.d(TAG, "옵션 B: " + optionB + " (" + typeB + ")");
                 
-                PersonalityQuestion localQuestion = new PersonalityQuestion(
-                    apiQuestion.getId(),
-                    apiQuestion.getText(),
-                    optionA, optionB, "", "",
-                    typeA, typeB, "", ""
-                );
+                                 PersonalityQuestion localQuestion = new PersonalityQuestion(
+                     apiQuestion.getId(),
+                     apiQuestion.getText(),
+                     optionA, optionB,
+                     typeA, typeB
+                 );
                 
                 localQuestions.add(localQuestion);
                 Log.d(TAG, "질문 변환 완료: " + localQuestion.getQuestion());
@@ -249,11 +249,19 @@ public class PersonalityTestQuestionFragment extends Fragment implements Persona
     }
 
     @Override
-    public void onOptionSelected(int questionIndex, String option, String type) {
-        selectedAnswers.put(questionIndex, option);
-        selectedTypes.put(questionIndex, type);
+    public void onOptionSelected(int questionIndex, String option) {
+        Log.d(TAG, "옵션 선택: 질문 " + (questionIndex + 1) + ", 옵션 " + option);
         
-        Log.d(TAG, "선택된 답변: " + questionIndex + "번 질문 - " + option + " (" + type + ")");
+        // 선택된 답변 저장
+        selectedAnswers.put(questionIndex, option);
+        
+        // 해당 질문의 성향 타입 저장
+        if (questions != null && questionIndex < questions.size()) {
+            PersonalityQuestion question = questions.get(questionIndex);
+            String type = option.equals("A") ? question.getTypeA() : question.getTypeB();
+            selectedTypes.put(questionIndex, type);
+            Log.d(TAG, "질문 " + (questionIndex + 1) + "의 선택된 타입: " + type);
+        }
         
         // 결과 버튼 상태 업데이트
         updateResultButtonState();
@@ -272,7 +280,7 @@ public class PersonalityTestQuestionFragment extends Fragment implements Persona
     
     private void submitPersonalityTestToAPI() {
         // 답변 데이터를 API 형식으로 변환
-        List<PersonalityTestAnswer> answers = new ArrayList<>();
+        List<PersonalityAnswer> answers = new ArrayList<>();
         
         Log.d(TAG, "=== 성향 테스트 답변 데이터 ===");
         for (int i = 0; i < questions.size(); i++) {
@@ -294,45 +302,45 @@ public class PersonalityTestQuestionFragment extends Fragment implements Persona
                 }
             }
             
-            answers.add(new PersonalityTestAnswer(question.getId(), optionId));
+                         answers.add(new PersonalityAnswer(question.getId(), optionId));
             Log.d(TAG, "→ 최종: question_id=" + question.getId() + ", option_id=" + optionId);
         }
         
         // API 요청 객체 생성
-        PersonalityTestSubmitRequest request = new PersonalityTestSubmitRequest(userId, answers);
+        PersonalityTestRequest request = new PersonalityTestRequest(userId, answers);
         Log.d(TAG, "API 요청: userId=" + userId + ", answers count=" + answers.size());
         
         // API 호출
         RetrofitClient.getInstance()
                 .getApiService()
                 .submitPersonalityTest(request)
-                .enqueue(new Callback<PersonalityProfileResponse>() {
-                    @Override
-                    public void onResponse(Call<PersonalityProfileResponse> call, Response<PersonalityProfileResponse> response) {
+                                 .enqueue(new Callback<PersonalityTestResponse>() {
+                     @Override
+                     public void onResponse(Call<PersonalityTestResponse> call, Response<PersonalityTestResponse> response) {
                         Log.d(TAG, "API 응답: " + response.code() + " " + response.message());
                         
-                        if (response.isSuccessful() && response.body() != null) {
-                            // API 호출 성공: 결과 Fragment로 이동
-                            PersonalityProfileResponse profile = response.body();
-                            Log.d(TAG, "성향 프로필 받음: " + profile.getProfileCode());
+                                                 if (response.isSuccessful() && response.body() != null) {
+                             // API 호출 성공: 결과 Fragment로 이동
+                             PersonalityTestResponse profile = response.body();
+                             Log.d(TAG, "성향 프로필 받음: " + profile.getProfileCode());
                             
-                            if (fromSignup && getActivity() instanceof SignupTestBaseActivity) {
-                                // 회원가입에서 온 경우: SignupTestBaseActivity로 결과 전달
-                                Gson gson = new Gson();
-                                String traitsJson = gson.toJson(profile.getTraitsJson());
-                                ((SignupTestBaseActivity) getActivity()).onPersonalityTestCompleted(
-                                    profile.getProfileCode(), 
-                                    traitsJson
-                                );
-                            } else {
-                                // 일반적인 경우: 결과 Fragment로 이동
-                                PersonalityTestResultFragment resultFragment = new PersonalityTestResultFragment();
-                                Bundle args = new Bundle();
-                                args.putString("personalityType", profile.getProfileCode());
-                                Gson gson = new Gson();
-                                String traitsJson = gson.toJson(profile.getTraitsJson());
-                                args.putString("personalityTraitsJson", traitsJson);
-                                resultFragment.setArguments(args);
+                                                         if (fromSignup && getActivity() instanceof SignupTestBaseActivity) {
+                                 // 회원가입에서 온 경우: SignupTestBaseActivity로 결과 전달
+                                 Gson gson = new Gson();
+                                 String traitsJson = gson.toJson(profile.getTraits());
+                                 ((SignupTestBaseActivity) getActivity()).onPersonalityTestCompleted(
+                                     profile.getProfileCode(), 
+                                     traitsJson
+                                 );
+                             } else {
+                                 // 일반적인 경우: 결과 Fragment로 이동
+                                 PersonalityTestResultFragment resultFragment = new PersonalityTestResultFragment();
+                                 Bundle args = new Bundle();
+                                 args.putString("personalityType", profile.getProfileCode());
+                                 Gson gson = new Gson();
+                                 String traitsJson = gson.toJson(profile.getTraits());
+                                 args.putString("personalityTraitsJson", traitsJson);
+                                 resultFragment.setArguments(args);
                                 
                                 if (getActivity() instanceof MainActivity) {
                                     ((MainActivity) getActivity()).showFragment(resultFragment);
@@ -355,8 +363,8 @@ public class PersonalityTestQuestionFragment extends Fragment implements Persona
                         }
                     }
                     
-                    @Override
-                    public void onFailure(Call<PersonalityProfileResponse> call, Throwable t) {
+                                         @Override
+                     public void onFailure(Call<PersonalityTestResponse> call, Throwable t) {
                         // 네트워크 오류
                         Toast.makeText(requireContext(), "네트워크 오류가 발생했습니다.", Toast.LENGTH_SHORT).show();
                     }

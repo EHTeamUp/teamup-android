@@ -22,6 +22,8 @@ public class PersonalityQuestion {
     private String optionB;
     private int optionAId;  // A 옵션의 실제 ID
     private int optionBId;  // B 옵션의 실제 ID
+    private String typeA;   // A 옵션의 성향 타입
+    private String typeB;   // B 옵션의 성향 타입
 
     public PersonalityQuestion(int id, String question, String optionA, String optionB) {
         this.id = id;
@@ -30,6 +32,8 @@ public class PersonalityQuestion {
         this.optionB = optionB;
         this.optionAId = 1;  // 기본값
         this.optionBId = 2;  // 기본값
+        this.typeA = "";     // 기본값
+        this.typeB = "";     // 기본값
     }
     
     public PersonalityQuestion(int id, String question, String optionA, String optionB, int optionAId, int optionBId) {
@@ -39,6 +43,19 @@ public class PersonalityQuestion {
         this.optionB = optionB;
         this.optionAId = optionAId;
         this.optionBId = optionBId;
+        this.typeA = "";     // 기본값
+        this.typeB = "";     // 기본값
+    }
+    
+    public PersonalityQuestion(int id, String question, String optionA, String optionB, String typeA, String typeB) {
+        this.id = id;
+        this.question = question;
+        this.optionA = optionA;
+        this.optionB = optionB;
+        this.optionAId = 1;  // 기본값
+        this.optionBId = 2;  // 기본값
+        this.typeA = typeA;
+        this.typeB = typeB;
     }
 
     public int getId() {
@@ -63,6 +80,14 @@ public class PersonalityQuestion {
     
     public int getOptionBId() {
         return optionBId;
+    }
+    
+    public String getTypeA() {
+        return typeA;
+    }
+    
+    public String getTypeB() {
+        return typeB;
     }
 
     /**
