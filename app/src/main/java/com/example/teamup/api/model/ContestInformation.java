@@ -19,6 +19,9 @@ public class ContestInformation {
 
     @SerializedName("due_date")
     private String dueDateString;
+    
+    @SerializedName("start_date")
+    private String startDate;
 
     @SerializedName("tags")
     private List<Tag> tags;
@@ -33,8 +36,9 @@ public class ContestInformation {
 
     public String getName() { return name; }
     public String getPosterImgUrl() { return posterImgUrl; }
+    public String getStartDate() { return startDate; }
     public List<Tag> getTags() { return tags; }
-    public  String getContestUrl(){ return contestUrl; }
+    public String getContestUrl(){ return contestUrl; }
 
     /**
      * 서버에서 받은 due_date (String)를 LocalDate 객체로 변환하여 반환합니다.
