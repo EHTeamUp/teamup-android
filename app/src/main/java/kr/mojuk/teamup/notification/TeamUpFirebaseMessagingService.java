@@ -1,19 +1,31 @@
 package kr.mojuk.teamup.notification;
 
-// Firebase 설정 완료 후 주석 해제
-// import com.google.firebase.messaging.FirebaseMessagingService;
-// import com.google.firebase.messaging.RemoteMessage;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
+import android.media.RingtoneManager;
+import android.net.Uri;
+import android.os.Build;
+import android.util.Log;
 
-// Firebase 설정 완료 후 주석 해제하고 FirebaseMessagingService 상속
-public class FirebaseMessagingService /* extends FirebaseMessagingService */ {
+import androidx.annotation.NonNull;
+import androidx.core.app.NotificationCompat;
+
+import com.google.firebase.messaging.FirebaseMessagingService;
+import com.google.firebase.messaging.RemoteMessage;
+
+import kr.mojuk.teamup.MainActivity;
+import kr.mojuk.teamup.R;
+
+public class TeamUpFirebaseMessagingService extends FirebaseMessagingService {
 
     private static final String TAG = "TeamUpFCM";
     private static final String CHANNEL_ID = "teamup_notifications";
     private static final String CHANNEL_NAME = "TeamUp 알림";
     private static final String CHANNEL_DESCRIPTION = "TeamUp 앱의 알림 채널";
 
-    // Firebase 설정 완료 후 주석 해제
-    /*
     @Override
     public void onNewToken(@NonNull String token) {
         super.onNewToken(token);
@@ -45,14 +57,11 @@ public class FirebaseMessagingService /* extends FirebaseMessagingService */ {
             );
         }
     }
-    */
 
     /**
      * 알림 채널 생성 (Android 8.0 이상)
      */
     private void createNotificationChannel() {
-        // Firebase 설정 완료 후 주석 해제
-        /*
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(
                 CHANNEL_ID,
@@ -66,15 +75,12 @@ public class FirebaseMessagingService /* extends FirebaseMessagingService */ {
                 notificationManager.createNotificationChannel(channel);
             }
         }
-        */
     }
 
     /**
      * 알림 표시
      */
     private void sendNotification(String title, String messageBody) {
-        // Firebase 설정 완료 후 주석 해제
-        /*
         // 알림 채널 생성
         createNotificationChannel();
 
@@ -103,15 +109,13 @@ public class FirebaseMessagingService /* extends FirebaseMessagingService */ {
         if (notificationManager != null) {
             notificationManager.notify(0, notificationBuilder.build());
         }
-        */
     }
 
     /**
      * FCM 토큰을 서버에 전송
      */
     private void sendFcmTokenToServer(String token) {
-        // Firebase 설정 완료 후 주석 해제
         // FCM 토큰 매니저를 통해 서버에 전송
-        // FcmTokenManager.getInstance(this).updateFcmToken(token);
+        FcmTokenManager.getInstance(this).updateFcmToken(token);
     }
 }

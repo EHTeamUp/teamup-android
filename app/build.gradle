@@ -1,7 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
-    // Firebase 설정 완료 후 주석 해제
-    // id 'com.google.gms.google-services'
+    // Google 서비스 Gradle 플러그인 추가
+    id 'com.google.gms.google-services'
 }
 
 android {
@@ -56,10 +56,10 @@ dependencies {
     implementation libs.glide
     annotationProcessor libs.glide.compiler
     
-    // Firebase FCM 관련 의존성 (Firebase 설정 완료 후 주석 해제)
-    // implementation platform('com.google.firebase:firebase-bom:32.7.0')
-    // implementation 'com.google.firebase:firebase-messaging'
-    // implementation 'com.google.firebase:firebase-analytics'
+    // Firebase FCM 관련 의존성
+    implementation platform('com.google.firebase:firebase-bom:34.1.0')
+    implementation 'com.google.firebase:firebase-analytics'
+    implementation 'com.google.firebase:firebase-messaging'
     
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit

@@ -52,8 +52,16 @@ public class MainActivity extends AppCompatActivity implements ExperienceFragmen
 
         tokenManager = TokenManager.getInstance(this);
       
-        // FCM 토큰 매니저 초기화
-        FcmTokenManager.getInstance(this);
+        // FCM 토큰 매니저 초기화 및 토큰 요청
+        FcmTokenManager fcmTokenManager = FcmTokenManager.getInstance(this);
+        
+        // FCM 토큰 강제 요청
+        fcmTokenManager.requestFcmToken();
+        
+        // 사용자가 로그인되어 있다면 FCM 토큰을 서버에 전송
+        if (tokenManager.isLoggedIn()) {
+            fcmTokenManager.sendFcmTokenOnLogin();
+        }
 
         // 알림 권한 요청
         NotificationPermissionHelper.requestNotificationPermission(this);
