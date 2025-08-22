@@ -85,14 +85,14 @@ public class HomeFragment extends Fragment {
         api.getLatestContests().enqueue(new Callback<List<ContestInformation>>() {
             @Override
             public void onResponse(Call<List<ContestInformation>> call, Response<List<ContestInformation>> response) {
-                Log.d("HomeFragment", "📡 API 응답 받음 - 성공: " + response.isSuccessful() + ", 코드: " + response.code());
+                Log.d("HomeFragment", "API 응답 받음 - 성공: " + response.isSuccessful() + ", 코드: " + response.code());
                 if (response.isSuccessful() && response.body() != null) {
-                    Log.d("HomeFragment", "📋 응답 body 크기: " + response.body().size());
+                    Log.d("HomeFragment", "응답 body 크기: " + response.body().size());
                     containerContests.removeAllViews();
                     int totalContests = 0;
                     for (ContestInformation contest : response.body()) {
                         if (contest != null) {
-                            Log.d("HomeFragment", "🏆 공모전 추가: " + contest.getName());
+                            Log.d("HomeFragment", "공모전 추가: " + contest.getName());
                             View itemView = inflater.inflate(R.layout.item_contest, containerContests, false);
 
                             TextView tvTitle = itemView.findViewById(R.id.tvContestTitle);
