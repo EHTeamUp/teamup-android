@@ -84,7 +84,19 @@ public class ContestListAdapter extends ListAdapter<ContestInformation, ContestL
                     .into(binding.imageThumbnail);
 
             binding.title.setText(contest.getName());
-            binding.dday.setText(contest.getdDayText());
+
+            // --- 수정된 D-day 로직 ---
+            LocalDate dueDate = contest.getDueDate();
+            if (dueDate != null && dueDate.isBefore(LocalDate.now())) {
+                // 마감일이 오늘보다 이전이면 "마감됨"으로 표시
+                binding.dday.setText("마감됨");
+                binding.dday.setTextColor(Color.GRAY);
+            } else {
+                // 마감되지 않았으면 기존 dDayText 표시
+                binding.dday.setText(contest.getdDayText());
+                binding.dday.setTextColor(Color.parseColor("#888888"));
+            }
+
 
             if (contest.getTags() != null && !contest.getTags().isEmpty()) {
                 String tags = contest.getTags().stream()
@@ -93,13 +105,6 @@ public class ContestListAdapter extends ListAdapter<ContestInformation, ContestL
                 binding.hashtags.setText(tags);
             } else {
                 binding.hashtags.setText("");
-            }
-
-            LocalDate dueDate = contest.getDueDate();
-            if (dueDate != null) {
-                binding.dday.setTextColor(dueDate.isBefore(LocalDate.now()) ? Color.GRAY : Color.parseColor("#FF5722"));
-            } else {
-                binding.dday.setTextColor(Color.BLACK);
             }
         }
     }
