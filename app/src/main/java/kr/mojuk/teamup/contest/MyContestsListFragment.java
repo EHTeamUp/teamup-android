@@ -12,6 +12,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import kr.mojuk.teamup.MainActivity;
 import kr.mojuk.teamup.R;
 import kr.mojuk.teamup.api.ApiService;
 import kr.mojuk.teamup.api.RetrofitClient;
@@ -66,13 +67,25 @@ public class MyContestsListFragment extends Fragment {
         setupRecyclerView();
         loadMyActivities();
 
+        // 뒤로가기 버튼 클릭 리스너
+        binding.llContestTitleBar.setOnClickListener(v -> {
+            if (getActivity() != null) {
+                getActivity().onBackPressed();
+            }
+        });
+
         binding.btnGoToContest.setOnClickListener(v -> {
             if (getActivity() != null) {
-                // ContestListFragment로 교체하는 로직
+                // ContestListFragment로 교체하고 하단 네비게이션 바 공모전 탭 활성화
                 getActivity().getSupportFragmentManager().beginTransaction()
                         .replace(R.id.fragment_container, new ContestListFragment())
                         .addToBackStack(null) // 뒤로가기 버튼으로 돌아올 수 있도록 스택에 추가
                         .commit();
+                
+                // 하단 네비게이션 바 공모전 탭 활성화
+                if (getActivity() instanceof MainActivity) {
+                    ((MainActivity) getActivity()).setBottomNavigationItem(R.id.navigation_contest);
+                }
             }
         });
     }

@@ -89,7 +89,7 @@
                 android:id="@+id/et_password"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
-                android:hint="Value"
+                android:hint="value"
                 android:inputType="textPassword"
                 android:imeOptions="actionNext"
                 android:padding="12dp"
@@ -108,7 +108,7 @@
                 android:id="@+id/et_password_confirm"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
-                android:hint="Value"
+                android:hint="value"
                 android:inputType="textPassword"
                 android:imeOptions="actionNext"
                 android:padding="12dp"
@@ -203,10 +203,10 @@
                     android:id="@+id/btn_email_verify"
                     android:layout_width="wrap_content"
                     android:layout_height="48dp"
-                    android:text="인증 확인"
-                    app:cornerRadius="10dp"
                     android:backgroundTint="@color/black"
-                    android:textColor="@color/white" />
+                    android:text="인증 확인"
+                    android:textColor="@color/white"
+                    app:cornerRadius="10dp" />
 
             </LinearLayout>
 

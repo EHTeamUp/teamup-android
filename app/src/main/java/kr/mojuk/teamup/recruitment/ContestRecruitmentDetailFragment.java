@@ -35,6 +35,7 @@ import kr.mojuk.teamup.api.model.RecruitmentPostResponse;
 import kr.mojuk.teamup.auth.TokenManager; // TokenManager import
 import kr.mojuk.teamup.databinding.FragmentContestRecruitmentDetailBinding;
 import kr.mojuk.teamup.databinding.PopupApplyFormBinding;
+import kr.mojuk.teamup.fragments.MypageProfileFragment;
 import kr.mojuk.teamup.util.PlaceholderFragment; // 임시 PlaceholderFragment import
 import kr.mojuk.teamup.applicant.ApplicantListFragment;
 
@@ -117,7 +118,8 @@ public class ContestRecruitmentDetailFragment extends Fragment implements Commen
         binding.rvTeamMembers.setAdapter(teamMemberAdapter);
 
         teamMemberAdapter.setOnMemberClickListener(userId -> {
-            navigateToFragment(PlaceholderFragment.newInstance(userId + "의 프로필"));
+            // 해당 팀원의 프로필로 이동
+            navigateToFragment(MypageProfileFragment.newInstance(userId));
         });
 
         commentAdapter = new CommentAdapter(flatCommentList, currentUserId, this);
@@ -169,8 +171,10 @@ public class ContestRecruitmentDetailFragment extends Fragment implements Commen
             public void onResponse(@NonNull Call<RecruitmentPostResponse> call, @NonNull Response<RecruitmentPostResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     currentPost = response.body();
-                    binding.tvPostTitle.setText(currentPost.getTitle());
-                    binding.tvPostContent.setText(currentPost.getContent());
+                    if (binding != null) {
+                        binding.tvPostTitle.setText(currentPost.getTitle());
+                        binding.tvPostContent.setText(currentPost.getContent());
+                    }
 
                     loadContestDetails(currentPost.getContestId());
                     loadTeamMembersAndCheckRole(currentPost.getRecruitmentCount());
@@ -194,10 +198,12 @@ public class ContestRecruitmentDetailFragment extends Fragment implements Commen
             public void onResponse(@NonNull Call<ContestInformation> call, @NonNull Response<ContestInformation> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     currentContest = response.body();
-                    binding.contestTitleTextInBar.setText(currentContest.getName());
-                    binding.ddayText.setText(currentContest.getdDayText());
-                    if (getContext() != null) {
-                        Glide.with(getContext()).load(currentContest.getPosterImgUrl()).into(binding.ivPoster);
+                    if (binding != null) {
+                        binding.contestTitleTextInBar.setText(currentContest.getName());
+                        binding.ddayText.setText(currentContest.getdDayText());
+                        if (getContext() != null) {
+                            Glide.with(getContext()).load(currentContest.getPosterImgUrl()).into(binding.ivPoster);
+                        }
                     }
                 }
             }
@@ -216,9 +222,11 @@ public class ContestRecruitmentDetailFragment extends Fragment implements Commen
                     List<ApplicationResponse> teamMembers = response.body();
                     teamMemberAdapter.submitList(teamMembers);
 
-                    int currentMembersCount = teamMembers.size();
-                    String memberCountText = String.format(Locale.getDefault(), "팀원 (%d / %d)", currentMembersCount, totalRecruitmentCount);
-                    binding.teamMemberCount.setText(memberCountText);
+                    if (binding != null) {
+                        int currentMembersCount = teamMembers.size();
+                        String memberCountText = String.format(Locale.getDefault(), "팀원 (%d / %d)", currentMembersCount, totalRecruitmentCount);
+                        binding.teamMemberCount.setText(memberCountText);
+                    }
 
                     checkUserRole();
                 }
@@ -281,6 +289,10 @@ public class ContestRecruitmentDetailFragment extends Fragment implements Commen
     }
 
     private void updateUiBasedOnRole(UserRole role) {
+        if (binding == null) {
+            return; 
+        }
+
         switch (role) {
             case AUTHOR:
                 binding.llRecruiterView.setVisibility(View.VISIBLE);
@@ -304,6 +316,10 @@ public class ContestRecruitmentDetailFragment extends Fragment implements Commen
     }
 
     private void setupAuthorButtons() {
+        if (binding == null) {
+            return; 
+        }
+
         binding.tvViewApplicants.setOnClickListener(v -> {
             // ApplicantListFragment로 이동
             navigateToFragment(ApplicantListFragment.newInstance(recruitmentPostId));

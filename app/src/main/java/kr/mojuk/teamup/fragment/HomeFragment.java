@@ -21,6 +21,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
+import kr.mojuk.teamup.MainActivity;
 import kr.mojuk.teamup.api.ApiService;
 import kr.mojuk.teamup.api.RetrofitClient;
 import kr.mojuk.teamup.api.model.ContestInformation;
@@ -52,14 +53,19 @@ public class HomeFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_home, container, false);
 
-        TextView btnRecruitmentList = root.findViewById(R.id.btn_recruitment_list);
-        TextView btnContestList = root.findViewById(R.id.btn_contest_list);
+        LinearLayout btnRecruitmentList = root.findViewById(R.id.btn_recruitment_list);
+        LinearLayout btnContestList = root.findViewById(R.id.btn_contest_list);
 
         btnContestList.setOnClickListener(v -> {
             FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
             transaction.replace(R.id.fragment_container, new ContestListFragment());
             transaction.addToBackStack(null);
             transaction.commit();
+            
+            // 하단 네비게이션 바 공모전 탭 활성화
+            if (getActivity() instanceof MainActivity) {
+                ((MainActivity) getActivity()).setBottomNavigationItem(R.id.navigation_contest);
+            }
         });
 
         btnRecruitmentList.setOnClickListener(v -> {
@@ -67,6 +73,11 @@ public class HomeFragment extends Fragment {
             transaction.replace(R.id.fragment_container, new ContestRecruitmentListFragment());
             transaction.addToBackStack(null);
             transaction.commit();
+            
+            // 하단 네비게이션 바 게시판 탭 활성화
+            if (getActivity() instanceof MainActivity) {
+                ((MainActivity) getActivity()).setBottomNavigationItem(R.id.navigation_board);
+            }
         });
 
         this.inflater = inflater;
@@ -115,6 +126,11 @@ public class HomeFragment extends Fragment {
                                 transaction.replace(R.id.fragment_container, fragment);
                                 transaction.addToBackStack(null);
                                 transaction.commit();
+                                
+                                // 하단 네비게이션 바 공모전 탭 활성화
+                                if (getActivity() instanceof MainActivity) {
+                                    ((MainActivity) getActivity()).setBottomNavigationItem(R.id.navigation_contest);
+                                }
                             });
                             
                             containerContests.addView(itemView);
@@ -175,6 +191,11 @@ public class HomeFragment extends Fragment {
                                 transaction.replace(R.id.fragment_container, fragment);
                                 transaction.addToBackStack(null);
                                 transaction.commit();
+                                
+                                // 하단 네비게이션 바 게시판 탭 활성화
+                                if (getActivity() instanceof MainActivity) {
+                                    ((MainActivity) getActivity()).setBottomNavigationItem(R.id.navigation_board);
+                                }
                             });
                             
                             containerRecruitments.addView(itemView);
