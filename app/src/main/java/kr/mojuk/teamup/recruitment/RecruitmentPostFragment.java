@@ -131,6 +131,11 @@ public class RecruitmentPostFragment extends Fragment {
                 return;
             }
 
+            if (memberCount == 0) {
+                Toast.makeText(getContext(), "모집 인원을 선택해주세요.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            
             RecruitmentPostRequest postRequest = new RecruitmentPostRequest(title, content, memberCount, contestId, currentUserId);
 
             if (isEditMode) {
