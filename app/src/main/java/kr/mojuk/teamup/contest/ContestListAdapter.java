@@ -94,7 +94,7 @@ public class ContestListAdapter extends ListAdapter<ContestInformation, ContestL
             } else {
                 // 마감되지 않았으면 기존 dDayText 표시
                 binding.dday.setText(contest.getdDayText());
-                binding.dday.setTextColor(Color.parseColor("#888888"));
+                binding.dday.setTextColor(Color.parseColor("#FF5722"));
             }
 
 
