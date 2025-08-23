@@ -77,13 +77,11 @@ public class ContestInformationDetailFragment extends Fragment {
         }
 
         // 뒤로가기 버튼
-        if (binding != null) {
-            binding.btnBackTitle.setOnClickListener(v -> {
-                if (getActivity() != null) {
-                    getActivity().getSupportFragmentManager().popBackStack();
-                }
-            });
-        }
+        binding.btnBackTitle.setOnClickListener(v -> {
+            if (getActivity() != null) {
+                getActivity().getSupportFragmentManager().popBackStack();
+            }
+        });
     }
 
     private void loadContestDetailsFromApi(int contestId) {
@@ -120,10 +118,6 @@ public class ContestInformationDetailFragment extends Fragment {
     }
 
     private void updateUi(ContestInformation contestDetail) {
-        if (binding == null) {
-            return; // Fragment가 destroy된 상태면 UI 업데이트하지 않음
-        }
-
         binding.contestTitleTextInBar.setText(contestDetail.getName());
 
         // 포스터 이미지 로드
@@ -144,8 +138,8 @@ public class ContestInformationDetailFragment extends Fragment {
         // 공모전 사이트 URL 처리
         final String siteUrl = contestDetail.getContestUrl();
         if (siteUrl != null && !siteUrl.isEmpty()) {
-            binding.btnGoToSite.setVisibility(View.VISIBLE);
-            binding.btnGoToSite.setOnClickListener(v -> {
+            binding.tvGoToSite.setVisibility(View.VISIBLE);
+            binding.tvGoToSite.setOnClickListener(v -> {
                 try {
                     Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(siteUrl));
                     startActivity(browserIntent);
@@ -154,11 +148,11 @@ public class ContestInformationDetailFragment extends Fragment {
                 }
             });
         } else {
-            binding.btnGoToSite.setVisibility(View.GONE);
+            binding.tvGoToSite.setVisibility(View.GONE);
         }
 
         // 글 작성 버튼
-        binding.btnCreatePost.setOnClickListener(v -> {
+        binding.tvCreatePost.setOnClickListener(v -> {
             if (getActivity() != null) {
                 RecruitmentPostFragment recruitmentFragment = RecruitmentPostFragment.newInstanceForCreate(
                         contestDetail.getContestId(),
@@ -203,3 +197,5 @@ public class ContestInformationDetailFragment extends Fragment {
         binding = null; // 메모리 누수 방지
     }
 }
+
+
