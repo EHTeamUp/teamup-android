@@ -20,13 +20,16 @@ public class RecruitmentPostDTO {
     @SerializedName("contest_id")
     private int contestId;
 
+    // --- 추가: 공모전 이름을 받을 필드 ---
+    @SerializedName("contest_name")
+    private String contestName;
+
     @SerializedName("user_id")
     private String userId;
 
     @SerializedName("created_at")
     private String createdAt;
 
-    // --- 추가된 필드 ---
     @SerializedName("due_date")
     private String dueDate;
 
@@ -39,14 +42,12 @@ public class RecruitmentPostDTO {
     public String getContent() { return content; }
     public int getRecruitmentCount() { return recruitmentCount; }
     public int getContestId() { return contestId; }
+    public String getContestName() { return contestName; } // --- 추가: Getter ---
     public String getUserId() { return userId; }
     public String getCreatedAt() { return createdAt; }
-
-    // --- 추가된 Getter ---
     public String getDueDate() { return dueDate; }
     public int getAcceptedCount() { return acceptedCount; }
 
-    // ListAdapter의 효율적인 업데이트를 위해 equals와 hashCode를 오버라이드합니다.
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -57,12 +58,14 @@ public class RecruitmentPostDTO {
                 contestId == that.contestId &&
                 acceptedCount == that.acceptedCount &&
                 Objects.equals(title, that.title) &&
+                Objects.equals(contestName, that.contestName) && // --- 추가: equals 비교 ---
                 Objects.equals(userId, that.userId) &&
                 Objects.equals(dueDate, that.dueDate);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(recruitmentPostId, title, recruitmentCount, contestId, userId, dueDate, acceptedCount);
+        // --- 수정: hashCode에 contestName 추가 ---
+        return Objects.hash(recruitmentPostId, title, recruitmentCount, contestId, contestName, userId, dueDate, acceptedCount);
     }
 }

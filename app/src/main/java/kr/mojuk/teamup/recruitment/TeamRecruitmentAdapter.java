@@ -1,5 +1,6 @@
 package kr.mojuk.teamup.recruitment;
 
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
@@ -39,7 +40,6 @@ public class TeamRecruitmentAdapter extends ListAdapter<RecruitmentPostDTO, Team
 
         @Override
         public boolean areContentsTheSame(@NonNull RecruitmentPostDTO oldItem, @NonNull RecruitmentPostDTO newItem) {
-            // DTO 클래스에 equals()가 구현되어 있어야 합니다.
             return oldItem.equals(newItem);
         }
     };
@@ -71,19 +71,24 @@ public class TeamRecruitmentAdapter extends ListAdapter<RecruitmentPostDTO, Team
         }
 
         public void bind(RecruitmentPostDTO post) {
+            // --- 수정된 부분 ---
+            // 1. 모집글 정보 바인딩
             binding.titleText.setText(post.getTitle());
             binding.organizerText.setText("모집자: " + post.getUserId());
-
             String peopleInfo = String.format(Locale.getDefault(), "모집 인원: %d / %d",
                     post.getAcceptedCount(), post.getRecruitmentCount());
             binding.peopleText.setText(peopleInfo);
 
-            // D-Day 계산 로직을 ViewHolder 안으로 가져옵니다.
+            // 2. 공모전 제목 바인딩
+            binding.contestTitleText.setText("공모전 제목: " + post.getContestName());
+
+            // 3. D-Day 계산 및 색상 적용
             binding.dDayText.setText(calculateDday(post.getDueDate()));
         }
 
         private String calculateDday(String dueDateString) {
             if (dueDateString == null || dueDateString.isEmpty()) {
+                binding.dDayText.setTextColor(Color.BLACK); // 기본 색상
                 return "-";
             }
             try {
@@ -93,14 +98,19 @@ public class TeamRecruitmentAdapter extends ListAdapter<RecruitmentPostDTO, Team
                 long daysRemaining = ChronoUnit.DAYS.between(today, dueDate);
 
                 if (daysRemaining < 0) {
+                    binding.dDayText.setTextColor(Color.GRAY); // 마감 시 회색
                     return "마감";
-                } else if (daysRemaining == 0) {
-                    return "D-Day";
                 } else {
-                    return "D-" + daysRemaining;
+                    binding.dDayText.setTextColor(Color.parseColor("#FF5722")); // 진행 중일 때 원래 색상
+                    if (daysRemaining == 0) {
+                        return "D-Day";
+                    } else {
+                        return "D-" + daysRemaining;
+                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
+                binding.dDayText.setTextColor(Color.BLACK);
                 return "-";
             }
         }
