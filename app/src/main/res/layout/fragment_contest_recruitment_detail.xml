@@ -24,7 +24,7 @@
 
         <EditText
             android:id="@+id/et_comment_input"
-            android:layout_width="186dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@drawable/rounded_box_border"
@@ -35,12 +35,12 @@
         <Button
             android:id="@+id/btn_comment_submit"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minHeight="48dp"
+            android:layout_height="58dp"
+            android:layout_marginStart="8dp"
             android:backgroundTint="@color/black"
+            android:minHeight="48dp"
             android:text="작성"
-            app:cornerRadius="8dp"
-            android:layout_marginStart="8dp"/>
+            app:cornerRadius="8dp" />
     </LinearLayout>
 
     <!-- 2. 스크롤될 모든 콘텐츠를 NestedScrollView에 배치 -->
@@ -266,7 +266,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="10dp"
         android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@id/ll_comment_input"
         app:layout_constraintEnd_toEndOf="parent"
@@ -278,10 +278,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:backgroundTint="#dddddd"
+            android:layout_marginBottom="8dp"
             android:src="@drawable/ic_delete"
             android:contentDescription="게시글 삭제"
             app:fabSize="normal"
-            app:elevation="6dp"
+            app:elevation="0dp"
             android:layout_marginEnd="8dp"/>
 
         <!-- 수정 버튼 -->
@@ -290,10 +291,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:backgroundTint="#dddddd"
+            android:layout_marginBottom="8dp"
             android:src="@drawable/ic_edit"
             android:contentDescription="게시글 수정"
             app:fabSize="normal"
-            app:elevation="6dp"/>
+            app:elevation="0dp"/>
 
     </LinearLayout>
 
