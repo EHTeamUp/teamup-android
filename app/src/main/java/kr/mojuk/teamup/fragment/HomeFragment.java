@@ -122,7 +122,7 @@ public class HomeFragment extends Fragment {
                             // 공모전 아이템 클릭 리스너 추가
                             itemView.setOnClickListener(v -> {
                                 FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
-                                ContestInformationDetailFragment fragment = ContestInformationDetailFragment.newInstance(contest.getContestId());
+                                ContestInformationDetailFragment fragment = ContestInformationDetailFragment.newInstance(contest);
                                 transaction.replace(R.id.fragment_container, fragment);
                                 transaction.addToBackStack(null);
                                 transaction.commit();
