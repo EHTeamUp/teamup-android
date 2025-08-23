@@ -65,10 +65,11 @@ public class ContestListFragment extends Fragment {
         binding.recyclerviewContests.setLayoutManager(new LinearLayoutManager(getContext()));
         binding.recyclerviewContests.setAdapter(adapter);
 
-        adapter.setOnItemClickListener(contestId -> {
+        adapter.setOnItemClickListener(contest -> {
             if (getActivity() != null) {
+                ContestInformationDetailFragment detailFragment = ContestInformationDetailFragment.newInstance(contest);
                 getActivity().getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, ContestInformationDetailFragment.newInstance(contestId))
+                        .replace(R.id.fragment_container, detailFragment)
                         .addToBackStack(null)
                         .commit();
             }

@@ -24,7 +24,7 @@ public class ContestListAdapter extends ListAdapter<ContestInformation, ContestL
     private OnItemClickListener listener;
 
     public interface OnItemClickListener {
-        void onItemClick(int contestId);
+        void onItemClick(ContestInformation contest);
     }
 
     public void setOnItemClickListener(OnItemClickListener listener) {
@@ -69,7 +69,7 @@ public class ContestListAdapter extends ListAdapter<ContestInformation, ContestL
             itemView.setOnClickListener(v -> {
                 int position = getAdapterPosition();
                 if (position != RecyclerView.NO_POSITION && listener != null) {
-                    listener.onItemClick(getItem(position).getContestId());
+                    listener.onItemClick(getItem(position));
                 }
             });
         }
