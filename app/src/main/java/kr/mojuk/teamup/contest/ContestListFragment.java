@@ -24,6 +24,9 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -33,7 +36,7 @@ public class ContestListFragment extends Fragment {
 
     private FragmentContestListBinding binding;
     private ContestListAdapter adapter;
-    private List<FilterItem> availableFilters = new ArrayList<>(); // 서버에서 받아온 필터 목록
+    private List<FilterItem> availableFilters = new ArrayList<>();
     private ApiService apiService;
 
     public ContestListFragment() {
@@ -49,12 +52,10 @@ public class ContestListFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
         apiService = RetrofitClient.getInstance().getApiService();
-
         setupRecyclerView();
-        loadFilters(); // 먼저 필터 목록을 로드
-        loadAllContests(); // 전체 공모전 로드
+        loadFilters();
+        loadAllContests();
         setupDropdownMenu();
         setupFilterButtons();
     }
@@ -64,37 +65,53 @@ public class ContestListFragment extends Fragment {
         binding.recyclerviewContests.setLayoutManager(new LinearLayoutManager(getContext()));
         binding.recyclerviewContests.setAdapter(adapter);
 
-        adapter.setOnItemClickListener(contestId -> {
+        adapter.setOnItemClickListener(contest -> {
             if (getActivity() != null) {
+                ContestInformationDetailFragment detailFragment = ContestInformationDetailFragment.newInstance(contest);
                 getActivity().getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, ContestInformationDetailFragment.newInstance(contestId))
+                        .replace(R.id.fragment_container, detailFragment)
                         .addToBackStack(null)
                         .commit();
             }
         });
     }
 
-    // 서버에서 사용 가능한 필터 목록을 가져옴
-    private void loadFilters() {
-        apiService.getFilters().enqueue(new Callback<List<FilterItem>>() {
-            @Override
-            public void onResponse(@NonNull Call<List<FilterItem>> call, @NonNull Response<List<FilterItem>> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    availableFilters.clear();
-                    availableFilters.addAll(response.body());
-                    Log.d("ContestListFragment", "Loaded " + availableFilters.size() + " filters");
-                } else {
-                    Log.e("ContestListFragment", "Failed to load filters");
-                    Toast.makeText(getContext(), "필터 정보를 불러오지 못했습니다.", Toast.LENGTH_SHORT).show();
-                }
-            }
+    // --- 수정: 정렬 로직을 처리하는 공통 메서드 ---
+    private void sortAndDisplayContests(List<ContestInformation> contests) {
+        if (contests == null || contests.isEmpty()) {
+            adapter.submitList(new ArrayList<>());
+            return;
+        }
 
-            @Override
-            public void onFailure(@NonNull Call<List<FilterItem>> call, @NonNull Throwable t) {
-                Log.e("ContestListFragment", "Filter API Call Failed: " + t.getMessage());
-                Toast.makeText(getContext(), "필터 정보를 불러오지 못했습니다.", Toast.LENGTH_SHORT).show();
+        List<ContestInformation> ongoingContests = new ArrayList<>();
+        List<ContestInformation> finishedContests = new ArrayList<>();
+        LocalDate today = LocalDate.now();
+
+        // 1. 진행 중인 공모전과 마감된 공모전을 분리
+        for (ContestInformation contest : contests) {
+            LocalDate dueDate = contest.getDueDate();
+            if (dueDate != null && dueDate.isBefore(today)) {
+                finishedContests.add(contest);
+            } else {
+                ongoingContests.add(contest);
             }
+        }
+
+        // 2. 진행 중인 공모전을 D-day가 적게 남은 순으로 정렬
+        Collections.sort(ongoingContests, (c1, c2) -> {
+            LocalDate d1 = c1.getDueDate();
+            LocalDate d2 = c2.getDueDate();
+            if (d1 == null && d2 == null) return 0;
+            if (d1 == null) return 1; // 날짜 없는 항목은 뒤로
+            if (d2 == null) return -1;
+            return d1.compareTo(d2);
         });
+
+        // 3. 두 리스트를 합침 (진행 중 -> 마감 순)
+        ongoingContests.addAll(finishedContests);
+
+        // 4. 어댑터에 최종 리스트 전달
+        adapter.submitList(ongoingContests);
     }
 
     // 전체 공모전을 로드 (필터 없음)
@@ -103,21 +120,9 @@ public class ContestListFragment extends Fragment {
             @Override
             public void onResponse(@NonNull Call<ContestsListResponse> call, @NonNull Response<ContestsListResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    List<ContestInformation> contestsFromServer = response.body().getContests();
-                    if (contestsFromServer != null) {
-                        // 날짜순 정렬
-                        Collections.sort(contestsFromServer, (c1, c2) -> {
-                            LocalDate d1 = c1.getDueDate();
-                            LocalDate d2 = c2.getDueDate();
-                            if (d1 == null || d2 == null) return 0;
-                            return d1.compareTo(d2);
-                        });
+                    sortAndDisplayContests(response.body().getContests());
+                    binding.tvOngoingTitle.setText("전체 공모전 목록");
 
-                        adapter.submitList(new ArrayList<>(contestsFromServer));
-                        if (binding != null) {
-                            binding.tvOngoingTitle.setText("전체 공모전 목록");
-                        }
-                    }
                 } else {
                     Toast.makeText(getContext(), "공모전 정보를 불러오지 못했습니다.", Toast.LENGTH_SHORT).show();
                 }
@@ -171,75 +176,66 @@ public class ContestListFragment extends Fragment {
             return;
         }
 
-        List<ContestInformation> combinedContests = new ArrayList<>();
+        // 동시성 환경에서 안전한 Map을 사용하여 중복을 제거하고 결과를 저장
+        final Map<Integer, ContestInformation> combinedContestsMap = new ConcurrentHashMap<>();
+        // --- 수정: int[] 대신 AtomicInteger 사용 ---
+        final AtomicInteger completedRequests = new AtomicInteger(0);
         final int totalFilters = filterIds.size();
-        final int[] completedRequests = {0}; // 완료된 요청 수를 추적
 
         for (int filterId : filterIds) {
             apiService.getContestsByFilter(filterId).enqueue(new Callback<ContestsListResponse>() {
                 @Override
                 public void onResponse(@NonNull Call<ContestsListResponse> call, @NonNull Response<ContestsListResponse> response) {
-                    if (response.isSuccessful() && response.body() != null) {
-                        List<ContestInformation> contests = response.body().getContests();
-                        if (contests != null) {
-                            // 중복 제거를 위해 ID 기준으로 합치기
-                            for (ContestInformation contest : contests) {
-                                boolean isDuplicate = false;
-                                for (ContestInformation existing : combinedContests) {
-                                    if (existing.getContestId() == contest.getContestId()) {
-                                        isDuplicate = true;
-                                        break;
-                                    }
-                                }
-                                if (!isDuplicate) {
-                                    combinedContests.add(contest);
-                                }
-                            }
+                    if (response.isSuccessful() && response.body() != null && response.body().getContests() != null) {
+                        for (ContestInformation contest : response.body().getContests()) {
+                            combinedContestsMap.put(contest.getContestId(), contest);
                         }
                     }
+                    checkIfAllRequestsFinished();
 
-                    completedRequests[0]++;
-
-                    // 모든 요청이 완료되면 결과 표시
-                    if (completedRequests[0] == totalFilters) {
-                        // 날짜순 정렬
-                        Collections.sort(combinedContests, (c1, c2) -> {
-                            LocalDate d1 = c1.getDueDate();
-                            LocalDate d2 = c2.getDueDate();
-                            if (d1 == null || d2 == null) return 0;
-                            return d1.compareTo(d2);
-                        });
-
-                        if (binding != null) {
-                            adapter.submitList(new ArrayList<>(combinedContests));
-                        }
-                    }
                 }
 
                 @Override
                 public void onFailure(@NonNull Call<ContestsListResponse> call, @NonNull Throwable t) {
                     Log.e("ContestListFragment", "Multi Filter API Call Failed: " + t.getMessage());
-                    completedRequests[0]++;
+                    checkIfAllRequestsFinished();
+                }
 
-                    // 모든 요청이 완료되면 (실패한 것들 포함) 현재까지의 결과 표시
-                    if (completedRequests[0] == totalFilters) {
-                        if (!combinedContests.isEmpty()) {
-                            Collections.sort(combinedContests, (c1, c2) -> {
-                                LocalDate d1 = c1.getDueDate();
-                                LocalDate d2 = c2.getDueDate();
-                                if (d1 == null || d2 == null) return 0;
-                                return d1.compareTo(d2);
-                            });
-                            if (binding != null) {
-                                adapter.submitList(new ArrayList<>(combinedContests));
-                            }
-                        } else {
-                            Toast.makeText(getContext(), "필터된 공모전 정보를 불러오지 못했습니다.", Toast.LENGTH_SHORT).show();
+                private void checkIfAllRequestsFinished() {
+                    // --- 수정: incrementAndGet() 메서드 사용 ---
+                    if (completedRequests.incrementAndGet() == totalFilters) {
+                        List<ContestInformation> finalList = new ArrayList<>(combinedContestsMap.values());
+                        if (getActivity() != null) {
+                            getActivity().runOnUiThread(() -> sortAndDisplayContests(finalList));
+
                         }
                     }
                 }
             });
         }
+    }
+
+    // 서버에서 사용 가능한 필터 목록을 가져옴
+    private void loadFilters() {
+        apiService.getFilters().enqueue(new Callback<List<FilterItem>>() {
+            @Override
+            public void onResponse(@NonNull Call<List<FilterItem>> call, @NonNull Response<List<FilterItem>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    availableFilters.clear();
+                    availableFilters.addAll(response.body());
+                    Log.d("ContestListFragment", "Loaded " + availableFilters.size() + " filters");
+                } else {
+                    Log.e("ContestListFragment", "Failed to load filters");
+                    Toast.makeText(getContext(), "필터 정보를 불러오지 못했습니다.", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<List<FilterItem>> call, @NonNull Throwable t) {
+                Log.e("ContestListFragment", "Filter API Call Failed: " + t.getMessage());
+                Toast.makeText(getContext(), "필터 정보를 불러오지 못했습니다.", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void setupDropdownMenu() {

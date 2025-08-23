@@ -22,6 +22,7 @@ import kr.mojuk.teamup.api.model.Tag;
 import kr.mojuk.teamup.databinding.FragmentContestInformationDetailBinding;
 import kr.mojuk.teamup.recruitment.RecruitmentPostFragment;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 import retrofit2.Call;
@@ -35,10 +36,10 @@ public class ContestInformationDetailFragment extends Fragment {
     private int contestId = -1;
 
     // Fragment 인스턴스를 생성하고 arguments를 설정하는 정적 메서드
-    public static ContestInformationDetailFragment newInstance(int contestId) {
+    public static ContestInformationDetailFragment newInstance(ContestInformation contest) {
         ContestInformationDetailFragment fragment = new ContestInformationDetailFragment();
         Bundle args = new Bundle();
-        args.putInt("CONTEST_ID", contestId);
+        args.putInt("CONTEST_ID", contest.getContestId());
         fragment.setArguments(args);
         return fragment;
     }
@@ -90,9 +91,23 @@ public class ContestInformationDetailFragment extends Fragment {
             @Override
             public void onResponse(@NonNull Call<ContestInformation> call, @NonNull Response<ContestInformation> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    updateUi(response.body());
+                    ContestInformation contestDetail = response.body();
+
+                    // 디버깅용 로그 추가
+                    Log.d("ContestDetailFragment", "Contest loaded: " + contestDetail.getName());
+                    if (contestDetail.getTags() != null) {
+                        Log.d("ContestDetailFragment", "Tags count: " + contestDetail.getTags().size());
+                        for (Tag tag : contestDetail.getTags()) {
+                            Log.d("ContestDetailFragment", "Tag: " + tag.getName() + " (ID: " + tag.getTagId() + ")");
+                        }
+                    } else {
+                        Log.d("ContestDetailFragment", "No tags found");
+                    }
+
+                    updateUi(contestDetail);
                 } else {
                     Toast.makeText(getContext(), "상세 정보가 없습니다.", Toast.LENGTH_SHORT).show();
+                    Log.e("ContestDetailFragment", "API response not successful: " + response.code());
                 }
             }
 
@@ -111,7 +126,7 @@ public class ContestInformationDetailFragment extends Fragment {
 
         binding.contestTitleTextInBar.setText(contestDetail.getName());
 
-        // Glide 사용 시 getActivity() 또는 getContext()로 Context를 전달
+        // 포스터 이미지 로드
         if (getContext() != null) {
             Glide.with(getContext())
                     .load(contestDetail.getPosterImgUrl())
@@ -120,18 +135,13 @@ public class ContestInformationDetailFragment extends Fragment {
                     .into(binding.ivPoster);
         }
 
+        // 마감일 표시
         binding.tvDeadline.setText("모집마감 " + contestDetail.getdDayText());
 
-        if (contestDetail.getTags() != null && !contestDetail.getTags().isEmpty()) {
-            String hashtags = contestDetail.getTags().stream()
-                    .map(Tag::getName)
-                    .map(name -> "#" + name)
-                    .collect(Collectors.joining(" "));
-            binding.tvHashtag.setText(hashtags);
-        } else {
-            binding.tvHashtag.setVisibility(View.GONE);
-        }
+        // 태그 표시 - 개선된 버전
+        displayTags(contestDetail.getTags());
 
+        // 공모전 사이트 URL 처리
         final String siteUrl = contestDetail.getContestUrl();
         if (siteUrl != null && !siteUrl.isEmpty()) {
             binding.btnGoToSite.setVisibility(View.VISIBLE);
@@ -147,9 +157,9 @@ public class ContestInformationDetailFragment extends Fragment {
             binding.btnGoToSite.setVisibility(View.GONE);
         }
 
+        // 글 작성 버튼
         binding.btnCreatePost.setOnClickListener(v -> {
             if (getActivity() != null) {
-                // '새 글 작성' 모드로 RecruitmentPostFragment를 호출합니다.
                 RecruitmentPostFragment recruitmentFragment = RecruitmentPostFragment.newInstanceForCreate(
                         contestDetail.getContestId(),
                         contestDetail.getName()
@@ -161,6 +171,30 @@ public class ContestInformationDetailFragment extends Fragment {
                         .commit();
             }
         });
+    }
+
+    // 태그를 표시하는 별도 메서드
+    private void displayTags(List<Tag> tags) {
+        if (tags != null && !tags.isEmpty()) {
+            // 태그들을 "#태그명" 형식으로 변환하고 공백으로 연결
+            String hashtags = tags.stream()
+                    .map(Tag::getName)
+                    .filter(name -> name != null && !name.trim().isEmpty()) // null이나 빈 문자열 제거
+                    .map(name -> "#" + name.trim()) // 앞뒤 공백 제거하고 # 추가
+                    .collect(Collectors.joining(" "));
+
+            if (!hashtags.isEmpty()) {
+                binding.tvHashtag.setText(hashtags);
+                binding.tvHashtag.setVisibility(View.VISIBLE);
+                Log.d("ContestDetailFragment", "Tags displayed: " + hashtags);
+            } else {
+                binding.tvHashtag.setVisibility(View.GONE);
+                Log.d("ContestDetailFragment", "No valid tags to display");
+            }
+        } else {
+            binding.tvHashtag.setVisibility(View.GONE);
+            Log.d("ContestDetailFragment", "Tags list is null or empty");
+        }
     }
 
     @Override
