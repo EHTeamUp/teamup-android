@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -51,7 +52,7 @@ public class TeamSynergyScoreFragment extends Fragment {
         
         initViews(view);
         setupRecyclerView();
-        setupClickListeners();
+        setupClickListeners(view);
         loadDummyData();
     }
 
@@ -67,9 +68,9 @@ public class TeamSynergyScoreFragment extends Fragment {
         recyclerView.setAdapter(adapter);
     }
 
-    private void setupClickListeners() {
+    private void setupClickListeners(View view) {
         // 지원자 추가 모집 버튼
-        Button btnAddApplicant = getView().findViewById(R.id.btn_add_applicant);
+        Button btnAddApplicant = view.findViewById(R.id.btn_add_applicant);
         if (btnAddApplicant != null) {
             btnAddApplicant.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -86,18 +87,22 @@ public class TeamSynergyScoreFragment extends Fragment {
             });
         }
 
-        // 뒤로가기 화살표
-        View backArrow = getView().findViewById(R.id.iv_back_arrow);
-        if (backArrow != null) {
-            backArrow.setOnClickListener(new View.OnClickListener() {
+        // 네비게이션 바 전체에 뒤로가기 클릭 리스너
+        LinearLayout navigationBar = view.findViewById(R.id.navigation_bar);
+        if (navigationBar != null) {
+            Log.d("TeamSynergyScore", "네비게이션 바 클릭 리스너 설정됨");
+            navigationBar.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    Log.d("TeamSynergyScore", "네비게이션 바 클릭됨");
                     // 프래그먼트 백스택에서 제거
                     if (getActivity() != null) {
                         getActivity().getSupportFragmentManager().popBackStack();
                     }
                 }
             });
+        } else {
+            Log.e("TeamSynergyScore", "네비게이션 바를 찾을 수 없음");
         }
     }
 
@@ -116,6 +121,7 @@ public class TeamSynergyScoreFragment extends Fragment {
         updateSynergyScore(85);
 
         adapter.notifyDataSetChanged();
+        Log.d("TeamSynergyScore", "더미 데이터 로드 완료 - 팀원 수: " + teamMemberList.size());
         
         // 시너지 분석 API 호출
         performSynergyAnalysis();
@@ -165,26 +171,70 @@ public class TeamSynergyScoreFragment extends Fragment {
                             SynergyAnalysisResponse synergyResponse = response.body();
                             
                             Log.d("TeamSynergyScore", "시너지 분석 성공!");
-                            Log.d("TeamSynergyScore", "응답 메시지: " + synergyResponse.getMessage());
                             
                             if (synergyResponse.getUsers() != null) {
                                 Log.d("TeamSynergyScore", "사용자 수: " + synergyResponse.getUsers().size());
+                                
+                                // API 응답으로 팀원 데이터 업데이트
+                                teamMemberList.clear();
                                 for (SynergyAnalysisResponse.User user : synergyResponse.getUsers()) {
                                     Log.d("TeamSynergyScore", "사용자 ID: " + user.getUserId());
-                                    Log.d("TeamSynergyScore", "사용자 이름: " + user.getName());
-                                    Log.d("TeamSynergyScore", "사용자 이메일: " + user.getEmail());
+                                    
+                                    // 스킬 정보 구성
+                                    String skillsText = "스킬 정보 없음";
+                                    if (user.getSkills() != null && !user.getSkills().isEmpty()) {
+                                        StringBuilder skillsBuilder = new StringBuilder();
+                                        for (SynergyAnalysisResponse.Skill skill : user.getSkills()) {
+                                            if (skillsBuilder.length() > 0) skillsBuilder.append(", ");
+                                            skillsBuilder.append(skill.getSkillName());
+                                        }
+                                        skillsText = skillsBuilder.toString();
+                                        Log.d("TeamSynergyScore", "사용자 스킬: " + skillsText);
+                                    }
+                                    
+                                    // 역할 정보 구성
+                                    String roleText = "역할 미정";
+                                    if (user.getRoles() != null && !user.getRoles().isEmpty()) {
+                                        StringBuilder rolesBuilder = new StringBuilder();
+                                        for (SynergyAnalysisResponse.Role role : user.getRoles()) {
+                                            if (rolesBuilder.length() > 0) rolesBuilder.append(", ");
+                                            rolesBuilder.append(role.getRoleName());
+                                        }
+                                        roleText = rolesBuilder.toString();
+                                        Log.d("TeamSynergyScore", "사용자 역할: " + roleText);
+                                    }
+                                    
+                                                                         // 성향 정보 구성
+                                     String traitText = "성향 미정";
+                                     if (user.getTraits() != null && user.getTraits().getDisplayName() != null) {
+                                         traitText = user.getTraits().getDisplayName();
+                                     }
+                                    
+                                    // 팀원 데이터 추가
+                                    teamMemberList.add(new TeamMemberData(
+                                        user.getUserId(),
+                                        roleText,
+                                        skillsText,
+                                        traitText
+                                    ));
                                 }
-                            }
-                            
-                            if (synergyResponse.getTeamAnalysis() != null) {
-                                Log.d("TeamSynergyScore", "팀 시너지 점수: " + synergyResponse.getTeamAnalysis().getTeamSynergyScore());
-                                Log.d("TeamSynergyScore", "분석 요약: " + synergyResponse.getTeamAnalysis().getAnalysisSummary());
                                 
-                                // UI에 시너지 점수 업데이트
-                                Double synergyScore = synergyResponse.getTeamAnalysis().getTeamSynergyScore();
-                                if (synergyScore != null) {
-                                    updateSynergyScore(synergyScore.intValue());
-                                }
+                                                                 // UI 업데이트
+                                 if (getActivity() != null) {
+                                     getActivity().runOnUiThread(() -> {
+                                         adapter.notifyDataSetChanged();
+                                         Log.d("TeamSynergyScore", "UI 업데이트 완료 - 팀원 수: " + teamMemberList.size());
+                                         
+                                         // 각 팀원 데이터 로깅
+                                         for (int i = 0; i < teamMemberList.size(); i++) {
+                                             TeamMemberData member = teamMemberList.get(i);
+                                             Log.d("TeamSynergyScore", "팀원 " + i + ": " + member.getName() + 
+                                                   " | 역할: " + member.getRole() + 
+                                                   " | 스킬: " + member.getSkills() + 
+                                                   " | 성향: " + member.getType());
+                                         }
+                                     });
+                                 }
                             }
                             
                         } else {
@@ -205,9 +255,11 @@ public class TeamSynergyScoreFragment extends Fragment {
                         t.printStackTrace();
                     }
                 });
-    }
+         }
+     
 
-    // 팀원 데이터 클래스
+ 
+     // 팀원 데이터 클래스
     public static class TeamMemberData {
         private String name;
         private String role;
@@ -250,6 +302,13 @@ public class TeamSynergyScoreFragment extends Fragment {
             holder.tvMemberRole.setText(data.getRole());
             holder.tvMemberSkills.setText(data.getSkills());
             holder.tvMemberType.setText(data.getType());
+            
+            // 데이터 바인딩 로그
+            Log.d("TeamMemberAdapter", "바인딩 - 위치: " + position + 
+                  " | 이름: " + data.getName() + 
+                  " | 역할: " + data.getRole() + 
+                  " | 스킬: " + data.getSkills() + 
+                  " | 성향: " + data.getType());
         }
 
         @Override
