@@ -122,6 +122,7 @@ public class ContestListFragment extends Fragment {
                 if (response.isSuccessful() && response.body() != null) {
                     sortAndDisplayContests(response.body().getContests());
                     binding.tvOngoingTitle.setText("전체 공모전 목록");
+
                 } else {
                     Toast.makeText(getContext(), "공모전 정보를 불러오지 못했습니다.", Toast.LENGTH_SHORT).show();
                 }
@@ -151,7 +152,9 @@ public class ContestListFragment extends Fragment {
                             return d1.compareTo(d2);
                         });
 
-                        adapter.submitList(new ArrayList<>(contestsFromServer));
+                        if (binding != null) {
+                            adapter.submitList(new ArrayList<>(contestsFromServer));
+                        }
                     }
                 } else {
                     Toast.makeText(getContext(), "필터된 공모전 정보를 불러오지 못했습니다.", Toast.LENGTH_SHORT).show();
@@ -189,6 +192,7 @@ public class ContestListFragment extends Fragment {
                         }
                     }
                     checkIfAllRequestsFinished();
+
                 }
 
                 @Override
@@ -203,6 +207,7 @@ public class ContestListFragment extends Fragment {
                         List<ContestInformation> finalList = new ArrayList<>(combinedContestsMap.values());
                         if (getActivity() != null) {
                             getActivity().runOnUiThread(() -> sortAndDisplayContests(finalList));
+
                         }
                     }
                 }
@@ -234,14 +239,20 @@ public class ContestListFragment extends Fragment {
     }
 
     private void setupDropdownMenu() {
-        binding.tvOngoingTitle.setOnClickListener(v -> {
-            binding.layoutFilterBox.setVisibility(binding.layoutFilterBox.getVisibility() == View.GONE ? View.VISIBLE : View.GONE);
-        });
+        if (binding != null) {
+            binding.tvOngoingTitle.setOnClickListener(v -> {
+                if (binding != null) {
+                    binding.layoutFilterBox.setVisibility(binding.layoutFilterBox.getVisibility() == View.GONE ? View.VISIBLE : View.GONE);
+                }
+            });
+        }
     }
 
     private void setupFilterButtons() {
-        binding.btnApply.setOnClickListener(v -> applyFilter());
-        binding.btnReset.setOnClickListener(v -> resetFilter());
+        if (binding != null) {
+            binding.btnApply.setOnClickListener(v -> applyFilter());
+            binding.btnReset.setOnClickListener(v -> resetFilter());
+        }
     }
 
     private void applyFilter() {
@@ -258,37 +269,43 @@ public class ContestListFragment extends Fragment {
             loadContestsByMultipleFilters(selectedFilterIds);
         }
 
-        binding.layoutFilterBox.setVisibility(View.GONE);
+        if (binding != null) {
+            binding.layoutFilterBox.setVisibility(View.GONE);
+        }
     }
 
     private void resetFilter() {
         uncheckAllFilters();
         loadAllContests();
-        binding.layoutFilterBox.setVisibility(View.GONE);
+        if (binding != null) {
+            binding.layoutFilterBox.setVisibility(View.GONE);
+        }
     }
 
     // 체크박스 상태를 확인하여 선택된 필터 ID들을 반환
     private List<Integer> getSelectedFilterIds() {
         List<Integer> filterIds = new ArrayList<>();
 
-        // 체크박스와 필터 ID 매핑
-        if (binding.checkboxWebApp.isChecked()) {
-            filterIds.add(getFilterIdByName("웹/앱"));
-        }
-        if (binding.checkboxAi.isChecked()) {
-            filterIds.add(getFilterIdByName("AI/데이터 사이언스"));
-        }
-        if (binding.checkboxPlanning.isChecked()) {
-            filterIds.add(getFilterIdByName("아이디어/기획"));
-        }
-        if (binding.checkboxDataAnalysis.isChecked()) {
-            filterIds.add(getFilterIdByName("IoT/임베디드"));
-        }
-        if (binding.checkboxIdea.isChecked()) {
-            filterIds.add(getFilterIdByName("게임"));
-        }
-        if (binding.checkboxIot.isChecked()) {
-            filterIds.add(getFilterIdByName("정보보안/블록체인"));
+        if (binding != null) {
+            // 체크박스와 필터 ID 매핑
+            if (binding.checkboxWebApp.isChecked()) {
+                filterIds.add(getFilterIdByName("웹/앱"));
+            }
+            if (binding.checkboxAi.isChecked()) {
+                filterIds.add(getFilterIdByName("AI/데이터 사이언스"));
+            }
+            if (binding.checkboxPlanning.isChecked()) {
+                filterIds.add(getFilterIdByName("아이디어/기획"));
+            }
+            if (binding.checkboxDataAnalysis.isChecked()) {
+                filterIds.add(getFilterIdByName("IoT/임베디드"));
+            }
+            if (binding.checkboxIdea.isChecked()) {
+                filterIds.add(getFilterIdByName("게임"));
+            }
+            if (binding.checkboxIot.isChecked()) {
+                filterIds.add(getFilterIdByName("정보보안/블록체인"));
+            }
         }
 
         // 유효하지 않은 ID(-1) 제거
@@ -318,12 +335,14 @@ public class ContestListFragment extends Fragment {
     }
 
     private void uncheckAllFilters() {
-        binding.checkboxWebApp.setChecked(false);
-        binding.checkboxAi.setChecked(false);
-        binding.checkboxPlanning.setChecked(false);
-        binding.checkboxDataAnalysis.setChecked(false);
-        binding.checkboxIdea.setChecked(false);
-        binding.checkboxIot.setChecked(false);
+        if (binding != null) {
+            binding.checkboxWebApp.setChecked(false);
+            binding.checkboxAi.setChecked(false);
+            binding.checkboxPlanning.setChecked(false);
+            binding.checkboxDataAnalysis.setChecked(false);
+            binding.checkboxIdea.setChecked(false);
+            binding.checkboxIot.setChecked(false);
+        }
     }
 
     @Override
