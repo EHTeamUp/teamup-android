@@ -10,7 +10,11 @@ import kr.mojuk.teamup.api.model.CommentResponse;
 import kr.mojuk.teamup.databinding.ItemCommentBinding;
 import kr.mojuk.teamup.databinding.ItemReplyBinding;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
@@ -67,6 +71,29 @@ public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         return flatCommentList.size();
     }
 
+    private String formatTimestamp(Date date) {
+        if (date == null) return "";
+
+        long timeDiff = new Date().getTime() - date.getTime();
+
+        // 미래 시간인 경우 (서버 시간과 클라이언트 시간 차이로 발생 가능)
+        if (timeDiff < 0) {
+            return "방금 전"; // 미래 시간은 "방금 전"으로 처리
+        }
+
+        long minutes = TimeUnit.MILLISECONDS.toMinutes(timeDiff);
+        if (minutes < 1) return "방금 전";
+        if (minutes < 60) return minutes + "분 전";
+
+        long hours = TimeUnit.MILLISECONDS.toHours(timeDiff);
+        if (hours < 24) return hours + "시간 전";
+
+        long days = TimeUnit.MILLISECONDS.toDays(timeDiff);
+        if (days < 7) return days + "일 전";
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy. MM. dd.", Locale.KOREA);
+        return sdf.format(date);
+    }
     class CommentViewHolder extends RecyclerView.ViewHolder {
         private final ItemCommentBinding binding;
 
@@ -79,12 +106,9 @@ public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             binding.layoutReadMode.setVisibility(isEditing ? View.GONE : View.VISIBLE);
             binding.layoutEditMode.setVisibility(isEditing ? View.VISIBLE : View.GONE);
 
-            binding.tvCommentContent.setText(comment.getContent());
-
-            // ▼▼▼ 수정된 부분 ▼▼▼
-            // (수정됨) 표시 로직을 제거하고, 사용자 ID만 표시합니다.
             binding.tvCommentUser.setText(comment.getUserId());
-            // ▲▲▲ 수정된 부분 ▲▲▲
+            binding.tvCommentContent.setText(comment.getContent());
+            binding.tvCommentTimestamp.setText(formatTimestamp(comment.getCreatedAt()));
 
             if (isEditing) {
                 binding.etCommentEdit.setText(comment.getContent());
@@ -131,12 +155,9 @@ public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             binding.layoutReadModeReply.setVisibility(isEditing ? View.GONE : View.VISIBLE);
             binding.layoutEditModeReply.setVisibility(isEditing ? View.VISIBLE : View.GONE);
 
-            binding.tvReplyContent.setText(comment.getContent());
-
-            // ▼▼▼ 수정된 부분 ▼▼▼
-            // (수정됨) 표시 로직을 제거하고, 사용자 ID만 표시합니다.
             binding.tvReplyUser.setText(comment.getUserId());
-            // ▲▲▲ 수정된 부분 ▲▲▲
+            binding.tvReplyContent.setText(comment.getContent());
+            binding.tvCommentTimestamp.setText(formatTimestamp(comment.getCreatedAt()));
 
             if (isEditing) {
                 binding.etReplyEdit.setText(comment.getContent());
