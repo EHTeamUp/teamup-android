@@ -21,6 +21,8 @@ import kr.mojuk.teamup.api.model.PersonalityOption;
 import kr.mojuk.teamup.api.model.PersonalityTestResponse;
 import kr.mojuk.teamup.api.model.PersonalityTestRequest;
 import kr.mojuk.teamup.api.model.PersonalityAnswer;
+import kr.mojuk.teamup.api.model.RegistrationStep4;
+import kr.mojuk.teamup.api.model.StepResponse;
 import kr.mojuk.teamup.MainActivity;
 import kr.mojuk.teamup.auth.SignupTestBaseActivity;
 import com.google.android.material.button.MaterialButton;
@@ -323,33 +325,28 @@ public class PersonalityTestQuestionFragment extends Fragment implements Persona
                      public void onResponse(Call<PersonalityTestResponse> call, Response<PersonalityTestResponse> response) {
                         Log.d(TAG, "API 응답: " + response.code() + " " + response.message());
                         
-                                                 if (response.isSuccessful() && response.body() != null) {
-                             // API 호출 성공: 결과 Fragment로 이동
-                             PersonalityTestResponse profile = response.body();
-                             Log.d(TAG, "성향 프로필 받음: " + profile.getProfileCode());
-                            
-                                                         if (fromSignup && getActivity() instanceof SignupTestBaseActivity) {
-                                 // 회원가입에서 온 경우: SignupTestBaseActivity로 결과 전달
-                                 Gson gson = new Gson();
-                                 String traitsJson = gson.toJson(profile.getTraits());
-                                 ((SignupTestBaseActivity) getActivity()).onPersonalityTestCompleted(
-                                     profile.getProfileCode(), 
-                                     traitsJson
-                                 );
-                             } else {
-                                 // 일반적인 경우: 결과 Fragment로 이동
-                                 PersonalityTestResultFragment resultFragment = new PersonalityTestResultFragment();
-                                 Bundle args = new Bundle();
-                                 args.putString("personalityType", profile.getProfileCode());
-                                 Gson gson = new Gson();
-                                 String traitsJson = gson.toJson(profile.getTraits());
-                                 args.putString("personalityTraitsJson", traitsJson);
-                                 resultFragment.setArguments(args);
-                                
-                                if (getActivity() instanceof MainActivity) {
-                                    ((MainActivity) getActivity()).showFragment(resultFragment);
-                                }
-                            }
+                            if (response.isSuccessful() && response.body() != null) {
+                            // API 호출 성공: 결과 Fragment로 이동
+                            PersonalityTestResponse profile = response.body();
+                            Log.d(TAG, "성향 프로필 받음: " + profile.getProfileCode());
+                           
+                            if (fromSignup && getActivity() instanceof SignupTestBaseActivity) {
+                                // 회원가입에서 온 경우: 회원가입 4단계 완료 후 SignupTestBaseActivity로 결과 전달
+                                completeRegistrationStep4(profile);
+                            } else {
+                                // 일반적인 경우: 결과 Fragment로 이동
+                                PersonalityTestResultFragment resultFragment = new PersonalityTestResultFragment();
+                                Bundle args = new Bundle();
+                                args.putString("personalityType", profile.getProfileCode());
+                                Gson gson = new Gson();
+                                String traitsJson = gson.toJson(profile.getTraits());
+                                args.putString("personalityTraitsJson", traitsJson);
+                                resultFragment.setArguments(args);
+                               
+                               if (getActivity() instanceof MainActivity) {
+                                   ((MainActivity) getActivity()).showFragment(resultFragment);
+                               }
+                           }
                         } else {
                             // API 호출 실패
                             String errorMessage = "테스트 결과 저장에 실패했습니다.";
@@ -370,6 +367,77 @@ public class PersonalityTestQuestionFragment extends Fragment implements Persona
                                          @Override
                      public void onFailure(Call<PersonalityTestResponse> call, Throwable t) {
                         // 네트워크 오류
+                        Toast.makeText(requireContext(), "네트워크 오류가 발생했습니다.", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+    
+    /**
+     * 회원가입 4단계 완료 (성향테스트 답변을 회원가입 세션에 저장)
+     */
+    private void completeRegistrationStep4(PersonalityTestResponse profile) {
+        Log.d(TAG, "회원가입 4단계 완료 시작: userId=" + userId);
+        
+        // 답변 데이터를 API 형식으로 변환
+        List<PersonalityAnswer> answers = new ArrayList<>();
+        
+        for (int i = 0; i < questions.size(); i++) {
+            PersonalityQuestion question = questions.get(i);
+            String selectedAnswer = selectedAnswers.get(i);
+            
+            int optionId = 1; // 기본값
+            if (selectedAnswer != null) {
+                if (selectedAnswer.equals("A")) {
+                    optionId = 1;
+                } else if (selectedAnswer.equals("B")) {
+                    optionId = 2;
+                }
+            }
+            
+            answers.add(new PersonalityAnswer(question.getId(), optionId));
+        }
+        
+        // RegistrationStep4 객체 생성 (answers 배열 포함)
+        RegistrationStep4 step4 = new RegistrationStep4(userId, answers);
+        
+        RetrofitClient.getInstance()
+                .getApiService()
+                .completeStep4(step4)
+                .enqueue(new Callback<StepResponse>() {
+                    @Override
+                    public void onResponse(Call<StepResponse> call, Response<StepResponse> response) {
+                        if (response.isSuccessful() && response.body() != null) {
+                            StepResponse result = response.body();
+                            Log.d(TAG, "회원가입 4단계 완료 성공: " + result.getMessage());
+                            
+                            // 4단계 완료 후 SignupTestBaseActivity로 결과 전달
+                            if (getActivity() instanceof SignupTestBaseActivity) {
+                                Gson gson = new Gson();
+                                String traitsJson = gson.toJson(profile.getTraits());
+                                ((SignupTestBaseActivity) getActivity()).onPersonalityTestCompleted(
+                                    profile.getProfileCode(), 
+                                    traitsJson
+                                );
+                            }
+                        } else {
+                            Log.e(TAG, "회원가입 4단계 완료 실패 - HTTP " + response.code());
+                            String errorMessage = "회원가입 4단계 완료 중 오류가 발생했습니다.";
+                            if (response.errorBody() != null) {
+                                try {
+                                    String errorBody = response.errorBody().string();
+                                    Log.e(TAG, "오류 응답: " + errorBody);
+                                    errorMessage += " (" + errorBody + ")";
+                                } catch (Exception e) {
+                                    Log.e(TAG, "오류 응답 읽기 실패", e);
+                                }
+                            }
+                            Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_LONG).show();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<StepResponse> call, Throwable t) {
+                        Log.e(TAG, "회원가입 4단계 완료 네트워크 오류: " + t.getMessage(), t);
                         Toast.makeText(requireContext(), "네트워크 오류가 발생했습니다.", Toast.LENGTH_SHORT).show();
                     }
                 });

@@ -6,6 +6,7 @@ import kr.mojuk.teamup.api.RetrofitClient;
 import kr.mojuk.teamup.api.model.*;
 
 import java.util.List;
+import java.util.ArrayList;
 
 import kr.mojuk.teamup.api.ApiService;
 import kr.mojuk.teamup.api.model.EmailVerificationCode;
@@ -17,6 +18,7 @@ import kr.mojuk.teamup.api.model.RegistrationStep1;
 import kr.mojuk.teamup.api.model.RegistrationStep2;
 import kr.mojuk.teamup.api.model.RegistrationStep3;
 import kr.mojuk.teamup.api.model.RegistrationStep4;
+import kr.mojuk.teamup.api.model.PersonalityAnswer;
 import kr.mojuk.teamup.api.model.Role;
 import kr.mojuk.teamup.api.model.Skill;
 import kr.mojuk.teamup.api.model.StepResponse;
@@ -352,10 +354,10 @@ public class RegistrationManager {
     }
     
     /**
-     * 회원가입 4단계: 성향테스트 (선택사항)
+     * 회원가입 4단계: 성향테스트
      */
-    public void completeStep4(String userId, boolean skipPersonalityTest, Object personalityResults, StepCallback callback) {
-        RegistrationStep4 step4 = new RegistrationStep4(userId, skipPersonalityTest, personalityResults);
+    public void completeStep4(String userId, List<PersonalityAnswer> answers, StepCallback callback) {
+        RegistrationStep4 step4 = new RegistrationStep4(userId, answers);
         
         RetrofitClient.getInstance()
                 .getApiService()

@@ -59,6 +59,7 @@ public class MypageProfileFragment extends Fragment {
     private List<Skill> allSkills;
     private List<Role> allRoles;
     
+
     // 다른 사용자 프로필 표시를 위한 변수들
     private String targetUserId;
     private boolean isViewMode = false; // true: 다른 사용자 프로필 보기, false: 내 프로필
@@ -88,6 +89,11 @@ public class MypageProfileFragment extends Fragment {
         tokenManager = TokenManager.getInstance(requireContext());
         profileManager = ProfileManager.getInstance(requireContext());
         registrationManager = RegistrationManager.getInstance();
+        
+        // 대상 사용자 ID 가져오기
+        if (getArguments() != null) {
+            targetUserId = getArguments().getString("TARGET_USER_ID");
+        }
 
         // 인자 확인하여 모드 설정
         if (getArguments() != null) {
@@ -194,6 +200,7 @@ public class MypageProfileFragment extends Fragment {
     /**
      * API에서 프로필 데이터 로드
      */
+
     private void loadUserProfileFromAPI(String userId) {
         RetrofitClient.getInstance()
                 .getApiService()
@@ -574,8 +581,6 @@ public class MypageProfileFragment extends Fragment {
         return result.toString();
     }
 
-
-
     private void setClickListeners() {
         tvBackArrow.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -586,6 +591,7 @@ public class MypageProfileFragment extends Fragment {
                 }
             }
         });
+
 
         // ll_user_id에 뒤로가기 리스너 추가 (뷰 모드에서만)
         if (isViewMode) {
@@ -662,7 +668,6 @@ public class MypageProfileFragment extends Fragment {
      */
     private void hideArrowTexts() {
         Log.d(TAG, "'>' 텍스트 숨기기 시작");
-        
         // 직접 참조로 ">" TextView들을 숨기기
         if (tvSkillsArrow != null) {
             tvSkillsArrow.setVisibility(View.GONE);
@@ -680,8 +685,8 @@ public class MypageProfileFragment extends Fragment {
 
     
     private void loadUserPersonalityProfile() {
-        // 현재 로그인된 사용자 ID 가져오기
-        String userId = tokenManager.getUserId();
+        // 대상 사용자 ID가 있으면 해당 사용자의 정보를 로드, 없으면 현재 사용자의 정보를 로드
+        String userId = (targetUserId != null) ? targetUserId : tokenManager.getUserId();
         
         RetrofitClient.getInstance()
                 .getApiService()

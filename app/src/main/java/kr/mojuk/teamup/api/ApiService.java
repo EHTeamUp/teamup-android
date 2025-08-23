@@ -338,7 +338,7 @@ public interface ApiService {
      * POST /api/v1/registration/complete
      */
     @POST("api/v1/registration/complete")
-    Call<StepResponse> completeRegistration(@Body String userId);
+    Call<StepResponse> completeRegistration(@Query("user_id") String userId);
 
     /**
      * 회원가입 진행 상태 확인

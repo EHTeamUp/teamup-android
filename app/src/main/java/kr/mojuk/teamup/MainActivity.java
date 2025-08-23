@@ -42,6 +42,21 @@ public class MainActivity extends AppCompatActivity implements ExperienceFragmen
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        
+        // 로그인 상태 확인
+        tokenManager = TokenManager.getInstance(this);
+        if (!tokenManager.isLoggedIn()) {
+            // 로그인되지 않은 경우 LoginActivity로 이동
+            Log.d(TAG, "로그인되지 않은 상태, LoginActivity로 이동");
+            Intent intent = new Intent(this, LoginActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+            finish();
+            return;
+        }
+        
+        // 로그인된 경우 MainActivity 계속 진행
+        Log.d(TAG, "로그인된 상태, MainActivity 계속 진행");
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
@@ -49,8 +64,6 @@ public class MainActivity extends AppCompatActivity implements ExperienceFragmen
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-
-        tokenManager = TokenManager.getInstance(this);
       
         // FCM 토큰 매니저 초기화 및 토큰 상태 확인
         FcmTokenManager fcmTokenManager = FcmTokenManager.getInstance(this);

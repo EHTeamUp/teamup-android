@@ -1,6 +1,7 @@
 package kr.mojuk.teamup.api.model;
 
 import com.google.gson.annotations.SerializedName;
+import java.util.List;
 
 /**
  * 회원가입 4단계 DTO
@@ -9,16 +10,12 @@ public class RegistrationStep4 {
     @SerializedName("user_id")
     private String userId;
     
-    @SerializedName("skip_personality_test")
-    private boolean skipPersonalityTest;
+    @SerializedName("answers")
+    private List<PersonalityAnswer> answers;
     
-    @SerializedName("personality_results")
-    private Object personalityResults; // 나중에 구체적인 타입으로 변경
-    
-    public RegistrationStep4(String userId, boolean skipPersonalityTest, Object personalityResults) {
+    public RegistrationStep4(String userId, List<PersonalityAnswer> answers) {
         this.userId = userId;
-        this.skipPersonalityTest = skipPersonalityTest;
-        this.personalityResults = personalityResults;
+        this.answers = answers;
     }
     
     public String getUserId() {
@@ -29,19 +26,11 @@ public class RegistrationStep4 {
         this.userId = userId;
     }
     
-    public boolean isSkipPersonalityTest() {
-        return skipPersonalityTest;
+    public List<PersonalityAnswer> getAnswers() {
+        return answers;
     }
     
-    public void setSkipPersonalityTest(boolean skipPersonalityTest) {
-        this.skipPersonalityTest = skipPersonalityTest;
-    }
-    
-    public Object getPersonalityResults() {
-        return personalityResults;
-    }
-    
-    public void setPersonalityResults(Object personalityResults) {
-        this.personalityResults = personalityResults;
+    public void setAnswers(List<PersonalityAnswer> answers) {
+        this.answers = answers;
     }
 }

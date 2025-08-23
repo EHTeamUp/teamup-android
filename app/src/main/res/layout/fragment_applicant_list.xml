@@ -8,20 +8,6 @@
     android:background="@android:color/white"
     tools:context="kr.mojuk.teamup.applicant.ApplicantListFragment">
 
-    <!-- App Header -->
-    <TextView
-        android:id="@+id/tv_app_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="TeamUp"
-        android:textColor="@android:color/black"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <!-- Navigation/Filter Bar -->
     <LinearLayout
         android:id="@+id/navigation_bar"
@@ -33,7 +19,7 @@
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:padding="12dp"
-        app:layout_constraintTop_toBottomOf="@id/tv_app_title">
+        app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
             android:id="@+id/iv_back_arrow"
@@ -124,6 +110,20 @@
                 app:cornerRadius="8dp" />
         </LinearLayout>
     </LinearLayout>
+
+    <!-- No Applicants Message -->
+    <TextView
+        android:id="@+id/tv_no_applicants"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="아직 지원자가 없습니다!"
+        android:textColor="@android:color/black"
+        android:textSize="16sp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/selection_controls" />
 
     <!-- Applicant List -->
     <androidx.recyclerview.widget.RecyclerView
