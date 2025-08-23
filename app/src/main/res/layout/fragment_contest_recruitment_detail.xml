@@ -258,31 +258,43 @@
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
-    <!-- 플로팅 버튼들 -->
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_delete"
+    <!-- ▼▼▼ 수정된 부분 ▼▼▼ -->
+    <!-- 플로팅 버튼들을 가로로 정렬하기 위한 LinearLayout 컨테이너 -->
+    <LinearLayout
+        android:id="@+id/fab_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:orientation="horizontal"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
-        android:backgroundTint="@color/white"
-        android:src="@drawable/ic_delete"
-        android:visibility="gone"
-        app:fabSize="mini"
-        app:layout_constraintBottom_toTopOf="@id/fab_edit"
-        app:layout_constraintEnd_toEndOf="parent"
-        tools:visibility="visible"/>
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_edit"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:backgroundTint="@color/white"
-        android:src="@drawable/ic_edit"
         android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@id/ll_comment_input"
         app:layout_constraintEnd_toEndOf="parent"
-        tools:visibility="visible"/>
+        tools:visibility="visible">
+
+        <!-- 삭제 버튼 -->
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_delete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#dddddd"
+            android:src="@drawable/ic_delete"
+            android:contentDescription="게시글 삭제"
+            app:fabSize="normal"
+            app:elevation="6dp"
+            android:layout_marginEnd="8dp"/>
+
+        <!-- 수정 버튼 -->
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_edit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#dddddd"
+            android:src="@drawable/ic_edit"
+            android:contentDescription="게시글 수정"
+            app:fabSize="normal"
+            app:elevation="6dp"/>
+
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

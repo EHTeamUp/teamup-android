@@ -192,7 +192,7 @@ public class ContestRecruitmentDetailFragment extends Fragment implements Commen
                     boolean isClosed = "마감됨".equals(dDayText) || (dDayText != null && dDayText.startsWith("D+"));
 
                     if (isClosed) {
-                        binding.ddayText.setText("마감됨");
+                        binding.ddayText.setText("마감");
                         binding.btnApply.setEnabled(false);
                         binding.btnApply.setText("모집 마감");
                         if (getContext() != null) {
@@ -312,11 +312,7 @@ public class ContestRecruitmentDetailFragment extends Fragment implements Commen
             case AUTHOR:
                 binding.llRecruiterView.setVisibility(View.VISIBLE);
                 binding.btnApply.setVisibility(View.GONE);
-                // ▼▼▼ 수정된 부분 ▼▼▼
-                // 작성자일 경우 수정 버튼과 삭제 버튼을 항상 보이도록 설정
-                binding.fabEdit.setVisibility(View.VISIBLE);
-                binding.fabDelete.setVisibility(View.VISIBLE);
-                // ▲▲▲ 수정된 부분 ▲▲▲
+                binding.fabContainer.setVisibility(View.VISIBLE);
                 setupAuthorButtons();
                 break;
             case MEMBER:
