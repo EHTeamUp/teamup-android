@@ -50,6 +50,7 @@ import kr.mojuk.teamup.api.model.UserIdCheckResponse;
 import kr.mojuk.teamup.api.model.UserRolesResponse;
 import kr.mojuk.teamup.api.model.UserSkillsResponse;
 import kr.mojuk.teamup.api.model.UserUpdateRequest;
+import kr.mojuk.teamup.api.model.UserProfileResponse;
 
 import java.util.List;
 
@@ -390,6 +391,34 @@ public interface ApiService {
      */
     @GET("api/v1/profile/experiences")
     Call<List<Experience>> getUserExperiences(@Header("Authorization") String authorization);
+
+    /**
+     * 프로필 - 특정 사용자의 스킬 조회
+     * GET /api/v1/profile/skills/{user_id}
+     */
+    @GET("api/v1/profile/skills/{user_id}")
+    Call<UserSkillsResponse> getUserSkillsByUserId(@Path("user_id") String userId);
+
+    /**
+     * 프로필 - 특정 사용자의 역할 조회
+     * GET /api/v1/profile/roles/{user_id}
+     */
+    @GET("api/v1/profile/roles/{user_id}")
+    Call<UserRolesResponse> getUserRolesByUserId(@Path("user_id") String userId);
+
+    /**
+     * 프로필 - 특정 사용자의 공모전 수상 경험 조회
+     * GET /api/v1/profile/experiences/{user_id}
+     */
+    @GET("api/v1/profile/experiences/{user_id}")
+    Call<List<Experience>> getUserExperiencesByUserId(@Path("user_id") String userId);
+
+    /**
+     * 프로필 - 특정 사용자의 전체 프로필 정보 조회
+     * GET /api/v1/profile/{user_id}
+     */
+    @GET("api/v1/profile/{user_id}")
+    Call<UserProfileResponse> getUserProfile(@Path("user_id") String userId);
 
 
     // ===== 성향 테스트 관련 API =====

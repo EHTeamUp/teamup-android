@@ -1,12 +1,14 @@
 package kr.mojuk.teamup.api.model;
 
 import com.google.gson.annotations.SerializedName;
+
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
-public class ContestInformation {
+public class ContestInformation implements Serializable {
 
     @SerializedName("contest_id")
     private int contestId;

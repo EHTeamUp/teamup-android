@@ -1,23 +1,49 @@
 <ScrollView android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="@android:color/white"
+    android:padding="24dp"
+    >
 
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@android:color/white"
         android:padding="12dp">
 
         <!-- 공모전 영역 -->
-        <TextView
+        <LinearLayout
             android:id="@+id/btn_contest_list"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="진행중인 공모전 목록"
-            android:background="@drawable/profile_card_background"
-            android:textStyle="bold"
-            android:textSize="16sp"
-            android:padding="8dp" />
+            android:layout_height="56dp"
+            android:orientation="horizontal"
+            android:background="@drawable/mypage_menu_item_background"
+            android:padding="16dp"
+            android:gravity="center_vertical"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?android:attr/selectableItemBackground">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="진행중인 공모전 목록"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:textColor="@android:color/black"
+                android:gravity="start" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=">"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:textColor="@android:color/black" />
+
+        </LinearLayout>
 
         <HorizontalScrollView
             android:layout_width="match_parent"
@@ -34,16 +60,38 @@
         </HorizontalScrollView>
 
         <!-- 팀원 모집 영역 -->
-        <TextView
+        <LinearLayout
             android:id="@+id/btn_recruitment_list"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="최신 팀원 모집 게시글"
-            android:background="@drawable/profile_card_background"
-            android:textStyle="bold"
-            android:textSize="16sp"
-            android:padding="8dp"
-            android:layout_marginTop="20dp"/>
+            android:layout_height="56dp"
+            android:orientation="horizontal"
+            android:background="@drawable/mypage_menu_item_background"
+            android:padding="16dp"
+            android:gravity="center_vertical"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:layout_marginTop="20dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="최신 팀원 모집 게시글"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:textColor="@android:color/black"
+                android:gravity="start" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=">"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:textColor="@android:color/black" />
+
+        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/containerRecruitments"

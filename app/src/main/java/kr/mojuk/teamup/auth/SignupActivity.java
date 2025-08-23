@@ -327,12 +327,6 @@ public class SignupActivity extends AppCompatActivity {
             Toast.makeText(this, "이메일을 입력해주세요.", Toast.LENGTH_SHORT).show();
             return false;
         }
-        
-        // @itc.ac.kr 형식 검증
-        if (!email.endsWith("@itc.ac.kr")) {
-            Toast.makeText(this, "ITC 학원 이메일(@itc.ac.kr)만 사용 가능합니다.", Toast.LENGTH_SHORT).show();
-            return false;
-        }
 
         return true;
     }

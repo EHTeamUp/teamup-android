@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="12dp"
+    android:padding="6dp"
     android:layout_marginTop="8dp"
     android:background="#F5F5F5">
 
@@ -24,10 +24,18 @@
             android:textColor="@android:color/black"/>
 
         <TextView
+            android:id="@+id/tv_comment_timestamp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:textSize="12sp"
+            android:textColor="@android:color/darker_gray"/>
+
+        <TextView
             android:id="@+id/tv_comment_content"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="2dp"
             android:text="댓글 내용이 여기에 표시됩니다."/>
 
         <!-- 답글, 수정, 삭제 버튼 컨테이너 -->
@@ -36,7 +44,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginTop="8dp">
+            android:layout_marginTop="4dp">
 
             <TextView
                 android:id="@+id/tv_reply_button"

@@ -9,7 +9,7 @@
     <TextView
         android:id="@+id/tv_header_title"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
         android:text="TeamUp"
         android:textSize="24sp"
         android:textStyle="bold"

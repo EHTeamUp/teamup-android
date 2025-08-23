@@ -39,7 +39,7 @@
                     android:id="@+id/tv_back_arrow"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="←"
+                    android:text="&lt;"
                     android:textSize="20sp"
                     android:textColor="@android:color/black"
                     android:layout_marginEnd="12dp" />
@@ -99,6 +99,7 @@
                     </LinearLayout>
 
                     <TextView
+                        android:id="@+id/tv_skills_arrow"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text=">"
@@ -151,6 +152,7 @@
                     </LinearLayout>
 
                     <TextView
+                        android:id="@+id/tv_experience_arrow"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text=">"
@@ -186,7 +188,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="팀원 성향"
+                            android:text="개발 성향"
                             android:textSize="16sp"
                             android:textStyle="bold"
                             android:textColor="@android:color/black"
@@ -203,6 +205,7 @@
                     </LinearLayout>
 
                     <TextView
+                        android:id="@+id/tv_tendency_arrow"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text=">"

@@ -18,6 +18,7 @@ import kr.mojuk.teamup.auth.ProfileManager;
 import kr.mojuk.teamup.auth.TokenManager;
 import kr.mojuk.teamup.auth.RegistrationManager;
 import kr.mojuk.teamup.api.model.Experience;
+import kr.mojuk.teamup.api.model.UserProfileResponse;
 import kr.mojuk.teamup.api.model.UserRolesResponse;
 import kr.mojuk.teamup.api.model.UserSkillsResponse;
 import kr.mojuk.teamup.api.model.Skill;
@@ -46,6 +47,9 @@ public class MypageProfileFragment extends Fragment {
     // 프로필 정보 표시용 TextView들
     private TextView tvUserId, tvUserSkillsAndRoles, tvUserExperiences, tvTeamTendency;
     
+    // ">" 화살표 TextView들
+    private TextView tvSkillsArrow, tvExperienceArrow, tvTendencyArrow;
+    
     // Manager 인스턴스들
     private TokenManager tokenManager;
     private ProfileManager profileManager;
@@ -55,8 +59,21 @@ public class MypageProfileFragment extends Fragment {
     private List<Skill> allSkills;
     private List<Role> allRoles;
     
-    // 대상 사용자 ID (다른 사용자의 프로필을 볼 때 사용)
+
+    // 다른 사용자 프로필 표시를 위한 변수들
     private String targetUserId;
+    private boolean isViewMode = false; // true: 다른 사용자 프로필 보기, false: 내 프로필
+
+    /**
+     * 다른 사용자의 프로필을 보기 위한 newInstance 메서드
+     */
+    public static MypageProfileFragment newInstance(String userId) {
+        MypageProfileFragment fragment = new MypageProfileFragment();
+        Bundle args = new Bundle();
+        args.putString("target_user_id", userId);
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     @Nullable
     @Override
@@ -78,6 +95,14 @@ public class MypageProfileFragment extends Fragment {
             targetUserId = getArguments().getString("TARGET_USER_ID");
         }
 
+        // 인자 확인하여 모드 설정
+        if (getArguments() != null) {
+            targetUserId = getArguments().getString("target_user_id");
+            if (targetUserId != null) {
+                isViewMode = true; // 다른 사용자 프로필 보기 모드
+            }
+        }
+
         initViews(view);
         setClickListeners();
         
@@ -97,144 +122,265 @@ public class MypageProfileFragment extends Fragment {
         tvUserSkillsAndRoles = view.findViewById(R.id.tv_user_skills_and_roles);
         tvUserExperiences = view.findViewById(R.id.tv_user_experiences);
         tvTeamTendency = view.findViewById(R.id.tv_team_tendency);
+        
+        // ">" 화살표 TextView들
+        tvSkillsArrow = view.findViewById(R.id.tv_skills_arrow);
+        tvExperienceArrow = view.findViewById(R.id.tv_experience_arrow);
+        tvTendencyArrow = view.findViewById(R.id.tv_tendency_arrow);
     }
 
     /**
      * 프로필 정보 로드
      */
     private void loadProfileInfo() {
-        // 사용자 ID 표시 (대상 사용자 ID가 있으면 해당 ID, 없으면 현재 로그인한 사용자 ID)
-        String displayUserId = (targetUserId != null) ? targetUserId : tokenManager.getUserId();
-        if (tvUserId != null && displayUserId != null) {
-            tvUserId.setText("ID: " + displayUserId);
+        // 사용자 ID 표시
+        String userId = isViewMode ? targetUserId : tokenManager.getUserId();
+        if (tvUserId != null && userId != null) {
+            tvUserId.setText("ID: " + userId);
         }
         
-        // 통합된 기술/역할 정보 로드
-        loadUserSkillsAndRoles();
-        
-        // 경험 정보 로드
-        loadUserExperiences();
-        
-        // 사용자 성향 정보 로드
-        loadUserPersonalityInfo();
+        // 통합 프로필 API로 모든 정보 로드
+        loadUserProfileData(userId);
     }
 
+  
+
+    
     /**
-     * 사용자 기술/역할 정보 통합 로드
+     * 통합 프로필 API로 사용자 데이터 로드
      */
-    private void loadUserSkillsAndRoles() {
-        Log.d(TAG, "사용자 기술/역할 정보 로드 시작");
-        
-        // 먼저 전체 스킬/역할 목록을 로드
-        loadAllSkillsAndRoles();
+    private void loadUserProfileData(String userId) {
+        Log.d(TAG, "통합 프로필 API로 데이터 로드 시작: " + userId);
+        // 먼저 스킬/역할 목록을 로드한 후 프로필 데이터 로드
+        loadSkillsAndRolesForMapping(userId);
     }
     
     /**
-     * 전체 스킬/역할 목록 로드
+     * 스킬/역할 목록 로드 (ID -> 이름 매핑용)
      */
-    private void loadAllSkillsAndRoles() {
-        // 전체 스킬 목록 로드
+    private void loadSkillsAndRolesForMapping(String userId) {
+        Log.d(TAG, "스킬/역할 목록 로드 시작 (매핑용)");
+        
+        // 스킬 목록 로드
         registrationManager.getAvailableSkills(new RegistrationManager.SkillsCallback() {
             @Override
             public void onSuccess(List<Skill> skills) {
                 allSkills = skills;
-                Log.d(TAG, "전체 스킬 로드 완료: " + allSkills.size() + "개");
+                Log.d(TAG, "스킬 목록 로드 완료: " + skills.size() + "개");
                 
-                // 전체 역할 목록 로드
+                // 역할 목록 로드
                 registrationManager.getAvailableRoles(new RegistrationManager.RolesCallback() {
                     @Override
                     public void onSuccess(List<Role> roles) {
                         allRoles = roles;
-                        Log.d(TAG, "전체 역할 로드 완료: " + allRoles.size() + "개");
+                        Log.d(TAG, "역할 목록 로드 완료: " + roles.size() + "개");
                         
-                        // 전체 목록 로드 완료 후 사용자 데이터 로드
-                        loadUserData();
+                        // 이제 통합 프로필 API 호출
+                        loadUserProfileFromAPI(userId);
                     }
 
                     @Override
                     public void onError(String errorMessage) {
-                        Log.e(TAG, "전체 역할 로드 실패: " + errorMessage);
-                        // 실패해도 사용자 데이터는 로드
-                        loadUserData();
+                        Log.e(TAG, "역할 목록 로드 실패: " + errorMessage);
+                        // 실패해도 프로필 데이터는 로드
+                        loadUserProfileFromAPI(userId);
                     }
                 });
             }
 
             @Override
             public void onError(String errorMessage) {
-                Log.e(TAG, "전체 스킬 로드 실패: " + errorMessage);
-                // 실패해도 사용자 데이터는 로드
-                loadUserData();
+                Log.e(TAG, "스킬 목록 로드 실패: " + errorMessage);
+                // 실패해도 프로필 데이터는 로드
+                loadUserProfileFromAPI(userId);
             }
         });
     }
     
     /**
-     * 사용자 데이터 로드 (전체 목록 로드 후 호출)
+     * API에서 프로필 데이터 로드
      */
-    private void loadUserData() {
-        // 대상 사용자 ID가 있으면 해당 사용자의 정보를 로드, 없으면 현재 사용자의 정보를 로드
-        String userId = (targetUserId != null) ? targetUserId : tokenManager.getUserId();
-        
-        // 사용자 스킬 정보 로드
-        profileManager.getUserSkills(requireContext(), new ProfileManager.UserSkillsCallback() {
-            @Override
-            public void onSuccess(UserSkillsResponse skills) {
-                // 사용자 역할 정보 로드
-                profileManager.getUserRoles(requireContext(), new ProfileManager.UserRolesCallback() {
+
+    private void loadUserProfileFromAPI(String userId) {
+        RetrofitClient.getInstance()
+                .getApiService()
+                .getUserProfile(userId)
+                .enqueue(new Callback<UserProfileResponse>() {
                     @Override
-                    public void onSuccess(UserRolesResponse roles) {
-                        if (getActivity() != null) {
-                            getActivity().runOnUiThread(() -> {
-                                displayUserSkillsAndRoles(skills, roles);
-                            });
+                    public void onResponse(Call<UserProfileResponse> call, Response<UserProfileResponse> response) {
+                        if (response.isSuccessful() && response.body() != null) {
+                            UserProfileResponse profile = response.body();
+                            Log.d(TAG, "프로필 로드 성공: " + profile.getUserId());
+                            
+                            if (getActivity() != null) {
+                                getActivity().runOnUiThread(() -> {
+                                    // 각 데이터를 분리해서 바인딩
+                                    bindSkillsAndRoles(profile.getSkills(), profile.getRoles());
+                                    bindExperiences(profile.getExperiences());
+                                    bindPersonalityInfo(profile.getPersonalityProfile());
+                                });
+                            }
+                        } else {
+                            Log.e(TAG, "프로필 로드 실패: " + response.code());
+                            if (getActivity() != null) {
+                                getActivity().runOnUiThread(() -> {
+                                    // 실패 시 빈 데이터로 표시
+                                    bindSkillsAndRoles(new UserSkillsResponse(), new UserRolesResponse());
+                                    bindExperiences(null);
+                                    bindPersonalityInfo(null);
+                                });
+                            }
                         }
                     }
 
                     @Override
-                    public void onError(String errorMessage) {
-                        Log.e(TAG, "사용자 역할 로드 실패: " + errorMessage);
+                    public void onFailure(Call<UserProfileResponse> call, Throwable t) {
+                        Log.e(TAG, "프로필 로드 네트워크 오류: " + t.getMessage());
                         if (getActivity() != null) {
                             getActivity().runOnUiThread(() -> {
-                                displayUserSkillsAndRoles(skills, new UserRolesResponse());
+                                // 실패 시 빈 데이터로 표시
+                                bindSkillsAndRoles(new UserSkillsResponse(), new UserRolesResponse());
+                                bindExperiences(null);
+                                bindPersonalityInfo(null);
                             });
                         }
                     }
                 });
-            }
-
-            @Override
-            public void onError(String errorMessage) {
-                Log.e(TAG, "사용자 스킬 로드 실패: " + errorMessage);
-                if (getActivity() != null) {
-                    getActivity().runOnUiThread(() -> {
-                        displayUserSkillsAndRoles(new UserSkillsResponse(), new UserRolesResponse());
-                    });
-                }
-            }
-        });
     }
     
+    /**
+     * 사용자 경험 정보 표시
+     */
+    private void displayUserExperiences(List<Experience> experiences) {
+        if (tvUserExperiences == null) return;
+        
+        if (experiences == null || experiences.isEmpty()) {
+            tvUserExperiences.setText("등록된 경험이 없습니다");
+        } else {
+            tvUserExperiences.setText(formatExperiencesDisplay(experiences));
+        }
+    }
+
+    /**
+     * 사용자 성향 정보 표시
+     */
+    private void displayUserPersonalityInfo(PersonalityProfileResponse personalityProfile) {
+        if (tvTeamTendency == null) return;
+        
+        if (personalityProfile == null) {
+            tvTeamTendency.setText("등록된 성향 정보가 없습니다");
+        } else {
+            String profileCode = personalityProfile.getProfileCode();
+            String displayName = getPersonalityDisplayName(profileCode);
+            tvTeamTendency.setText("성향: " + displayName);
+            Log.d(TAG, "성향 정보 로드 성공: " + profileCode + " -> " + displayName);
+        }
+    }
+    
+    /**
+     * 성향 코드를 표시 이름으로 변환
+     */
+    private String getPersonalityDisplayName(String profileCode) {
+        if (profileCode == null) return "알 수 없는 성향";
+        
+        switch (profileCode) {
+            case "STRATEGIC_LEADER":
+                return "전략 리더";
+            case "EXECUTION_LEADER":
+                return "실행 리더";
+            case "VISIONARY_LEADER":
+                return "비전 리더";
+            case "DYNAMIC_LEADER":
+                return "다이내믹 리더";
+            case "RELIABLE_PARTNER":
+                return "신뢰 파트너";
+            case "ENERGETIC_SUPPORTER":
+                return "열정 서포터";
+            case "CAREFUL_SUPPORTER":
+                return "섬세한 서포터";
+            case "BALANCE_SUPPORTER":
+                return "균형 서포터";
+            default:
+                Log.w(TAG, "알 수 없는 성향 코드: " + profileCode);
+                return "알 수 없는 성향";
+        }
+    }
+
+    /**
+     * 스킬/역할 데이터 바인딩
+     */
+    private void bindSkillsAndRoles(UserSkillsResponse skills, UserRolesResponse roles) {
+        Log.d(TAG, "=== 스킬/역할 데이터 바인딩 시작 ===");
+        
+        // null 체크
+        if (skills == null) skills = new UserSkillsResponse();
+        if (roles == null) roles = new UserRolesResponse();
+        
+        // 디버깅 로그
+        Log.d(TAG, "스킬 ID 개수: " + (skills.getSkillIds() != null ? skills.getSkillIds().size() : 0));
+        Log.d(TAG, "스킬 IDs: " + (skills.getSkillIds() != null ? skills.getSkillIds().toString() : "null"));
+        Log.d(TAG, "역할 ID 개수: " + (roles.getRoleIds() != null ? roles.getRoleIds().size() : 0));
+        Log.d(TAG, "역할 IDs: " + (roles.getRoleIds() != null ? roles.getRoleIds().toString() : "null"));
+        
+        // 스킬/역할 정보 표시
+        displayUserSkillsAndRoles(skills, roles);
+    }
+    
+    /**
+     * 경험 데이터 바인딩
+     */
+    private void bindExperiences(List<Experience> experiences) {
+        Log.d(TAG, "=== 경험 데이터 바인딩 시작 ===");
+        Log.d(TAG, "경험 개수: " + (experiences != null ? experiences.size() : 0));
+        
+        // 경험 정보 표시
+        displayUserExperiences(experiences);
+    }
+    
+    /**
+     * 성향 데이터 바인딩
+     */
+    private void bindPersonalityInfo(PersonalityProfileResponse personalityProfile) {
+        Log.d(TAG, "=== 성향 데이터 바인딩 시작 ===");
+        
+        // 통합 프로필에서 성향 정보가 없으면 별도 API로 가져오기
+        if (personalityProfile != null) {
+            Log.d(TAG, "통합 프로필에서 성향 정보 로드: " + personalityProfile.getProfileCode());
+            displayUserPersonalityInfo(personalityProfile);
+        } else {
+            Log.d(TAG, "통합 프로필에 성향 정보 없음, 별도 API 호출");
+            loadUserPersonalityProfileForDisplay();
+        }
+    }
+    
+
+
     /**
      * 사용자 기술/역할 정보 표시
      */
     private void displayUserSkillsAndRoles(UserSkillsResponse skills, UserRolesResponse roles) {
         if (tvUserSkillsAndRoles == null) return;
         
+        // null 체크 추가
+        if (skills == null) skills = new UserSkillsResponse();
+        if (roles == null) roles = new UserRolesResponse();
+        
         // 디버깅 로그
         Log.d(TAG, "=== 기술/역할 표시 디버깅 ===");
-        Log.d(TAG, "스킬 ID 개수: " + skills.getSkillIds().size());
-        Log.d(TAG, "스킬 IDs: " + skills.getSkillIds().toString());
-        Log.d(TAG, "커스텀 스킬: " + skills.getCustomSkills().toString());
-        Log.d(TAG, "역할 ID 개수: " + roles.getRoleIds().size());
-        Log.d(TAG, "역할 IDs: " + roles.getRoleIds().toString());
-        Log.d(TAG, "커스텀 역할: " + roles.getCustomRoles().toString());
+        Log.d(TAG, "스킬 ID 개수: " + (skills.getSkillIds() != null ? skills.getSkillIds().size() : 0));
+        Log.d(TAG, "스킬 IDs: " + (skills.getSkillIds() != null ? skills.getSkillIds().toString() : "null"));
+        Log.d(TAG, "커스텀 스킬: " + (skills.getCustomSkills() != null ? skills.getCustomSkills().toString() : "null"));
+        Log.d(TAG, "역할 ID 개수: " + (roles.getRoleIds() != null ? roles.getRoleIds().size() : 0));
+        Log.d(TAG, "역할 IDs: " + (roles.getRoleIds() != null ? roles.getRoleIds().toString() : "null"));
+        Log.d(TAG, "커스텀 역할: " + (roles.getCustomRoles() != null ? roles.getCustomRoles().toString() : "null"));
         
         StringBuilder displayText = new StringBuilder();
         
-        // 스킬과 역할 존재 여부 확인
-        boolean hasSkills = !skills.getSkillIds().isEmpty() || !skills.getCustomSkills().isEmpty();
-        boolean hasRoles = !roles.getRoleIds().isEmpty() || !roles.getCustomRoles().isEmpty();
+        // 스킬과 역할 존재 여부 확인 (null 체크 포함)
+        boolean hasSkills = (skills.getSkillIds() != null && !skills.getSkillIds().isEmpty()) || 
+                           (skills.getCustomSkills() != null && !skills.getCustomSkills().isEmpty());
+        boolean hasRoles = (roles.getRoleIds() != null && !roles.getRoleIds().isEmpty()) || 
+                          (roles.getCustomRoles() != null && !roles.getCustomRoles().isEmpty());
         
         Log.d(TAG, "hasSkills: " + hasSkills + ", hasRoles: " + hasRoles);
         
@@ -267,24 +413,35 @@ public class MypageProfileFragment extends Fragment {
     private String formatSkillsDisplay(UserSkillsResponse skills) {
         StringBuilder result = new StringBuilder();
         
+        // null 체크
+        if (skills == null) return "등록된 기술이 없습니다";
+        
+        Log.d(TAG, "=== 스킬 표시 형식 생성 ===");
+        Log.d(TAG, "스킬 ID 개수: " + (skills.getSkillIds() != null ? skills.getSkillIds().size() : 0));
+        
         // 기존 스킬들 처리
-        if (!skills.getSkillIds().isEmpty()) {
+        if (skills.getSkillIds() != null && !skills.getSkillIds().isEmpty()) {
+            Log.d(TAG, "스킬 ID 리스트: " + skills.getSkillIds().toString());
+            
             for (int i = 0; i < skills.getSkillIds().size(); i++) {
                 Integer skillId = skills.getSkillIds().get(i);
                 String skillName = getSkillNameById(skillId);
+                Log.d(TAG, "스킬 처리: ID=" + skillId + " -> " + skillName + " (인덱스: " + i + ")");
                 
                 if (i == 0) {
                     result.append(skillName);
+                    Log.d(TAG, "첫 번째 스킬 추가: " + skillName + ", 현재 result: " + result.toString());
                 } else {
                     // 2개 이상이면 첫 번째 + "등"
                     result.append(" 등");
+                    Log.d(TAG, "2개 이상 스킬이므로 '등' 추가, 현재 result: " + result.toString());
                     break;
                 }
             }
         }
         
         // 커스텀 스킬들 처리
-        if (!skills.getCustomSkills().isEmpty()) {
+        if (skills.getCustomSkills() != null && !skills.getCustomSkills().isEmpty()) {
             if (result.length() > 0) {
                 result.append(", ");
             }
@@ -302,6 +459,7 @@ public class MypageProfileFragment extends Fragment {
             }
         }
         
+        Log.d(TAG, "스킬 표시 최종 결과: " + result.toString());
         return result.toString();
     }
     
@@ -311,24 +469,35 @@ public class MypageProfileFragment extends Fragment {
     private String formatRolesDisplay(UserRolesResponse roles) {
         StringBuilder result = new StringBuilder();
         
+        // null 체크
+        if (roles == null) return "등록된 역할이 없습니다";
+        
+        Log.d(TAG, "=== 역할 표시 형식 생성 ===");
+        Log.d(TAG, "역할 ID 개수: " + (roles.getRoleIds() != null ? roles.getRoleIds().size() : 0));
+        
         // 기존 역할들 처리
-        if (!roles.getRoleIds().isEmpty()) {
+        if (roles.getRoleIds() != null && !roles.getRoleIds().isEmpty()) {
+            Log.d(TAG, "역할 ID 리스트: " + roles.getRoleIds().toString());
+            
             for (int i = 0; i < roles.getRoleIds().size(); i++) {
                 Integer roleId = roles.getRoleIds().get(i);
                 String roleName = getRoleNameById(roleId);
+                Log.d(TAG, "역할 처리: ID=" + roleId + " -> " + roleName + " (인덱스: " + i + ")");
                 
                 if (i == 0) {
                     result.append(roleName);
+                    Log.d(TAG, "첫 번째 역할 추가: " + roleName + ", 현재 result: " + result.toString());
                 } else {
                     // 2개 이상이면 첫 번째 + "등"
                     result.append(" 등");
+                    Log.d(TAG, "2개 이상 역할이므로 '등' 추가, 현재 result: " + result.toString());
                     break;
                 }
             }
         }
         
         // 커스텀 역할들 처리
-        if (!roles.getCustomRoles().isEmpty()) {
+        if (roles.getCustomRoles() != null && !roles.getCustomRoles().isEmpty()) {
             if (result.length() > 0) {
                 result.append(", ");
             }
@@ -346,6 +515,7 @@ public class MypageProfileFragment extends Fragment {
             }
         }
         
+        Log.d(TAG, "역할 표시 최종 결과: " + result.toString());
         return result.toString();
     }
     
@@ -353,13 +523,17 @@ public class MypageProfileFragment extends Fragment {
      * 스킬 ID로 이름 찾기
      */
     private String getSkillNameById(Integer skillId) {
+        Log.d(TAG, "스킬 ID로 이름 찾기: " + skillId + ", 전체 스킬 개수: " + (allSkills != null ? allSkills.size() : 0));
+        
         if (allSkills != null) {
             for (Skill skill : allSkills) {
                 if (skill.getSkillId() == skillId) {
+                    Log.d(TAG, "스킬 매칭 성공: ID=" + skillId + " -> " + skill.getName());
                     return skill.getName();
                 }
             }
         }
+        Log.w(TAG, "스킬 매칭 실패: ID=" + skillId + " -> 알 수 없는 스킬");
         return "알 수 없는 스킬";
     }
     
@@ -367,13 +541,17 @@ public class MypageProfileFragment extends Fragment {
      * 역할 ID로 이름 찾기
      */
     private String getRoleNameById(Integer roleId) {
+        Log.d(TAG, "역할 ID로 이름 찾기: " + roleId + ", 전체 역할 개수: " + (allRoles != null ? allRoles.size() : 0));
+        
         if (allRoles != null) {
             for (Role role : allRoles) {
                 if (role.getRoleId() == roleId) {
+                    Log.d(TAG, "역할 매칭 성공: ID=" + roleId + " -> " + role.getName());
                     return role.getName();
                 }
             }
         }
+        Log.w(TAG, "역할 매칭 실패: ID=" + roleId + " -> 알 수 없는 역할");
         return "알 수 없는 역할";
     }
     
@@ -403,64 +581,47 @@ public class MypageProfileFragment extends Fragment {
         return result.toString();
     }
 
-    /**
-     * 사용자 경험 정보 로드
-     */
-    private void loadUserExperiences() {
-        // 대상 사용자 ID가 있으면 해당 사용자의 정보를 로드, 없으면 현재 사용자의 정보를 로드
-        String userId = (targetUserId != null) ? targetUserId : tokenManager.getUserId();
-        
-        profileManager.getUserExperiences(requireContext(), new ProfileManager.UserExperiencesCallback() {
-            @Override
-            public void onSuccess(List<Experience> experiences) {
-                if (getActivity() != null) {
-                    getActivity().runOnUiThread(() -> {
-                        if (tvUserExperiences != null) {
-                            if (experiences.isEmpty()) {
-                                tvUserExperiences.setText("등록된 경험이 없습니다");
-                            } else {
-                                tvUserExperiences.setText(formatExperiencesDisplay(experiences));
-                            }
-                        }
-                    });
-                }
-            }
-
-            @Override
-            public void onError(String errorMessage) {
-                if (getActivity() != null) {
-                    getActivity().runOnUiThread(() -> {
-                        Log.e(TAG, "경험 정보 로드 실패: " + errorMessage);
-                        if (tvUserExperiences != null) {
-                            tvUserExperiences.setText("경험: 로드 실패");
-                        }
-                    });
-                }
-            }
-        });
-    }
-
     private void setClickListeners() {
         tvBackArrow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // 마이페이지 메인으로 돌아가기
+                // 뒤로가기
                 if (getActivity() != null) {
-                    // MainActivity의 MypageFragment로 이동
-                    ((MainActivity) getActivity()).showFragment(new MypageFragment());
+                    getActivity().onBackPressed();
                 }
             }
         });
 
-        // 다른 사용자의 프로필을 볼 때는 편집 기능을 비활성화
-        if (targetUserId == null) {
-            // 현재 사용자의 프로필일 때만 편집 기능 활성화
+
+        // ll_user_id에 뒤로가기 리스너 추가 (뷰 모드에서만)
+        if (isViewMode) {
+            llUserId.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // 뒤로가기
+                    if (getActivity() != null) {
+                        getActivity().onBackPressed();
+                    }
+                }
+            });
+        }
+
+        // 뷰 모드에서는 수정 버튼들을 비활성화
+        if (isViewMode) {
+            // ">" 텍스트 숨기기
+            hideArrowTexts();
+            
+            // 클릭 리스너 제거 (수정 불가) 
+            llLanguagesAndRoles.setClickable(false);
+            llExperience.setClickable(false);
+            llTeamTendency.setClickable(false);
+        } else {
+            // 내 프로필 모드일 때만 수정 가능
             llUserId.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     // 마이페이지 메인으로 돌아가기
                     if (getActivity() != null) {
-                        // MainActivity의 MypageFragment로 이동
                         ((MainActivity) getActivity()).showFragment(new MypageFragment());
                     }
                 }
@@ -499,64 +660,29 @@ public class MypageProfileFragment extends Fragment {
                     }
                 }
             });
-        } else {
-            // 다른 사용자의 프로필일 때는 편집 기능 비활성화
-            llUserId.setClickable(false);
-            llLanguagesAndRoles.setClickable(false);
-            llExperience.setClickable(false);
-            llTeamTendency.setClickable(false);
         }
     }
 
-    private void loadUserPersonalityInfo() {
-        // 대상 사용자 ID가 있으면 해당 사용자의 정보를 로드, 없으면 현재 사용자의 정보를 로드
-        String userId = (targetUserId != null) ? targetUserId : tokenManager.getUserId();
+    /**
+     * 뷰 모드에서 ">" 텍스트를 숨기는 메서드
+     */
+    private void hideArrowTexts() {
+        Log.d(TAG, "'>' 텍스트 숨기기 시작");
+        // 직접 참조로 ">" TextView들을 숨기기
+        if (tvSkillsArrow != null) {
+            tvSkillsArrow.setVisibility(View.GONE);
+        }
         
-        RetrofitClient.getInstance()
-                .getApiService()
-                .getUserPersonalityProfile(userId)
-                .enqueue(new Callback<PersonalityProfileResponse>() {
-                    @Override
-                    public void onResponse(Call<PersonalityProfileResponse> call, Response<PersonalityProfileResponse> response) {
-                        if (response.isSuccessful() && response.body() != null) {
-                            PersonalityProfileResponse profile = response.body();
-                            Log.d("MypageProfileFragment", "성향 정보 로드 성공: " + profile.getProfileCode());
-                            
-                            // UI 업데이트
-                            if (getActivity() != null) {
-                                getActivity().runOnUiThread(() -> {
-                                    if (tvTeamTendency != null) {
-                                        tvTeamTendency.setText(profile.getProfileCode());
-                                    }
-                                });
-                            }
-                        } else {
-                            Log.e("MypageProfileFragment", "성향 정보 로드 실패: " + response.code());
-                            // 성향 정보가 없으면 "미완료" 표시
-                            if (getActivity() != null) {
-                                getActivity().runOnUiThread(() -> {
-                                    if (tvTeamTendency != null) {
-                                        tvTeamTendency.setText("미완료");
-                                    }
-                                });
-                            }
-                        }
-                    }
-                    
-                    @Override
-                    public void onFailure(Call<PersonalityProfileResponse> call, Throwable t) {
-                        Log.e("MypageProfileFragment", "성향 정보 로드 네트워크 오류: " + t.getMessage());
-                        // 네트워크 오류 시 "미완료" 표시
-                        if (getActivity() != null) {
-                            getActivity().runOnUiThread(() -> {
-                                if (tvTeamTendency != null) {
-                                    tvTeamTendency.setText("미완료");
-                                }
-                            });
-                        }
-                    }
-                });
+        if (tvExperienceArrow != null) {
+            tvExperienceArrow.setVisibility(View.GONE);
+        }
+        
+        if (tvTendencyArrow != null) {
+            tvTendencyArrow.setVisibility(View.GONE);
+        }
     }
+
+
     
     private void loadUserPersonalityProfile() {
         // 대상 사용자 ID가 있으면 해당 사용자의 정보를 로드, 없으면 현재 사용자의 정보를 로드
@@ -604,11 +730,50 @@ public class MypageProfileFragment extends Fragment {
                 });
     }
     
-    private boolean hasPersonalityTestResult() {
-        // TODO: 실제로는 데이터베이스나 SharedPreferences에서 사용자의 성향 테스트 결과 여부를 확인
-        // 현재는 임시로 false를 반환 (테스트를 위해 필요시 true로 변경)
-        return false;
+    /**
+     * 사용자 성향 프로필 별도 API로 로드 (프로필 표시용)
+     */
+    private void loadUserPersonalityProfileForDisplay() {
+        String userId = targetUserId != null ? targetUserId : tokenManager.getUserId();
+        Log.d(TAG, "성향 프로필 API 호출 (표시용): " + userId);
+        
+        RetrofitClient.getInstance()
+                .getApiService()
+                .getUserPersonalityProfile(userId)
+                .enqueue(new Callback<PersonalityProfileResponse>() {
+                    @Override
+                    public void onResponse(Call<PersonalityProfileResponse> call, Response<PersonalityProfileResponse> response) {
+                        if (response.isSuccessful() && response.body() != null) {
+                            PersonalityProfileResponse personalityProfile = response.body();
+                            Log.d(TAG, "성향 프로필 로드 성공: " + personalityProfile.getProfileCode());
+                            
+                            if (getActivity() != null) {
+                                getActivity().runOnUiThread(() -> {
+                                    displayUserPersonalityInfo(personalityProfile);
+                                });
+                            }
+                        } else {
+                            Log.e(TAG, "성향 프로필 로드 실패: " + response.code());
+                            if (getActivity() != null) {
+                                getActivity().runOnUiThread(() -> {
+                                    displayUserPersonalityInfo(null);
+                                });
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<PersonalityProfileResponse> call, Throwable t) {
+                        Log.e(TAG, "성향 프로필 네트워크 오류: " + t.getMessage());
+                        if (getActivity() != null) {
+                            getActivity().runOnUiThread(() -> {
+                                displayUserPersonalityInfo(null);
+                            });
+                        }
+                    }
+                });
     }
+    
     
     private void showExperienceFragment() {
         // ExperienceFragment 생성 (마이페이지 모드)

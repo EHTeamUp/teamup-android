@@ -17,6 +17,7 @@ import kr.mojuk.teamup.api.ApiService;
 import kr.mojuk.teamup.api.RetrofitClient;
 import kr.mojuk.teamup.api.model.RecruitmentPostRequest;
 import kr.mojuk.teamup.api.model.RecruitmentPostResponse;
+import kr.mojuk.teamup.auth.TokenManager;
 import kr.mojuk.teamup.databinding.FragmentRecruitmentPostBinding;
 
 import java.util.ArrayList;
@@ -37,7 +38,7 @@ public class RecruitmentPostFragment extends Fragment {
     private int contestId = -1;
     private String contestName = "";
 
-    private String currentUserId = "user123"; // TODO: 실제 로그인된 사용자 ID로 교체
+    private String currentUserId = null;
 
     // '새 글 작성' 모드용 newInstance
     public static RecruitmentPostFragment newInstanceForCreate(int contestId, String contestName) {
@@ -89,6 +90,11 @@ public class RecruitmentPostFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        // --- 수정: TokenManager를 사용하여 로그인 상태 확인 및 사용자 ID 가져오기 ---
+        TokenManager tokenManager = TokenManager.getInstance(requireContext());
+        currentUserId = tokenManager.getUserId();
+
         apiService = RetrofitClient.getInstance().getApiService();
 
         setupMemberCountSpinner();
@@ -125,6 +131,11 @@ public class RecruitmentPostFragment extends Fragment {
                 return;
             }
 
+            if (memberCount == 0) {
+                Toast.makeText(getContext(), "모집 인원을 선택해주세요.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            
             RecruitmentPostRequest postRequest = new RecruitmentPostRequest(title, content, memberCount, contestId, currentUserId);
 
             if (isEditMode) {

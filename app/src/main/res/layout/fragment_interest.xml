@@ -65,7 +65,7 @@
                 android:id="@+id/tv_language_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="사용 가능한 기술 *"
+                android:text="사용 가능한 스킬 *"
                 android:textStyle="bold"
                 android:layout_marginBottom="8dp"/>
 
