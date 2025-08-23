@@ -8,19 +8,6 @@
     android:background="@android:color/white"
     tools:context="kr.mojuk.teamup.MainActivity">
 
-    <!-- Header - TeamUp Title -->
-    <TextView
-        android:id="@+id/tv_header_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="내 참여 공모전 목록"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:textColor="@android:color/black"
-        android:layout_marginTop="16dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
 
     <!-- ▼▼▼ 새로 추가된 공모전 제목 바 ▼▼▼ -->
     <LinearLayout
@@ -32,8 +19,8 @@
         android:padding="16dp"
         android:layout_marginHorizontal="16dp"
         android:layout_marginTop="16dp"
-        android:background="@drawable/rounded_box_border"
-        app:layout_constraintTop_toBottomOf="@id/tv_header_title"
+        android:background="@drawable/mypage_menu_item_background"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
@@ -47,7 +34,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:text="뒤로가기"
+            android:text="내참여 공모전 목록"
             android:textColor="@android:color/black"
             android:textStyle="bold"
             android:textSize="16sp" />
