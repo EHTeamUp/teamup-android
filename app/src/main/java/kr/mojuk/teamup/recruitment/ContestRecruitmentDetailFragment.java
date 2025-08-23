@@ -14,6 +14,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
@@ -23,19 +24,10 @@ import kr.mojuk.teamup.api.ApiService;
 import kr.mojuk.teamup.api.RetrofitClient;
 import kr.mojuk.teamup.api.model.*;
 
-import kr.mojuk.teamup.api.model.ApplicationCreate;
-import kr.mojuk.teamup.api.model.ApplicationResponse;
-import kr.mojuk.teamup.api.model.CheckAuthorResponse;
-import kr.mojuk.teamup.api.model.CommentCreate;
-import kr.mojuk.teamup.api.model.CommentResponse;
-import kr.mojuk.teamup.api.model.CommentUpdate;
-import kr.mojuk.teamup.api.model.CommentWithReplies;
-import kr.mojuk.teamup.api.model.ContestInformation;
-import kr.mojuk.teamup.api.model.RecruitmentPostResponse;
-import kr.mojuk.teamup.auth.TokenManager; // TokenManager import
+import kr.mojuk.teamup.auth.TokenManager;
 import kr.mojuk.teamup.databinding.FragmentContestRecruitmentDetailBinding;
 import kr.mojuk.teamup.databinding.PopupApplyFormBinding;
-import kr.mojuk.teamup.util.PlaceholderFragment; // 임시 PlaceholderFragment import
+import kr.mojuk.teamup.util.PlaceholderFragment;
 import kr.mojuk.teamup.applicant.ApplicantListFragment;
 
 import java.util.ArrayList;
@@ -78,7 +70,6 @@ public class ContestRecruitmentDetailFragment extends Fragment implements Commen
         if (getArguments() != null) {
             recruitmentPostId = getArguments().getInt("POST_ID", -1);
         }
-        // Fragment가 생성될 때 TokenManager를 통해 실제 사용자 ID를 가져옵니다.
         currentUserId = TokenManager.getInstance(requireContext()).getUserId();
     }
 
@@ -103,6 +94,7 @@ public class ContestRecruitmentDetailFragment extends Fragment implements Commen
         setupRecyclerViews();
         setupCommentInput();
         loadInitialRecruitmentPost();
+        checkApplicationStatus();
 
         binding.llContestTitleBar.setOnClickListener(v -> {
             if (getActivity() != null) {
@@ -195,7 +187,21 @@ public class ContestRecruitmentDetailFragment extends Fragment implements Commen
                 if (response.isSuccessful() && response.body() != null) {
                     currentContest = response.body();
                     binding.contestTitleTextInBar.setText(currentContest.getName());
-                    binding.ddayText.setText(currentContest.getdDayText());
+
+                    String dDayText = currentContest.getdDayText();
+                    boolean isClosed = "마감됨".equals(dDayText) || (dDayText != null && dDayText.startsWith("D+"));
+
+                    if (isClosed) {
+                        binding.ddayText.setText("마감됨");
+                        binding.btnApply.setEnabled(false);
+                        binding.btnApply.setText("모집 마감");
+                        if (getContext() != null) {
+                            binding.btnApply.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.light_gray));
+                        }
+                    } else {
+                        binding.ddayText.setText(dDayText);
+                    }
+
                     if (getContext() != null) {
                         Glide.with(getContext()).load(currentContest.getPosterImgUrl()).into(binding.ivPoster);
                     }
@@ -261,7 +267,6 @@ public class ContestRecruitmentDetailFragment extends Fragment implements Commen
                     if (response.body().isAuthor()) {
                         role = UserRole.AUTHOR;
                     } else {
-                        // ListAdapter에서 현재 리스트를 가져와서 확인
                         List<ApplicationResponse> currentMembers = teamMemberAdapter.getCurrentList();
                         if (currentMembers != null) {
                             boolean isMember = currentMembers.stream().anyMatch(member -> member.getUserId().equals(currentUserId));
@@ -280,24 +285,52 @@ public class ContestRecruitmentDetailFragment extends Fragment implements Commen
         });
     }
 
+    private void checkApplicationStatus() {
+        apiService.getApplicationsByPost(recruitmentPostId).enqueue(new Callback<List<Application>>() {
+            @Override
+            public void onResponse(@NonNull Call<List<Application>> call, @NonNull Response<List<Application>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    boolean hasApplied = response.body().stream()
+                            .anyMatch(application -> application.getUserId().equals(currentUserId));
+
+                    if (hasApplied) {
+                        binding.btnApply.setEnabled(false);
+                        binding.btnApply.setText("지원 완료");
+                    }
+                }
+            }
+            @Override
+            public void onFailure(@NonNull Call<List<Application>> call, @NonNull Throwable t) {
+                handleApiFailure("getApplicationsByPost", t);
+            }
+        });
+    }
+
+
     private void updateUiBasedOnRole(UserRole role) {
         switch (role) {
             case AUTHOR:
                 binding.llRecruiterView.setVisibility(View.VISIBLE);
                 binding.btnApply.setVisibility(View.GONE);
+                // ▼▼▼ 수정된 부분 ▼▼▼
+                // 작성자일 경우 수정 버튼과 삭제 버튼을 항상 보이도록 설정
                 binding.fabEdit.setVisibility(View.VISIBLE);
+                binding.fabDelete.setVisibility(View.VISIBLE);
+                // ▲▲▲ 수정된 부분 ▲▲▲
                 setupAuthorButtons();
                 break;
             case MEMBER:
                 binding.llRecruiterView.setVisibility(View.GONE);
                 binding.btnApply.setVisibility(View.GONE);
                 binding.fabEdit.setVisibility(View.GONE);
+                binding.fabDelete.setVisibility(View.GONE);
                 break;
             case APPLICANT:
             default:
                 binding.llRecruiterView.setVisibility(View.GONE);
                 binding.btnApply.setVisibility(View.VISIBLE);
                 binding.fabEdit.setVisibility(View.GONE);
+                binding.fabDelete.setVisibility(View.GONE);
                 binding.btnApply.setOnClickListener(v -> showApplyDialog());
                 break;
         }
@@ -305,12 +338,11 @@ public class ContestRecruitmentDetailFragment extends Fragment implements Commen
 
     private void setupAuthorButtons() {
         binding.tvViewApplicants.setOnClickListener(v -> {
-            // ApplicantListFragment로 이동
             navigateToFragment(ApplicantListFragment.newInstance(recruitmentPostId));
         });
-        binding.tvTeamSynergy.setOnClickListener(v -> {
-            navigateToFragment(PlaceholderFragment.newInstance("팀 시너지 점수"));
-        });
+
+        // ▼▼▼ 수정된 부분 ▼▼▼
+        // 수정 버튼의 클릭 리스너를 수정 화면 이동 기능으로 설정
         binding.fabEdit.setOnClickListener(v -> {
             if (currentPost != null && currentContest != null) {
                 navigateToFragment(RecruitmentPostFragment.newInstanceForEdit(
@@ -325,9 +357,12 @@ public class ContestRecruitmentDetailFragment extends Fragment implements Commen
                 Toast.makeText(getContext(), "게시글 정보를 불러오는 중입니다.", Toast.LENGTH_SHORT).show();
             }
         });
+
+        // 삭제 버튼의 클릭 리스너를 삭제 확인 다이얼로그 호출로 설정
         binding.fabDelete.setOnClickListener(v -> {
             showDeletePostConfirmationDialog();
         });
+        // ▲▲▲ 수정된 부분 ▲▲▲
     }
 
     private void navigateToFragment(Fragment fragment) {

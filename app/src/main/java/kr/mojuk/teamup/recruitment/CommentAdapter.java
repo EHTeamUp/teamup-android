@@ -20,9 +20,8 @@ public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     private final List<CommentResponse> flatCommentList;
     private final String currentUserId;
     private CommentActionListener actionListener;
-    private int editingPosition = -1; // 현재 수정 중인 아이템의 위치, -1이면 수정 중 아님
+    private int editingPosition = -1;
 
-    // Activity와 상호작용하기 위한 리스너 인터페이스
     public interface CommentActionListener {
         void onReplyClick(CommentResponse comment);
         void onSaveClick(CommentResponse comment, String newContent);
@@ -37,7 +36,6 @@ public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     @Override
     public int getItemViewType(int position) {
-        // parentCommentId가 null이면 최상위 댓글, 아니면 대댓글
         return flatCommentList.get(position).getParentCommentId() == null ? VIEW_TYPE_COMMENT : VIEW_TYPE_REPLY;
     }
 
@@ -69,8 +67,6 @@ public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         return flatCommentList.size();
     }
 
-    // --- ViewHolder들 ---
-
     class CommentViewHolder extends RecyclerView.ViewHolder {
         private final ItemCommentBinding binding;
 
@@ -80,51 +76,45 @@ public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }
 
         void bind(CommentResponse comment, boolean isEditing) {
-            // 모드 전환
             binding.layoutReadMode.setVisibility(isEditing ? View.GONE : View.VISIBLE);
             binding.layoutEditMode.setVisibility(isEditing ? View.VISIBLE : View.GONE);
 
-            // 데이터 바인딩
-            binding.tvCommentUser.setText(comment.getUserId());
             binding.tvCommentContent.setText(comment.getContent());
 
-            // 수정 모드일 때 EditText에 기존 내용 채우기
+            // ▼▼▼ 수정된 부분 ▼▼▼
+            // (수정됨) 표시 로직을 제거하고, 사용자 ID만 표시합니다.
+            binding.tvCommentUser.setText(comment.getUserId());
+            // ▲▲▲ 수정된 부분 ▲▲▲
+
             if (isEditing) {
                 binding.etCommentEdit.setText(comment.getContent());
                 binding.etCommentEdit.requestFocus();
             }
 
-            // 본인 댓글인 경우에만 수정/삭제 버튼 표시
             boolean isAuthor = currentUserId.equals(comment.getUserId());
             binding.tvSeparator1.setVisibility(isAuthor ? View.VISIBLE : View.GONE);
             binding.tvEditButton.setVisibility(isAuthor ? View.VISIBLE : View.GONE);
             binding.tvSeparator2.setVisibility(isAuthor ? View.VISIBLE : View.GONE);
             binding.tvDeleteButton.setVisibility(isAuthor ? View.VISIBLE : View.GONE);
 
-            // --- 리스너 설정 ---
             binding.tvReplyButton.setOnClickListener(v -> actionListener.onReplyClick(comment));
             binding.tvDeleteButton.setOnClickListener(v -> actionListener.onDeleteClick(comment));
 
-            // 수정 시작
             binding.tvEditButton.setOnClickListener(v -> {
                 editingPosition = getAdapterPosition();
                 notifyItemChanged(editingPosition);
             });
 
-            // 수정 취소
             binding.tvCancelButton.setOnClickListener(v -> {
                 int position = editingPosition;
                 editingPosition = -1;
                 notifyItemChanged(position);
             });
 
-            // 수정 저장
             binding.tvSaveButton.setOnClickListener(v -> {
                 String newContent = binding.etCommentEdit.getText().toString().trim();
                 actionListener.onSaveClick(comment, newContent);
-                int position = editingPosition;
                 editingPosition = -1;
-                // Activity에서 API 호출 성공 후 데이터를 갱신하고 notifyItemChanged를 호출해줄 것임
             });
         }
     }
@@ -138,12 +128,15 @@ public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }
 
         void bind(CommentResponse comment, boolean isEditing) {
-            // CommentViewHolder와 거의 동일한 로직
             binding.layoutReadModeReply.setVisibility(isEditing ? View.GONE : View.VISIBLE);
             binding.layoutEditModeReply.setVisibility(isEditing ? View.VISIBLE : View.GONE);
 
-            binding.tvReplyUser.setText(comment.getUserId());
             binding.tvReplyContent.setText(comment.getContent());
+
+            // ▼▼▼ 수정된 부분 ▼▼▼
+            // (수정됨) 표시 로직을 제거하고, 사용자 ID만 표시합니다.
+            binding.tvReplyUser.setText(comment.getUserId());
+            // ▲▲▲ 수정된 부분 ▲▲▲
 
             if (isEditing) {
                 binding.etReplyEdit.setText(comment.getContent());
@@ -156,7 +149,6 @@ public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             binding.tvSeparatorReply2.setVisibility(isAuthor ? View.VISIBLE : View.GONE);
             binding.tvDeleteButtonReply.setVisibility(isAuthor ? View.VISIBLE : View.GONE);
 
-            // --- 리스너 설정 ---
             binding.tvReplyButtonReply.setOnClickListener(v -> actionListener.onReplyClick(comment));
             binding.tvDeleteButtonReply.setOnClickListener(v -> actionListener.onDeleteClick(comment));
             binding.tvEditButtonReply.setOnClickListener(v -> {
@@ -171,7 +163,6 @@ public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             binding.tvSaveButtonReply.setOnClickListener(v -> {
                 String newContent = binding.etReplyEdit.getText().toString().trim();
                 actionListener.onSaveClick(comment, newContent);
-                int position = editingPosition;
                 editingPosition = -1;
             });
         }
