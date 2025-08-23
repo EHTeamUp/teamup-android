@@ -5,7 +5,7 @@
     <!-- 인터넷 권한 -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    
+
     <!-- 알림 권한 -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
@@ -21,15 +21,15 @@
         android:usesCleartextTraffic="true">
         <activity
             android:name="kr.mojuk.teamup.MainActivity"
+            android:exported="false"/>
+        <activity
+            android:name="kr.mojuk.teamup.auth.LoginActivity"
             android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name="kr.mojuk.teamup.auth.LoginActivity"
-            android:exported="false" />
         <activity
             android:name="kr.mojuk.teamup.auth.SignupActivity"
             android:exported="false" />
@@ -66,7 +66,7 @@
         <activity
             android:name="kr.mojuk.teamup.mypage.MypageTestResultActivity"
             android:exported="false" />
-            
+
         <!-- Firebase FCM 서비스 -->
         <service
             android:name=".notification.TeamUpFirebaseMessagingService"

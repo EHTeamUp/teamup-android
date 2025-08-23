@@ -76,11 +76,13 @@ public class ContestInformationDetailFragment extends Fragment {
         }
 
         // 뒤로가기 버튼
-        binding.btnBackTitle.setOnClickListener(v -> {
-            if (getActivity() != null) {
-                getActivity().getSupportFragmentManager().popBackStack();
-            }
-        });
+        if (binding != null) {
+            binding.btnBackTitle.setOnClickListener(v -> {
+                if (getActivity() != null) {
+                    getActivity().getSupportFragmentManager().popBackStack();
+                }
+            });
+        }
     }
 
     private void loadContestDetailsFromApi(int contestId) {
@@ -103,6 +105,10 @@ public class ContestInformationDetailFragment extends Fragment {
     }
 
     private void updateUi(ContestInformation contestDetail) {
+        if (binding == null) {
+            return; // Fragment가 destroy된 상태면 UI 업데이트하지 않음
+        }
+
         binding.contestTitleTextInBar.setText(contestDetail.getName());
 
         // Glide 사용 시 getActivity() 또는 getContext()로 Context를 전달

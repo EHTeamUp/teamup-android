@@ -23,6 +23,7 @@ import kr.mojuk.teamup.auth.TokenManager;
 import kr.mojuk.teamup.auth.UserManager;
 import kr.mojuk.teamup.fragments.MypageProfileFragment;
 import kr.mojuk.teamup.fragments.MypageUserinfoFragment;
+import kr.mojuk.teamup.contest.MyContestsListFragment;
 import kr.mojuk.teamup.notification.FcmTokenManager;
 import kr.mojuk.teamup.api.RetrofitClient;
 import kr.mojuk.teamup.api.model.ApiResponse;
@@ -96,7 +97,7 @@ public class MypageFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if (getActivity() instanceof MainActivity) {
-                    // TODO: 내 참여 공모전 이동
+                    ((MainActivity) getActivity()).showFragment(new MyContestsListFragment());
                 }
             }
         });
