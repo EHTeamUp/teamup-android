@@ -203,7 +203,7 @@ public class ContestRecruitmentDetailFragment extends Fragment implements Commen
                     if (isClosed) {
                         binding.ddayText.setText("마감");
                         binding.btnApply.setEnabled(false);
-                        binding.btnApply.setText("모집 마감");
+                        binding.tvApplyText.setText("모집 마감");
                         if (getContext() != null) {
                             binding.btnApply.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.light_gray));
                         }
@@ -305,11 +305,11 @@ public class ContestRecruitmentDetailFragment extends Fragment implements Commen
         if (binding == null) return;
 
         binding.btnApply.setEnabled(false);
-        binding.btnApply.setText("지원 완료");
+        binding.tvApplyText.setText("지원 완료");
 
         // XML 레이아웃의 화살표 이미지뷰 ID가 'ivApplyArrow'라고 가정합니다.
         // 실제 ID가 다를 경우 이 부분을 수정해주세요.
-         binding.ivApplyArrow.setVisibility(View.GONE);
+         binding.ivApplyArrowRight.setVisibility(View.GONE);
 
         // (선택 사항) 지원 완료 시 배경색 등 디자인 변경
         // if (getContext() != null) {
