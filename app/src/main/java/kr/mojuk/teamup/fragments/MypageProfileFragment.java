@@ -38,7 +38,6 @@ public class MypageProfileFragment extends Fragment {
 
     private static final String TAG = "MypageProfileFragment";
 
-    private TextView tvBackArrow;
     private LinearLayout llUserId;
     private LinearLayout llLanguagesAndRoles;
     private LinearLayout llExperience;
@@ -111,7 +110,6 @@ public class MypageProfileFragment extends Fragment {
     }
 
     private void initViews(View view) {
-        tvBackArrow = view.findViewById(R.id.tv_back_arrow);
         llUserId = view.findViewById(R.id.ll_user_id);
         llLanguagesAndRoles = view.findViewById(R.id.ll_languages_and_roles);
         llExperience = view.findViewById(R.id.ll_experience);
@@ -582,15 +580,6 @@ public class MypageProfileFragment extends Fragment {
     }
 
     private void setClickListeners() {
-        tvBackArrow.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // 뒤로가기
-                if (getActivity() != null) {
-                    getActivity().onBackPressed();
-                }
-            }
-        });
 
 
         // ll_user_id에 뒤로가기 리스너 추가 (뷰 모드에서만)

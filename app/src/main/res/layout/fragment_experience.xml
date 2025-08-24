@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:padding="24dp"
     android:background="@android:color/white">
 
     <!-- Header -->
@@ -14,9 +15,8 @@
         android:orientation="horizontal"
         android:background="@drawable/mypage_menu_item_background"
         android:padding="16dp"
+        android:layout_marginTop="16dp"
         android:gravity="center_vertical"
-        android:layout_marginStart="24dp"
-        android:layout_marginEnd="24dp"
         android:layout_marginBottom="16dp"
         android:clickable="true"
         android:focusable="true"
@@ -26,7 +26,7 @@
             android:id="@+id/tv_back_arrow"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="←"
+            android:text="&lt;"
             android:textSize="20sp"
             android:textColor="@android:color/black"
             android:layout_marginEnd="12dp" />
@@ -51,17 +51,14 @@
         android:textSize="20sp"
         android:textStyle="bold"
         android:textColor="@android:color/black"
-        android:layout_marginStart="24dp"
         android:layout_marginTop="16dp"
-        android:layout_marginBottom="24dp" />
+        android:layout_marginBottom="20dp"/>
 
     <!-- Experience Forms Container -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:layout_marginStart="24dp"
-        android:layout_marginEnd="24dp">
+        android:layout_weight="1">
 
         <LinearLayout
             android:id="@+id/ll_experience_forms_container"

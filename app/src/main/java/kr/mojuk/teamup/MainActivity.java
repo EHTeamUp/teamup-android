@@ -206,7 +206,7 @@ public class MainActivity extends AppCompatActivity implements ExperienceFragmen
     }
 
     /**
-     * 하단 네비게이션 바 활성화 (Fragment 전환 없이)
+     * 하단 네비게이션 바 활성화
      */
     public void setBottomNavigationItem(int itemId) {
         BottomNavigationView navView = findViewById(R.id.bottom_navigation);
@@ -216,14 +216,14 @@ public class MainActivity extends AppCompatActivity implements ExperienceFragmen
         // 리스너를 다시 설정
         setupBottomNavigationListener(navView);
     }
-    
+
     /**
      * 하단 네비게이션 리스너 설정
      */
     private void setupBottomNavigationListener(BottomNavigationView navView) {
         navView.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
-            
+
             Fragment selectedFragment = null;
 
             if (itemId == R.id.navigation_profile) {

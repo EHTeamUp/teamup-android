@@ -27,7 +27,8 @@ public class MypageUserinfoEditFragment extends Fragment {
     
     private TextView tvUserId, tvUserEmail;
     private EditText etUserName, etCurrentPassword, etNewPassword, etCheckNewPassword;
-    private Button btnCancel, btnSave;
+    private View btnCancel;
+    private com.google.android.material.button.MaterialButton btnSave;
     
     // Manager 인스턴스들
     private TokenManager tokenManager;
@@ -123,7 +124,7 @@ public class MypageUserinfoEditFragment extends Fragment {
                         // 버튼 상태 복원
                         if (btnSave != null) {
                             btnSave.setEnabled(true);
-                            btnSave.setText("저장");
+                            btnSave.setText("Save");
                         }
                         
                         Log.d(TAG, "사용자 정보 UI 업데이트 완료");
