@@ -18,8 +18,10 @@ import kr.mojuk.teamup.auth.LoginActivity;
 import kr.mojuk.teamup.auth.TokenManager;
 
 import kr.mojuk.teamup.contest.ContestListFragment;
+import kr.mojuk.teamup.contest.ContestInformationDetailFragment;
 import kr.mojuk.teamup.recruitment.ContestRecruitmentListFragment;
-import kr.mojuk.teamup.fragment.HomeFragment;
+import kr.mojuk.teamup.recruitment.ContestRecruitmentDetailFragment;
+import kr.mojuk.teamup.fragments.HomeFragment;
 import kr.mojuk.teamup.fragments.MypageFragment;
 import kr.mojuk.teamup.fragments.ExperienceFragment;
 import kr.mojuk.teamup.fragments.MypageProfileFragment;
@@ -29,6 +31,8 @@ import kr.mojuk.teamup.notification.FcmTokenManager;
 import kr.mojuk.teamup.notification.NotificationPermissionHelper;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements ExperienceFragment.ExperienceFragmentListener {
 
@@ -65,11 +69,9 @@ public class MainActivity extends AppCompatActivity implements ExperienceFragmen
             return insets;
         });
       
-        // FCM 토큰 매니저 초기화 및 토큰 상태 확인
-        FcmTokenManager fcmTokenManager = FcmTokenManager.getInstance(this);
-        
-        // 앱 시작 시 토큰 상태 확인 및 갱신
-        fcmTokenManager.initializeTokenOnAppStart();
+        // FCM 토큰 매니저 초기화 및 토큰 상태 확인 (Firebase 초기화 문제로 임시 비활성화)
+        // FcmTokenManager fcmTokenManager = FcmTokenManager.getInstance(this);
+        // fcmTokenManager.initializeTokenOnAppStart();
 
         // 알림 권한 요청
         NotificationPermissionHelper.requestNotificationPermission(this);
@@ -109,6 +111,17 @@ public class MainActivity extends AppCompatActivity implements ExperienceFragmen
         // 하단 탭 선택 리스너 설정
         navView.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
+            
+            // 현재 Fragment 확인
+            Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+            
+            // DetailFragment가 현재 표시되어 있으면 네비게이션 무시
+            if (currentFragment instanceof ContestInformationDetailFragment ||
+                currentFragment instanceof ContestRecruitmentDetailFragment) {
+                Log.d(TAG, "DetailFragment가 표시 중이므로 네비게이션 무시: " + currentFragment.getClass().getSimpleName());
+                return false;
+            }
+            
             Fragment selectedFragment = null;
 
             if (itemId == R.id.navigation_profile) {
@@ -123,6 +136,7 @@ public class MainActivity extends AppCompatActivity implements ExperienceFragmen
             }
 
             if (selectedFragment != null) {
+                Log.d(TAG, "네비게이션 Fragment 전환: " + selectedFragment.getClass().getSimpleName());
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.fragment_container, selectedFragment)
                         .commit();
@@ -165,15 +179,30 @@ public class MainActivity extends AppCompatActivity implements ExperienceFragmen
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
 
-        // 기존 Fragment들을 모두 숨기고 새로운 Fragment 추가
-        transaction.replace(R.id.fragment_container, fragment);
+        Log.d(TAG, "showFragment 시작 - Fragment: " + fragment.getClass().getSimpleName());
+        Log.d(TAG, "현재 FragmentManager: " + fragmentManager.getClass().getSimpleName());
+
+        // 기존 Fragment들을 모두 숨기기
+        List<Fragment> fragments = fragmentManager.getFragments();
+        Log.d(TAG, "현재 Fragment 개수: " + fragments.size());
+        for (Fragment existingFragment : fragments) {
+            if (existingFragment != null && existingFragment.isVisible()) {
+                transaction.hide(existingFragment);
+                Log.d(TAG, "기존 Fragment 숨김: " + existingFragment.getClass().getSimpleName());
+            }
+        }
+
+        // 새로운 Fragment 추가
+        Log.d(TAG, "새 Fragment 추가: " + fragment.getClass().getSimpleName() + " to container: " + R.id.fragment_container);
+        transaction.add(R.id.fragment_container, fragment, "DetailFragment");
+        transaction.show(fragment);
 
         // 백 스택에 추가 (뒤로가기 버튼으로 이전 Fragment로 돌아갈 수 있도록)
         transaction.addToBackStack(null);
 
         transaction.commit();
 
-        Log.d(TAG, "Fragment 표시: " + fragment.getClass().getSimpleName());
+        Log.d(TAG, "Fragment 표시 완료: " + fragment.getClass().getSimpleName());
     }
 
     // ===== ExperienceFragmentListener 구현 =====
