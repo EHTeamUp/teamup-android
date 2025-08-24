@@ -29,7 +29,7 @@ import kr.mojuk.teamup.databinding.FragmentContestRecruitmentDetailBinding;
 import kr.mojuk.teamup.databinding.PopupApplyFormBinding;
 import kr.mojuk.teamup.util.PlaceholderFragment;
 import kr.mojuk.teamup.fragments.MypageProfileFragment;
-import kr.mojuk.teamup.util.PlaceholderFragment; 
+import kr.mojuk.teamup.util.PlaceholderFragment;
 import kr.mojuk.teamup.applicant.ApplicantListFragment;
 
 import java.util.ArrayList;
@@ -135,7 +135,7 @@ public class ContestRecruitmentDetailFragment extends Fragment implements Commen
                 @Override
                 public void onResponse(@NonNull Call<CommentResponse> call, @NonNull Response<CommentResponse> response) {
                     if (binding == null) return; // Fragment가 destroy된 경우 처리하지 않음
-                    
+
                     if (response.isSuccessful()) {
                         Toast.makeText(getContext(), "댓글이 등록되었습니다.", Toast.LENGTH_SHORT).show();
                         resetCommentInput();
@@ -192,7 +192,7 @@ public class ContestRecruitmentDetailFragment extends Fragment implements Commen
             @Override
             public void onResponse(@NonNull Call<ContestInformation> call, @NonNull Response<ContestInformation> response) {
                 if (binding == null) return; // Fragment가 destroy된 경우 처리하지 않음
-                
+
                 if (response.isSuccessful() && response.body() != null) {
                     currentContest = response.body();
                     binding.contestTitleTextInBar.setText(currentContest.getName());
@@ -248,12 +248,13 @@ public class ContestRecruitmentDetailFragment extends Fragment implements Commen
         });
     }
 
+    // ▼▼▼ 수정된 부분 ▼▼▼
     private void loadComments() {
         apiService.getCommentsByPost(recruitmentPostId).enqueue(new Callback<List<CommentWithReplies>>() {
             @Override
             public void onResponse(@NonNull Call<List<CommentWithReplies>> call, @NonNull Response<List<CommentWithReplies>> response) {
                 if (binding == null) return; // Fragment가 destroy된 경우 처리하지 않음
-                
+
                 if (response.isSuccessful() && response.body() != null) {
                     flatCommentList.clear();
                     for (CommentWithReplies comment : response.body()) {
@@ -263,21 +264,42 @@ public class ContestRecruitmentDetailFragment extends Fragment implements Commen
                         }
                     }
                     commentAdapter.notifyDataSetChanged();
+
+                    // 댓글 목록의 상태에 따라 UI 업데이트
+                    if (flatCommentList.isEmpty()) {
+                        // 댓글이 없으면 안내 문구를 보여주고, 댓글 목록은 숨김
+                        binding.rvComments.setVisibility(View.GONE);
+                        binding.tvNoComments.setVisibility(View.VISIBLE);
+                    } else {
+                        // 댓글이 있으면 댓글 목록을 보여주고, 안내 문구는 숨김
+                        binding.rvComments.setVisibility(View.VISIBLE);
+                        binding.tvNoComments.setVisibility(View.GONE);
+                    }
+                } else {
+                    // API 응답이 실패했거나 body가 null인 경우에도 댓글 없음 처리
+                    binding.rvComments.setVisibility(View.GONE);
+                    binding.tvNoComments.setVisibility(View.VISIBLE);
                 }
             }
             @Override
             public void onFailure(@NonNull Call<List<CommentWithReplies>> call, @NonNull Throwable t) {
                 handleApiFailure("getCommentsByPost", t);
+                if (binding != null) {
+                    // 네트워크 오류 발생 시에도 댓글 없음 처리
+                    binding.rvComments.setVisibility(View.GONE);
+                    binding.tvNoComments.setVisibility(View.VISIBLE);
+                }
             }
         });
     }
+    // ▲▲▲ 수정된 부분 ▲▲▲
 
     private void checkUserRole() {
         apiService.checkPostAuthor(recruitmentPostId, currentUserId).enqueue(new Callback<CheckAuthorResponse>() {
             @Override
             public void onResponse(@NonNull Call<CheckAuthorResponse> call, @NonNull Response<CheckAuthorResponse> response) {
                 if (binding == null) return; // Fragment가 destroy된 경우 처리하지 않음
-                
+
                 UserRole role = UserRole.APPLICANT;
                 if (response.isSuccessful() && response.body() != null) {
                     if (response.body().isAuthor()) {
@@ -306,7 +328,7 @@ public class ContestRecruitmentDetailFragment extends Fragment implements Commen
             @Override
             public void onResponse(@NonNull Call<List<Application>> call, @NonNull Response<List<Application>> response) {
                 if (binding == null) return; // Fragment가 destroy된 경우 처리하지 않음
-                
+
                 if (response.isSuccessful() && response.body() != null) {
                     boolean hasApplied = response.body().stream()
                             .anyMatch(application -> application.getUserId().equals(currentUserId));
@@ -327,7 +349,7 @@ public class ContestRecruitmentDetailFragment extends Fragment implements Commen
 
     private void updateUiBasedOnRole(UserRole role) {
         if (binding == null) {
-            return; 
+            return;
         }
 
         switch (role) {
@@ -356,15 +378,13 @@ public class ContestRecruitmentDetailFragment extends Fragment implements Commen
 
     private void setupAuthorButtons() {
         if (binding == null) {
-            return; 
+            return;
         }
 
         binding.tvViewApplicants.setOnClickListener(v -> {
             navigateToFragment(ApplicantListFragment.newInstance(recruitmentPostId));
         });
 
-        // ▼▼▼ 수정된 부분 ▼▼▼
-        // 수정 버튼의 클릭 리스너를 수정 화면 이동 기능으로 설정
         binding.fabEdit.setOnClickListener(v -> {
             if (currentPost != null && currentContest != null) {
                 navigateToFragment(RecruitmentPostFragment.newInstanceForEdit(
@@ -380,11 +400,9 @@ public class ContestRecruitmentDetailFragment extends Fragment implements Commen
             }
         });
 
-        // 삭제 버튼의 클릭 리스너를 삭제 확인 다이얼로그 호출로 설정
         binding.fabDelete.setOnClickListener(v -> {
             showDeletePostConfirmationDialog();
         });
-        // ▲▲▲ 수정된 부분 ▲▲▲
     }
 
     private void navigateToFragment(Fragment fragment) {
@@ -415,7 +433,7 @@ public class ContestRecruitmentDetailFragment extends Fragment implements Commen
                 @Override
                 public void onResponse(@NonNull Call<ApplicationResponse> call, @NonNull Response<ApplicationResponse> response) {
                     if (binding == null) return; // Fragment가 destroy된 경우 처리하지 않음
-                    
+
                     if (response.isSuccessful()) {
                         Toast.makeText(getContext(), "지원이 완료되었습니다.", Toast.LENGTH_LONG).show();
                         dialog.dismiss();
@@ -456,7 +474,7 @@ public class ContestRecruitmentDetailFragment extends Fragment implements Commen
             @Override
             public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
                 if (binding == null) return; // Fragment가 destroy된 경우 처리하지 않음
-                
+
                 if (response.isSuccessful()) {
                     Toast.makeText(getContext(), "게시글이 삭제되었습니다.", Toast.LENGTH_SHORT).show();
                     if (getActivity() != null) {
@@ -507,7 +525,7 @@ public class ContestRecruitmentDetailFragment extends Fragment implements Commen
             @Override
             public void onResponse(@NonNull Call<CommentResponse> call, @NonNull Response<CommentResponse> response) {
                 if (binding == null) return; // Fragment가 destroy된 경우 처리하지 않음
-                
+
                 if (response.isSuccessful()) {
                     Toast.makeText(getContext(), "댓글이 수정되었습니다.", Toast.LENGTH_SHORT).show();
                     loadComments();
@@ -541,7 +559,7 @@ public class ContestRecruitmentDetailFragment extends Fragment implements Commen
             @Override
             public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
                 if (binding == null) return; // Fragment가 destroy된 경우 처리하지 않음
-                
+
                 if (response.isSuccessful()) {
                     Toast.makeText(getContext(), "댓글이 삭제되었습니다.", Toast.LENGTH_SHORT).show();
                     loadComments();

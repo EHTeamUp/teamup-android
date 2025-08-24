@@ -255,6 +255,21 @@
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 tools:listitem="@layout/item_comment"
                 tools:itemCount="5"/>
+            <!-- ▼▼▼ 이 TextView를 추가해주세요 ▼▼▼ -->
+            <TextView
+                android:id="@+id/tv_no_comments"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="아직 댓글이 없습니다."
+                android:gravity="center"
+                android:padding="24dp"
+                android:textSize="16sp"
+                android:textColor="@color/light_gray"
+                android:visibility="gone"
+                app:layout_constraintTop_toTopOf="@id/rv_comments"
+                app:layout_constraintBottom_toBottomOf="@id/rv_comments"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
