@@ -15,8 +15,8 @@ public class Experience {
     @SerializedName("host_organization")
     private String hostOrganization;
     
-    @SerializedName("award_name")
-    private String awardName;
+    @SerializedName("award_status")
+    private int awardStatus;
     
     @SerializedName("description")
     private String description;
@@ -28,11 +28,11 @@ public class Experience {
         // 기본 생성자
     }
     
-    public Experience(String contestName, String awardDate, String hostOrganization, String awardName, String description) {
+    public Experience(String contestName, String awardDate, String hostOrganization, int awardStatus, String description) {
         this.contestName = contestName;
         this.awardDate = awardDate;
         this.hostOrganization = hostOrganization;
-        this.awardName = awardName;
+        this.awardStatus = awardStatus;
         this.description = description;
         this.filterId = 1; // 기본값 설정
     }
@@ -61,12 +61,12 @@ public class Experience {
         this.hostOrganization = hostOrganization;
     }
     
-    public String getAwardName() {
-        return awardName;
+    public int getAwardStatus() {
+        return awardStatus;
     }
     
-    public void setAwardName(String awardName) {
-        this.awardName = awardName;
+    public void setAwardStatus(int awardStatus) {
+        this.awardStatus = awardStatus;
     }
     
     public String getDescription() {
@@ -91,7 +91,7 @@ public class Experience {
                 "contestName='" + contestName + '\'' +
                 ", awardDate='" + awardDate + '\'' +
                 ", hostOrganization='" + hostOrganization + '\'' +
-                ", awardName='" + awardName + '\'' +
+                ", awardStatus=" + awardStatus +
                 ", description='" + description + '\'' +
                 ", filterId=" + filterId +
                 '}';

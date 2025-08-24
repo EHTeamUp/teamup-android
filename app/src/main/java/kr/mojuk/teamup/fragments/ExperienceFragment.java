@@ -245,7 +245,7 @@ public class ExperienceFragment extends Fragment {
         
         // 기존 데이터가 있으면 폼에 채우기
         if (experience != null) {
-            etContestName.setText(experience.getAwardName());
+            etContestName.setText(experience.getContestName());
             
             // 카테고리 설정
             String category = experience.getHostOrganization();
@@ -257,7 +257,7 @@ public class ExperienceFragment extends Fragment {
             }
             
             etDate.setText(experience.getAwardDate());
-            cbAwardReceived.setChecked(true); // 수상 경험이므로 체크
+            cbAwardReceived.setChecked(experience.getAwardStatus() == 1); // award_status가 1이면 체크
             etDescription.setText(experience.getDescription());
         }
         
@@ -442,7 +442,7 @@ public class ExperienceFragment extends Fragment {
                 // 모든 필수 필드가 입력된 경우에만 추가
                 Experience experience = new Experience();
                 experience.setContestName(contestName);  // contest_name 필드
-                experience.setAwardName(contestName);     // award_name 필드 (동일한 값)
+                experience.setAwardStatus(cbAwardReceived.isChecked() ? 1 : 0);  // award_status 필드 (수상 여부)
                 experience.setHostOrganization(category); // host_organization 필드
                 experience.setAwardDate(date);           // award_date 필드
                 experience.setDescription(description);   // description 필드
@@ -539,7 +539,7 @@ public class ExperienceFragment extends Fragment {
                 
                 Experience experience = new Experience();
                 experience.setContestName(contestName);  // contest_name 필드에 설정
-                experience.setAwardName(contestName);    // award_name 필드에도 동일한 값 설정
+                experience.setAwardStatus(cbAwardReceived.isChecked() ? 1 : 0);  // award_status 필드 (수상 여부)
                 experience.setHostOrganization(category);
                 experience.setAwardDate(date);
                 experience.setDescription(description);

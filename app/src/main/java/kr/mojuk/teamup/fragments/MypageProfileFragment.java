@@ -570,7 +570,7 @@ public class MypageProfileFragment extends Fragment {
             
             if (i == 0) {
                 // 첫 번째 경험만 표시
-                result.append(experience.getAwardName());
+                result.append(experience.getContestName());
             } else {
                 // 2개 이상이면 첫 번째 + "등"
                 result.append(" 등");

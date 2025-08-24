@@ -98,7 +98,6 @@ public class SynergyAnalysisResponse {
     public static class Experience {
         private String contest_name;
         private int award_status;
-        private String award_name;
 
         public String getContestName() {
             return contest_name;
@@ -114,14 +113,6 @@ public class SynergyAnalysisResponse {
 
         public void setAwardStatus(int award_status) {
             this.award_status = award_status;
-        }
-
-        public String getAwardName() {
-            return award_name;
-        }
-
-        public void setAwardName(String award_name) {
-            this.award_name = award_name;
         }
     }
 
