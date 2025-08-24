@@ -14,6 +14,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
+
+import kr.mojuk.teamup.MainActivity;
 import kr.mojuk.teamup.R;
 import kr.mojuk.teamup.api.ApiService;
 import kr.mojuk.teamup.api.RetrofitClient;
@@ -80,6 +82,10 @@ public class ContestInformationDetailFragment extends Fragment {
         if (binding != null) {
             binding.btnBackTitle.setOnClickListener(v -> {
                 if (getActivity() != null) {
+                    // 뒤로가기 시 공모전 탭으로 네비게이션 상태 복원
+                    if (getActivity() instanceof MainActivity) {
+                        ((MainActivity) getActivity()).setBottomNavigationItem(R.id.navigation_contest);
+                    }
                     getActivity().getSupportFragmentManager().popBackStack();
                 }
             });
