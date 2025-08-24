@@ -69,9 +69,9 @@ public class MainActivity extends AppCompatActivity implements ExperienceFragmen
             return insets;
         });
       
-        // FCM 토큰 매니저 초기화 및 토큰 상태 확인 (Firebase 초기화 문제로 임시 비활성화)
-        // FcmTokenManager fcmTokenManager = FcmTokenManager.getInstance(this);
-        // fcmTokenManager.initializeTokenOnAppStart();
+        // FCM 토큰 매니저 초기화 및 토큰 상태 확인
+        FcmTokenManager fcmTokenManager = FcmTokenManager.getInstance(this);
+        fcmTokenManager.initializeTokenOnAppStart();
 
         // 알림 권한 요청
         NotificationPermissionHelper.requestNotificationPermission(this);

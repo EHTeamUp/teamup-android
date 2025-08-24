@@ -341,6 +341,7 @@ public class PersonalityTestQuestionFragment extends Fragment implements Persona
                                 Gson gson = new Gson();
                                 String traitsJson = gson.toJson(profile.getTraits());
                                 args.putString("personalityTraitsJson", traitsJson);
+                                args.putBoolean("isFromSignup", false); // 일반적인 경우
                                 resultFragment.setArguments(args);
                                
                                if (getActivity() instanceof MainActivity) {
@@ -409,6 +410,8 @@ public class PersonalityTestQuestionFragment extends Fragment implements Persona
                         if (response.isSuccessful() && response.body() != null) {
                             StepResponse result = response.body();
                             Log.d(TAG, "회원가입 4단계 완료 성공: " + result.getMessage());
+                            Log.d(TAG, "성향 프로필 코드: " + profile.getProfileCode());
+                            Log.d(TAG, "답변 개수: " + answers.size());
                             
                             // 4단계 완료 후 SignupTestBaseActivity로 결과 전달
                             if (getActivity() instanceof SignupTestBaseActivity) {

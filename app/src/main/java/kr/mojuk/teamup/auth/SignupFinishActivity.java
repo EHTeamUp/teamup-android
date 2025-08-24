@@ -37,8 +37,10 @@ public class SignupFinishActivity extends AppCompatActivity {
 
         initViews();
         
-        // 회원가입 완료 API 호출
-        completeRegistration();
+        // 회원가입 완료 API 호출 (성향 프로필 생성 시간 확보를 위해 지연)
+        new android.os.Handler().postDelayed(() -> {
+            completeRegistration();
+        }, 1000); // 1초 대기
     }
 
     private void initViews() {
@@ -58,11 +60,14 @@ public class SignupFinishActivity extends AppCompatActivity {
         });
     }
     
+    private int retryCount = 0;
+    private static final int MAX_RETRY_COUNT = 3;
+    
     /**
      * 회원가입 완료 API 호출
      */
     private void completeRegistration() {
-        Log.d(TAG, "회원가입 완료 API 호출: userId=" + userId);
+        Log.d(TAG, "회원가입 완료 API 호출: userId=" + userId + " (시도 " + (retryCount + 1) + "/" + MAX_RETRY_COUNT + ")");
         
         RetrofitClient.getInstance()
                 .getApiService()
@@ -76,17 +81,32 @@ public class SignupFinishActivity extends AppCompatActivity {
                             Toast.makeText(SignupFinishActivity.this, "회원가입이 완료되었습니다!", Toast.LENGTH_SHORT).show();
                         } else {
                             Log.e(TAG, "회원가입 완료 실패 - HTTP " + response.code());
-                            String errorMessage = "회원가입 완료 처리 중 오류가 발생했습니다.";
+                            String errorMessage = "";
                             if (response.errorBody() != null) {
                                 try {
                                     String errorBody = response.errorBody().string();
                                     Log.e(TAG, "오류 응답: " + errorBody);
-                                    errorMessage += " (" + errorBody + ")";
+                                    errorMessage = errorBody;
                                 } catch (Exception e) {
                                     Log.e(TAG, "오류 응답 읽기 실패", e);
                                 }
                             }
-                            Toast.makeText(SignupFinishActivity.this, errorMessage, Toast.LENGTH_LONG).show();
+                            
+                            // "No matching personality profile found" 오류 시 재시도
+                            if (errorMessage.contains("No matching personality profile found") && retryCount < MAX_RETRY_COUNT) {
+                                retryCount++;
+                                Log.d(TAG, "성향 프로필 생성 대기 중... " + (retryCount * 2) + "초 후 재시도");
+                                
+                                new android.os.Handler().postDelayed(() -> {
+                                    completeRegistration();
+                                }, retryCount * 2000); // 2초, 4초, 6초 후 재시도
+                            } else {
+                                String finalErrorMessage = "회원가입 완료 처리 중 오류가 발생했습니다.";
+                                if (!errorMessage.isEmpty()) {
+                                    finalErrorMessage += " (" + errorMessage + ")";
+                                }
+                                Toast.makeText(SignupFinishActivity.this, finalErrorMessage, Toast.LENGTH_LONG).show();
+                            }
                         }
                     }
 

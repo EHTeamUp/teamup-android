@@ -703,6 +703,7 @@ public class MypageProfileFragment extends Fragment {
                             Bundle args = new Bundle();
                             args.putString("personalityType", profile.getProfileCode());
                             args.putSerializable("personalityTraits", profile.getTraitsJson());
+                            args.putBoolean("isFromSignup", false); // 마이페이지에서 호출됨을 명시
                             resultFragment.setArguments(args);
                             
                             if (getActivity() instanceof MainActivity) {

@@ -5,9 +5,8 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:background="#F5F5F5"
-    android:padding="16dp">
-
-    <!-- 섹션 헤더 (제목 + 삭제 버튼) -->
+    android:padding="16dp"
+    >
 
     <!-- 공모전명 입력 필드 -->
     <LinearLayout
@@ -15,7 +14,8 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:layout_marginBottom="4dp">
+        android:layout_marginBottom="4dp"
+        >
 
         <TextView
             android:layout_width="0dp"
@@ -116,7 +116,7 @@
         android:layout_marginBottom="16dp" />
 
     <!-- 수상 경력 및 공모전 활동 추가 버튼 -->
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_add_experience_form"
         android:layout_width="match_parent"
         android:layout_height="48dp"
@@ -124,6 +124,7 @@
         android:textSize="16sp"
         android:textColor="@android:color/white"
         android:backgroundTint="@color/black"
+        app:cornerRadius="8dp"
         android:layout_marginTop="16dp" />
 
 </LinearLayout>
