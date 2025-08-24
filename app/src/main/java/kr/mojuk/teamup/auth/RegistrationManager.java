@@ -117,12 +117,50 @@ public class RegistrationManager {
     }
     
     /**
+     * 커스텀 스킬 데이터 저장
+     */
+    public void saveCustomSkills(List<String> customSkills) {
+        this.savedCustomSkills.clear();
+        if (customSkills != null) {
+            this.savedCustomSkills.addAll(customSkills);
+        }
+        Log.d(TAG, "커스텀 스킬 데이터 저장: " + savedCustomSkills.size() + "개");
+    }
+    
+    /**
+     * 커스텀 역할 데이터 저장
+     */
+    public void saveCustomRoles(List<String> customRoles) {
+        this.savedCustomRoles.clear();
+        if (customRoles != null) {
+            this.savedCustomRoles.addAll(customRoles);
+        }
+        Log.d(TAG, "커스텀 역할 데이터 저장: " + savedCustomRoles.size() + "개");
+    }
+    
+    /**
+     * 저장된 커스텀 스킬 데이터 반환
+     */
+    public List<String> getSavedCustomSkills() {
+        return new ArrayList<>(savedCustomSkills);
+    }
+    
+    /**
+     * 저장된 커스텀 역할 데이터 반환
+     */
+    public List<String> getSavedCustomRoles() {
+        return new ArrayList<>(savedCustomRoles);
+    }
+    
+    /**
      * 모든 저장된 데이터 초기화
      */
     public void clearSavedData() {
         savedSkills.clear();
         savedRoles.clear();
         savedExperiences.clear();
+        savedCustomSkills.clear();
+        savedCustomRoles.clear();
         Log.d(TAG, "저장된 회원가입 데이터 초기화 완료");
     }
     

@@ -147,6 +147,8 @@ public class MypageInterestFragment extends Fragment {
             loadUserSkillsAndRoles(); // 마이페이지: 사용자 기존 데이터 로드
         } else {
             loadSkillsAndRoles(); // 회원가입: 전체 스킬/역할 로드
+            // 저장된 데이터 복원
+            restoreSavedData();
         }
     }
 
@@ -562,8 +564,8 @@ public class MypageInterestFragment extends Fragment {
                 chip.setText(skill.getName());
                 chip.setTag(skill.getSkillId());
                 
-                // 마이페이지 모드에서 선택 상태 표시
-                if (SOURCE_MYPAGE.equals(source) && selectedSkillIds.contains(skill.getSkillId())) {
+                // 선택 상태 표시 (마이페이지 모드 또는 회원가입 모드에서 저장된 데이터가 있는 경우)
+                if (selectedSkillIds.contains(skill.getSkillId())) {
                     chip.setChecked(true);
                 }
             } else if (item instanceof String) {
@@ -571,8 +573,8 @@ public class MypageInterestFragment extends Fragment {
                 chip.setText(customSkill);
                 chip.setTag("custom_" + customSkill);
                 
-                // 마이페이지 모드에서 선택 상태 표시
-                if (SOURCE_MYPAGE.equals(source) && selectedCustomSkills.contains(customSkill)) {
+                // 선택 상태 표시 (마이페이지 모드 또는 회원가입 모드에서 저장된 데이터가 있는 경우)
+                if (selectedCustomSkills.contains(customSkill)) {
                     chip.setChecked(true);
                 }
             }
@@ -626,8 +628,8 @@ public class MypageInterestFragment extends Fragment {
                 chip.setText(role.getName());
                 chip.setTag(role.getRoleId());
                 
-                // 마이페이지 모드에서 선택 상태 표시
-                if (SOURCE_MYPAGE.equals(source) && selectedRoleIds.contains(role.getRoleId())) {
+                // 선택 상태 표시 (마이페이지 모드 또는 회원가입 모드에서 저장된 데이터가 있는 경우)
+                if (selectedRoleIds.contains(role.getRoleId())) {
                     chip.setChecked(true);
                 }
             } else if (item instanceof String) {
@@ -635,8 +637,8 @@ public class MypageInterestFragment extends Fragment {
                 chip.setText(customRole);
                 chip.setTag("custom_" + customRole);
                 
-                // 마이페이지 모드에서 선택 상태 표시
-                if (SOURCE_MYPAGE.equals(source) && selectedCustomRoles.contains(customRole)) {
+                // 선택 상태 표시 (마이페이지 모드 또는 회원가입 모드에서 저장된 데이터가 있는 경우)
+                if (selectedCustomRoles.contains(customRole)) {
                     chip.setChecked(true);
                 }
             }
@@ -718,6 +720,47 @@ public class MypageInterestFragment extends Fragment {
         Log.d(TAG, "updateSkillsPageIndicator: 인디케이터 업데이트 완료, 자식 뷰 개수=" + llSkillsPageIndicator.getChildCount());
     }
 
+    /**
+     * 저장된 데이터 복원
+     */
+    private void restoreSavedData() {
+        // 저장된 스킬 데이터 복원
+        List<Skill> savedSkills = registrationManager.getSavedSkills();
+        List<String> savedCustomSkills = registrationManager.getSavedCustomSkills();
+        
+        // 기존 선택 상태 초기화
+        selectedSkillIds.clear();
+        selectedCustomSkills.clear();
+        
+        // 저장된 스킬 ID 복원
+        for (Skill savedSkill : savedSkills) {
+            selectedSkillIds.add(savedSkill.getSkillId());
+        }
+        
+        // 저장된 커스텀 스킬 복원
+        selectedCustomSkills.addAll(savedCustomSkills);
+        customSkills.addAll(savedCustomSkills);
+        
+        // 저장된 역할 데이터 복원
+        List<Role> savedRoles = registrationManager.getSavedRoles();
+        List<String> savedCustomRoles = registrationManager.getSavedCustomRoles();
+        
+        // 기존 선택 상태 초기화
+        selectedRoleIds.clear();
+        selectedCustomRoles.clear();
+        
+        // 저장된 역할 ID 복원
+        for (Role savedRole : savedRoles) {
+            selectedRoleIds.add(savedRole.getRoleId());
+        }
+        
+        // 저장된 커스텀 역할 복원
+        selectedCustomRoles.addAll(savedCustomRoles);
+        customRoles.addAll(savedCustomRoles);
+        
+        Log.d(TAG, "저장된 데이터 복원 완료: " + selectedSkillIds.size() + "개 스킬, " + selectedCustomSkills.size() + "개 커스텀 스킬, " + selectedRoleIds.size() + "개 역할, " + selectedCustomRoles.size() + "개 커스텀 역할");
+    }
+    
     /**
      * 역할 페이지 인디케이터 업데이트
      */
@@ -1133,5 +1176,31 @@ public class MypageInterestFragment extends Fragment {
 
     public java.util.List<String> getSelectedCustomRoles() {
         return new java.util.ArrayList<>(selectedCustomRoles);
+    }
+    
+    /**
+     * 선택된 스킬 객체들을 반환
+     */
+    public java.util.List<Skill> getSelectedSkills() {
+        java.util.List<Skill> selectedSkills = new java.util.ArrayList<>();
+        for (Skill skill : allSkills) {
+            if (selectedSkillIds.contains(skill.getSkillId())) {
+                selectedSkills.add(skill);
+            }
+        }
+        return selectedSkills;
+    }
+    
+    /**
+     * 선택된 역할 객체들을 반환
+     */
+    public java.util.List<Role> getSelectedRoles() {
+        java.util.List<Role> selectedRoles = new java.util.ArrayList<>();
+        for (Role role : allRoles) {
+            if (selectedRoleIds.contains(role.getRoleId())) {
+                selectedRoles.add(role);
+            }
+        }
+        return selectedRoles;
     }
 }

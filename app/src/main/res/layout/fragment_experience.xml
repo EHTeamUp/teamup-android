@@ -51,8 +51,7 @@
         android:textSize="20sp"
         android:textStyle="bold"
         android:textColor="@android:color/black"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="20dp"/>
+        android:layout_marginTop="16dp" />
 
     <!-- Experience Forms Container -->
     <ScrollView

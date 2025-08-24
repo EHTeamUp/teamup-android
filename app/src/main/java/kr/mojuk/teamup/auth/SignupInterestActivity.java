@@ -77,6 +77,12 @@ public class SignupInterestActivity extends AppCompatActivity {
                 return;
             }
             
+            // 선택된 데이터를 RegistrationManager에 저장
+            registrationManager.saveSkills(interestFragment.getSelectedSkills());
+            registrationManager.saveRoles(interestFragment.getSelectedRoles());
+            registrationManager.saveCustomSkills(interestFragment.getSelectedCustomSkills());
+            registrationManager.saveCustomRoles(interestFragment.getSelectedCustomRoles());
+            
             // 2단계 완료 API 호출
             registrationManager.completeStep2(userId, selectedSkillIds, selectedCustomSkills, selectedRoleIds, selectedCustomRoles, new RegistrationManager.StepCallback() {
                 @Override
