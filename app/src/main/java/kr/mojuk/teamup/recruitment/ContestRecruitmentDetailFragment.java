@@ -248,7 +248,6 @@ public class ContestRecruitmentDetailFragment extends Fragment implements Commen
         });
     }
 
-    // ▼▼▼ 수정된 부분 ▼▼▼
     private void loadComments() {
         apiService.getCommentsByPost(recruitmentPostId).enqueue(new Callback<List<CommentWithReplies>>() {
             @Override
@@ -264,35 +263,14 @@ public class ContestRecruitmentDetailFragment extends Fragment implements Commen
                         }
                     }
                     commentAdapter.notifyDataSetChanged();
-
-                    // 댓글 목록의 상태에 따라 UI 업데이트
-                    if (flatCommentList.isEmpty()) {
-                        // 댓글이 없으면 안내 문구를 보여주고, 댓글 목록은 숨김
-                        binding.rvComments.setVisibility(View.GONE);
-                        binding.tvNoComments.setVisibility(View.VISIBLE);
-                    } else {
-                        // 댓글이 있으면 댓글 목록을 보여주고, 안내 문구는 숨김
-                        binding.rvComments.setVisibility(View.VISIBLE);
-                        binding.tvNoComments.setVisibility(View.GONE);
-                    }
-                } else {
-                    // API 응답이 실패했거나 body가 null인 경우에도 댓글 없음 처리
-                    binding.rvComments.setVisibility(View.GONE);
-                    binding.tvNoComments.setVisibility(View.VISIBLE);
                 }
             }
             @Override
             public void onFailure(@NonNull Call<List<CommentWithReplies>> call, @NonNull Throwable t) {
                 handleApiFailure("getCommentsByPost", t);
-                if (binding != null) {
-                    // 네트워크 오류 발생 시에도 댓글 없음 처리
-                    binding.rvComments.setVisibility(View.GONE);
-                    binding.tvNoComments.setVisibility(View.VISIBLE);
-                }
             }
         });
     }
-    // ▲▲▲ 수정된 부분 ▲▲▲
 
     private void checkUserRole() {
         apiService.checkPostAuthor(recruitmentPostId, currentUserId).enqueue(new Callback<CheckAuthorResponse>() {
@@ -323,19 +301,34 @@ public class ContestRecruitmentDetailFragment extends Fragment implements Commen
         });
     }
 
+    private void setAppliedState() {
+        if (binding == null) return;
+
+        binding.btnApply.setEnabled(false);
+        binding.btnApply.setText("지원 완료");
+
+        // XML 레이아웃의 화살표 이미지뷰 ID가 'ivApplyArrow'라고 가정합니다.
+        // 실제 ID가 다를 경우 이 부분을 수정해주세요.
+         binding.ivApplyArrow.setVisibility(View.GONE);
+
+        // (선택 사항) 지원 완료 시 배경색 등 디자인 변경
+        // if (getContext() != null) {
+        //     binding.btnApplyContainer.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.light_gray));
+        // }
+    }
+
     private void checkApplicationStatus() {
         apiService.getApplicationsByPost(recruitmentPostId).enqueue(new Callback<List<Application>>() {
             @Override
             public void onResponse(@NonNull Call<List<Application>> call, @NonNull Response<List<Application>> response) {
-                if (binding == null) return; // Fragment가 destroy된 경우 처리하지 않음
+                if (binding == null) return;
 
                 if (response.isSuccessful() && response.body() != null) {
                     boolean hasApplied = response.body().stream()
                             .anyMatch(application -> application.getUserId().equals(currentUserId));
 
                     if (hasApplied) {
-                        binding.btnApply.setEnabled(false);
-                        binding.btnApply.setText("지원 완료");
+                        setAppliedState();
                     }
                 }
             }
@@ -432,13 +425,12 @@ public class ContestRecruitmentDetailFragment extends Fragment implements Commen
             apiService.createApplication(dto).enqueue(new Callback<ApplicationResponse>() {
                 @Override
                 public void onResponse(@NonNull Call<ApplicationResponse> call, @NonNull Response<ApplicationResponse> response) {
-                    if (binding == null) return; // Fragment가 destroy된 경우 처리하지 않음
+                    if (binding == null) return;
 
                     if (response.isSuccessful()) {
                         Toast.makeText(getContext(), "지원이 완료되었습니다.", Toast.LENGTH_LONG).show();
                         dialog.dismiss();
-                        binding.btnApply.setEnabled(false);
-                        binding.btnApply.setText("지원 완료");
+                        setAppliedState(); // 헬퍼 메서드 호출
                     } else {
                         handleApiError("지원 실패", response.code());
                     }
@@ -473,7 +465,7 @@ public class ContestRecruitmentDetailFragment extends Fragment implements Commen
         apiService.deleteRecruitmentPost(recruitmentPostId, currentUserId).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
-                if (binding == null) return; // Fragment가 destroy된 경우 처리하지 않음
+                if (binding == null) return;
 
                 if (response.isSuccessful()) {
                     Toast.makeText(getContext(), "게시글이 삭제되었습니다.", Toast.LENGTH_SHORT).show();
@@ -524,7 +516,7 @@ public class ContestRecruitmentDetailFragment extends Fragment implements Commen
         apiService.updateComment(comment.getCommentId(), commentUpdate).enqueue(new Callback<CommentResponse>() {
             @Override
             public void onResponse(@NonNull Call<CommentResponse> call, @NonNull Response<CommentResponse> response) {
-                if (binding == null) return; // Fragment가 destroy된 경우 처리하지 않음
+                if (binding == null) return;
 
                 if (response.isSuccessful()) {
                     Toast.makeText(getContext(), "댓글이 수정되었습니다.", Toast.LENGTH_SHORT).show();
@@ -558,7 +550,7 @@ public class ContestRecruitmentDetailFragment extends Fragment implements Commen
         apiService.deleteComment(commentId).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
-                if (binding == null) return; // Fragment가 destroy된 경우 처리하지 않음
+                if (binding == null) return;
 
                 if (response.isSuccessful()) {
                     Toast.makeText(getContext(), "댓글이 삭제되었습니다.", Toast.LENGTH_SHORT).show();

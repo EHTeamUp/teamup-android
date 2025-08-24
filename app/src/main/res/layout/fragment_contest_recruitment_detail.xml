@@ -74,8 +74,9 @@
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
                 android:padding="16dp"
-                android:background="@drawable/rounded_box_border">
+                android:background="@drawable/mypage_menu_item_background">
                 <ImageView
+                    android:id="@+id/iv_apply_arrow"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:src="@drawable/ic_arrow_left"/>
@@ -146,7 +147,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_marginBottom="8dp"
-                                android:background="@drawable/rounded_box_border"
+                                android:background="@drawable/mypage_menu_item_background"
                                 android:drawableEnd="@drawable/ic_arrow_right"
                                 android:drawablePadding="12dp"
                                 android:gravity="center_vertical"
@@ -183,7 +184,7 @@
                 android:orientation="vertical"
                 android:layout_marginTop="16dp"
                 android:padding="16dp"
-                android:background="@drawable/background_rounded_white_border">
+                android:background="@drawable/edittext_border">
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -207,7 +208,7 @@
                 android:orientation="vertical"
                 android:layout_marginTop="16dp"
                 android:padding="16dp"
-                android:background="@drawable/background_rounded_white_border">
+                android:background="@drawable/edittext_border">
 
                 <TextView
                     android:id="@+id/tv_post_title"
@@ -260,16 +261,16 @@
                 android:id="@+id/tv_no_comments"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="아직 댓글이 없습니다."
                 android:gravity="center"
                 android:padding="24dp"
+                android:text="아직 댓글이 없습니다."
+                android:textColor="#555555"
                 android:textSize="16sp"
-                android:textColor="@color/light_gray"
                 android:visibility="gone"
-                app:layout_constraintTop_toTopOf="@id/rv_comments"
                 app:layout_constraintBottom_toBottomOf="@id/rv_comments"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
+                app:layout_constraintTop_toTopOf="@id/rv_comments" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
