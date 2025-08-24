@@ -252,22 +252,46 @@ public class ContestRecruitmentDetailFragment extends Fragment implements Commen
         apiService.getCommentsByPost(recruitmentPostId).enqueue(new Callback<List<CommentWithReplies>>() {
             @Override
             public void onResponse(@NonNull Call<List<CommentWithReplies>> call, @NonNull Response<List<CommentWithReplies>> response) {
-                if (binding == null) return; // Fragment가 destroy된 경우 처리하지 않음
+                if (binding == null) return; // 프래그먼트가 소멸된 경우
 
                 if (response.isSuccessful() && response.body() != null) {
+                    List<CommentWithReplies> comments = response.body();
                     flatCommentList.clear();
-                    for (CommentWithReplies comment : response.body()) {
-                        flatCommentList.add(comment);
-                        if (comment.getReplies() != null) {
-                            flatCommentList.addAll(comment.getReplies());
+
+                    // ▼▼▼ 추가된 로직 ▼▼▼
+                    if (comments.isEmpty()) {
+                        // 1. 댓글이 없을 경우: 안내 문구 보이기
+                        binding.rvComments.setVisibility(View.GONE);
+                        binding.tvNoComments.setVisibility(View.VISIBLE);
+                    } else {
+                        // 2. 댓글이 있을 경우: 댓글 목록 보이기
+                        binding.rvComments.setVisibility(View.VISIBLE);
+                        binding.tvNoComments.setVisibility(View.GONE);
+
+                        for (CommentWithReplies comment : comments) {
+                            flatCommentList.add(comment);
+                            if (comment.getReplies() != null) {
+                                flatCommentList.addAll(comment.getReplies());
+                            }
                         }
                     }
                     commentAdapter.notifyDataSetChanged();
+                    // ▲▲▲ 추가된 로직 ▲▲▲
+                } else {
+                    // 응답이 실패하거나 body가 null인 경우에도 댓글 없음 처리
+                    binding.rvComments.setVisibility(View.GONE);
+                    binding.tvNoComments.setVisibility(View.VISIBLE);
                 }
             }
+
             @Override
             public void onFailure(@NonNull Call<List<CommentWithReplies>> call, @NonNull Throwable t) {
                 handleApiFailure("getCommentsByPost", t);
+                if (binding != null) {
+                    // 네트워크 오류 시에도 댓글 없음 처리
+                    binding.rvComments.setVisibility(View.GONE);
+                    binding.tvNoComments.setVisibility(View.VISIBLE);
+                }
             }
         });
     }
