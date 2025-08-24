@@ -137,7 +137,12 @@ public class SignupTestBaseActivity extends AppCompatActivity {
      * 성향 테스트 완료 시 호출되는 메서드 (Fragment에서 호출)
      */
     public void onPersonalityTestCompleted(String personalityType, String personalityTraits) {
-        showPersonalityTestResultFragment(personalityType, personalityTraits);
+        // 성향 테스트 완료 후 잠시 대기 (백엔드에서 성향 프로필 생성 시간 확보)
+        Log.d(TAG, "성향 테스트 완료, 2초 후 결과 화면으로 이동");
+        
+        new android.os.Handler().postDelayed(() -> {
+            showPersonalityTestResultFragment(personalityType, personalityTraits);
+        }, 2000); // 2초 대기
     }
     
     /**
@@ -174,6 +179,7 @@ public class SignupTestBaseActivity extends AppCompatActivity {
         Bundle args = new Bundle();
         args.putString("personalityType", personalityType);
         args.putString("personalityTraitsJson", personalityTraits);
+        args.putBoolean("isFromSignup", true); // 회원가입 과정임을 표시
         fragment.setArguments(args);
         
         // Fragment 교체

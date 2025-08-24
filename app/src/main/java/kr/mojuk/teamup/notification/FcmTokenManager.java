@@ -128,21 +128,25 @@ public class FcmTokenManager {
      * 로그인 시 FCM 토큰을 서버에 전송
      */
     public void sendFcmTokenOnLogin() {
-        Log.d(TAG, "로그인 시 FCM 토큰 전송 시작");
-        String currentUserId = tokenManager.getUserId();
-        
-        Log.d(TAG, "현재 사용자 ID: " + currentUserId);
-        Log.d(TAG, "TokenManager 로그인 상태: " + tokenManager.isLoggedIn());
-        
-        String token = getFcmToken();
-        Log.d(TAG, "저장된 FCM 토큰: " + (token != null ? token.substring(0, Math.min(20, token.length())) + "..." : "null"));
-        
-        if (token != null && !token.trim().isEmpty()) {
-            Log.d(TAG, "저장된 토큰으로 서버 업데이트 진행");
-            updateFcmToken(token);
-        } else {
-            Log.d(TAG, "저장된 FCM 토큰 없음, 새로 요청");
-            requestFcmToken();
+        try {
+            Log.d(TAG, "로그인 시 FCM 토큰 전송 시작");
+            String currentUserId = tokenManager.getUserId();
+            
+            Log.d(TAG, "현재 사용자 ID: " + currentUserId);
+            Log.d(TAG, "TokenManager 로그인 상태: " + tokenManager.isLoggedIn());
+            
+            String token = getFcmToken();
+            Log.d(TAG, "저장된 FCM 토큰: " + (token != null ? token.substring(0, Math.min(20, token.length())) + "..." : "null"));
+            
+            if (token != null && !token.trim().isEmpty()) {
+                Log.d(TAG, "저장된 토큰으로 서버 업데이트 진행");
+                updateFcmToken(token);
+            } else {
+                Log.d(TAG, "저장된 FCM 토큰 없음, 새로 요청");
+                requestFcmToken();
+            }
+        } catch (Exception e) {
+            Log.w(TAG, "로그인 시 FCM 토큰 전송 중 오류 발생, 건너뜀: " + e.getMessage());
         }
     }
     
@@ -150,21 +154,34 @@ public class FcmTokenManager {
      * FCM 토큰을 강제로 요청
      */
     public void requestFcmToken() {
-        com.google.firebase.messaging.FirebaseMessaging.getInstance().getToken()
-            .addOnCompleteListener(task -> {
-                if (!task.isSuccessful()) {
-                    Log.w(TAG, "FCM 토큰 가져오기 실패", task.getException());
-                    return;
-                }
+        try {
+            // Firebase가 초기화되었는지 확인
+            com.google.firebase.FirebaseApp app = com.google.firebase.FirebaseApp.getInstance();
+            if (app == null) {
+                Log.w(TAG, "Firebase가 초기화되지 않음, FCM 토큰 요청 건너뜀");
+                return;
+            }
+            
+            com.google.firebase.messaging.FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(task -> {
+                    if (!task.isSuccessful()) {
+                        Log.w(TAG, "FCM 토큰 가져오기 실패", task.getException());
+                        return;
+                    }
 
-                String token = task.getResult();
-                if (token != null && !token.trim().isEmpty()) {
-                    Log.d(TAG, "새 FCM 토큰 요청 성공");
-                    updateFcmToken(token);
-                } else {
-                    Log.w(TAG, "FCM 토큰이 null이거나 빈 값");
-                }
-            });
+                    String token = task.getResult();
+                    if (token != null && !token.trim().isEmpty()) {
+                        Log.d(TAG, "새 FCM 토큰 요청 성공");
+                        updateFcmToken(token);
+                    } else {
+                        Log.w(TAG, "FCM 토큰이 null이거나 빈 값");
+                    }
+                });
+        } catch (IllegalStateException e) {
+            Log.w(TAG, "Firebase 초기화 오류, FCM 토큰 요청 건너뜀: " + e.getMessage());
+        } catch (Exception e) {
+            Log.e(TAG, "FCM 토큰 요청 중 예상치 못한 오류: " + e.getMessage());
+        }
     }
     
     /**
@@ -224,29 +241,33 @@ public class FcmTokenManager {
      * 앱 시작 시 토큰 상태 확인 및 갱신
      */
     public void initializeTokenOnAppStart() {
-        Log.d(TAG, "앱 시작 시 FCM 토큰 상태 확인");
-        
-        // 토큰이 없으면 새로 요청
-        String token = getFcmToken();
-        if (token == null || token.trim().isEmpty()) {
-            Log.d(TAG, "저장된 FCM 토큰 없음, 새로 요청");
-            requestFcmToken();
-            return;
-        }
-        
-        // 토큰이 오래되었으면 갱신
-        if (!isTokenFresh()) {
-            Log.d(TAG, "FCM 토큰이 오래됨, 갱신 필요");
-            requestFcmToken();
-            return;
-        }
-        
-        // 로그인된 상태이고 토큰이 신선하면 서버에 전송
-        if (tokenManager.isLoggedIn()) {
-            Log.d(TAG, "로그인 상태에서 신선한 토큰 확인, 서버 전송");
-            updateFcmToken(token);
-        } else {
-            Log.d(TAG, "로그인되지 않은 상태, 토큰만 로컬 저장");
+        try {
+            Log.d(TAG, "앱 시작 시 FCM 토큰 상태 확인");
+            
+            // 토큰이 없으면 새로 요청
+            String token = getFcmToken();
+            if (token == null || token.trim().isEmpty()) {
+                Log.d(TAG, "저장된 FCM 토큰 없음, 새로 요청");
+                requestFcmToken();
+                return;
+            }
+            
+            // 토큰이 오래되었으면 갱신
+            if (!isTokenFresh()) {
+                Log.d(TAG, "FCM 토큰이 오래됨, 갱신 필요");
+                requestFcmToken();
+                return;
+            }
+            
+            // 로그인된 상태이고 토큰이 신선하면 서버에 전송
+            if (tokenManager.isLoggedIn()) {
+                Log.d(TAG, "로그인 상태에서 신선한 토큰 확인, 서버 전송");
+                updateFcmToken(token);
+            } else {
+                Log.d(TAG, "로그인되지 않은 상태, 토큰만 로컬 저장");
+            }
+        } catch (Exception e) {
+            Log.w(TAG, "앱 시작 시 FCM 토큰 초기화 중 오류 발생, 건너뜀: " + e.getMessage());
         }
     }
 }

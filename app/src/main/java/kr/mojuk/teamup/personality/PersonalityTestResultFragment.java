@@ -20,6 +20,7 @@ public class PersonalityTestResultFragment extends Fragment {
     private String personalityType;
     private PersonalityTraits personalityTraits;
     private String personalityTraitsJson;
+    private boolean isFromSignup = false; // 회원가입 과정에서 호출되었는지 여부
 
     @Nullable
     @Override
@@ -37,10 +38,12 @@ public class PersonalityTestResultFragment extends Fragment {
             personalityType = args.getString("personalityType", "CAREFUL_SUPPORTER");
             personalityTraits = (PersonalityTraits) args.getSerializable("personalityTraits");
             personalityTraitsJson = args.getString("personalityTraitsJson", "");
+            isFromSignup = args.getBoolean("isFromSignup", false); // 회원가입 과정 여부
         } else {
             personalityType = "CAREFUL_SUPPORTER"; // 기본값
             personalityTraits = null;
             personalityTraitsJson = "";
+            isFromSignup = false;
         }
 
         // 결과 표시
@@ -48,6 +51,9 @@ public class PersonalityTestResultFragment extends Fragment {
         
         // 뒤로가기 버튼 설정
         setupBackButton(view);
+        
+        // 회원가입 과정이면 "테스트 다시 하기" 버튼 숨기기
+        setupRetakeButton(view);
     }
 
     private void displayPersonalityResult(View view) {
@@ -145,5 +151,16 @@ public class PersonalityTestResultFragment extends Fragment {
                 }
             }
         });
+    }
+    
+    private void setupRetakeButton(View view) {
+        com.google.android.material.button.MaterialButton btnEdit = view.findViewById(R.id.btn_edit);
+        
+        if (isFromSignup) {
+            // 회원가입 과정이면 버튼 숨기기
+            btnEdit.setVisibility(View.GONE);
+        } else {
+            
+        }
     }
 }

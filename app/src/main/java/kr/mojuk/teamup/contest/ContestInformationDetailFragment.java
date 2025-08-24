@@ -14,6 +14,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
+
+import kr.mojuk.teamup.MainActivity;
 import kr.mojuk.teamup.R;
 import kr.mojuk.teamup.api.ApiService;
 import kr.mojuk.teamup.api.RetrofitClient;
@@ -84,7 +86,6 @@ public class ContestInformationDetailFragment extends Fragment {
         });
     }
 
-    // ▼▼▼ 수정된 부분 ▼▼▼
     private void showLoading(boolean isLoading) {
         if (binding == null) return;
         if (isLoading) {
@@ -93,16 +94,16 @@ public class ContestInformationDetailFragment extends Fragment {
         } else {
             binding.progressBar.setVisibility(View.GONE);
             binding.scrollView.setVisibility(View.VISIBLE);
+
         }
     }
-    // ▲▲▲ 수정된 부분 ▲▲▲
 
     private void loadContestDetailsFromApi(int contestId) {
-        showLoading(true); // ▼▼▼ 수정된 부분 ▼▼▼
+        showLoading(true); 
         apiService.getContestDetail(contestId).enqueue(new Callback<ContestInformation>() {
             @Override
             public void onResponse(@NonNull Call<ContestInformation> call, @NonNull Response<ContestInformation> response) {
-                showLoading(false); // ▼▼▼ 수정된 부분 ▼▼▼
+                showLoading(false); 
                 if (response.isSuccessful() && response.body() != null) {
                     ContestInformation contestDetail = response.body();
 
@@ -126,7 +127,7 @@ public class ContestInformationDetailFragment extends Fragment {
 
             @Override
             public void onFailure(@NonNull Call<ContestInformation> call, @NonNull Throwable t) {
-                showLoading(false); // ▼▼▼ 수정된 부분 ▼▼▼
+                showLoading(false); 
                 Log.e("ContestDetailFragment", "API Call Failed: " + t.getMessage());
                 Toast.makeText(getContext(), "네트워크 오류가 발생했습니다.", Toast.LENGTH_SHORT).show();
             }

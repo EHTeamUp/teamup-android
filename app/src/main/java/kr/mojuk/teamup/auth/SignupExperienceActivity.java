@@ -17,6 +17,7 @@ import kr.mojuk.teamup.api.model.StepResponse;
 import kr.mojuk.teamup.fragments.ExperienceFragment;
 
 import java.util.List;
+import java.util.ArrayList;
 
 public class SignupExperienceActivity extends AppCompatActivity implements ExperienceFragment.ExperienceFragmentListener {
     
@@ -64,11 +65,6 @@ public class SignupExperienceActivity extends AppCompatActivity implements Exper
         btnNext.setText("Skip");
     }
 
-    // 이 메서드는 ExperienceFragment에서 처리하므로 제거
-
-    // 이 메서드는 ExperienceFragment에서 처리하므로 제거
-    
-    // 이 메서드들은 ExperienceFragment에서 처리하므로 제거
     
     private void handleNextButtonClick() {
         // ExperienceFragment에서 선택된 경험들 확인
@@ -143,27 +139,43 @@ public class SignupExperienceActivity extends AppCompatActivity implements Exper
     }
     
     private void goToFinishStep() {
-        Intent intent = new Intent(SignupExperienceActivity.this, SignupTestBaseActivity.class);
-        intent.putExtra("userId", userId);
-        startActivity(intent);
+        // 경험 입력 스킵 시 빈 경험 데이터로 Step3 완료 처리
+        List<Experience> emptyExperiences = new ArrayList<>();
+        
+        registrationManager.completeStep3(userId, emptyExperiences, new RegistrationManager.StepCallback() {
+            @Override
+            public void onSuccess(StepResponse response) {
+                runOnUiThread(() -> {
+                    // 빈 경험 데이터로 Step3 완료 후 다음 단계로 이동
+                    Intent intent = new Intent(SignupExperienceActivity.this, SignupTestBaseActivity.class);
+                    intent.putExtra("userId", userId);
+                    startActivity(intent);
+                });
+            }
+
+            @Override
+            public void onError(String error) {
+                runOnUiThread(() -> {
+                    Toast.makeText(SignupExperienceActivity.this, "경험 등록 중 오류가 발생했습니다: " + error, Toast.LENGTH_SHORT).show();
+                });
+            }
+        });
     }
 
     private void proceedToNextStep() {
         // ExperienceFragment에서 선택된 경험들 가져오기
         List<Experience> selectedExperiences = experienceFragment.getSelectedExperiences();
         
-        // Step 3 등록 - API 호출
-        if (selectedExperiences.isEmpty()) {
-            // 경험이 없으면 바로 finish로
-            goToFinishStep();
-            return;
-        }
-        
+        // Step 3 등록 - API 호출 (경험이 없어도 빈 배열로 전송)
         registrationManager.completeStep3(userId, selectedExperiences, new RegistrationManager.StepCallback() {
             @Override
             public void onSuccess(StepResponse response) {
                 runOnUiThread(() -> {
-                    Toast.makeText(SignupExperienceActivity.this, "경험 등록이 완료되었습니다.", Toast.LENGTH_SHORT).show();
+                    if (selectedExperiences.isEmpty()) {
+                        Toast.makeText(SignupExperienceActivity.this, "경험 입력을 건너뛰었습니다.", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(SignupExperienceActivity.this, "경험 등록이 완료되었습니다.", Toast.LENGTH_SHORT).show();
+                    }
                     
                     // 다음 단계로 이동 (성향 테스트)
                     Intent intent = new Intent(SignupExperienceActivity.this, SignupTestBaseActivity.class);
@@ -204,10 +216,10 @@ public class SignupExperienceActivity extends AppCompatActivity implements Exper
         runOnUiThread(() -> {
             if (hasContent) {
                 // form에 내용이 있으면 Next 버튼으로 변경
-                btnNext.setText("Next");
+                btnNext.setText("Next →");
             } else {
                 // form에 내용이 없으면 Skip 버튼으로 변경
-                btnNext.setText("Skip");
+                btnNext.setText("Skip →");
             }
         });
     }
