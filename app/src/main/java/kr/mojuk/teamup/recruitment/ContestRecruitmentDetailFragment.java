@@ -35,6 +35,7 @@ import kr.mojuk.teamup.applicant.ApplicantListFragment;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -57,6 +58,11 @@ public class ContestRecruitmentDetailFragment extends Fragment implements Commen
     private CommentResponse replyToComment = null;
 
     private enum UserRole { AUTHOR, MEMBER, APPLICANT }
+
+    // ▼▼▼ 수정된 부분 ▼▼▼
+    // 여러 비동기 호출을 추적하기 위한 카운터
+    private AtomicInteger loadingCounter;
+    // ▲▲▲ 수정된 부분 ▲▲▲
 
     public static ContestRecruitmentDetailFragment newInstance(int recruitmentPostId) {
         ContestRecruitmentDetailFragment fragment = new ContestRecruitmentDetailFragment();
@@ -95,8 +101,7 @@ public class ContestRecruitmentDetailFragment extends Fragment implements Commen
         apiService = RetrofitClient.getInstance().getApiService();
         setupRecyclerViews();
         setupCommentInput();
-        loadInitialRecruitmentPost();
-        checkApplicationStatus();
+        loadAllData(); // ▼▼▼ 수정된 부분 ▼▼▼
 
         binding.llContestTitleBar.setOnClickListener(v -> {
             if (getActivity() != null) {
@@ -104,6 +109,39 @@ public class ContestRecruitmentDetailFragment extends Fragment implements Commen
             }
         });
     }
+
+    // ▼▼▼ 수정된 부분 ▼▼▼
+    private void showLoading(boolean isLoading) {
+        if (binding == null) return;
+        if (isLoading) {
+            binding.progressBar.setVisibility(View.VISIBLE);
+            binding.svContent.setVisibility(View.GONE);
+            binding.llCommentInput.setVisibility(View.GONE);
+        } else {
+            binding.progressBar.setVisibility(View.GONE);
+            binding.svContent.setVisibility(View.VISIBLE);
+            binding.llCommentInput.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void checkAllDataLoaded() {
+        if (loadingCounter.decrementAndGet() == 0) {
+            if(getActivity() != null) {
+                getActivity().runOnUiThread(() -> showLoading(false));
+            }
+        }
+    }
+
+    private void loadAllData() {
+        showLoading(true);
+        loadingCounter = new AtomicInteger(4); // 4개의 API 호출을 기다림
+
+        loadInitialRecruitmentPost();
+        loadComments();
+        checkApplicationStatus();
+        checkUserRole(); // checkUserRole은 내부적으로 API를 호출하므로 카운트 포함
+    }
+    // ▲▲▲ 수정된 부분 ▲▲▲
 
     private void setupRecyclerViews() {
         teamMemberAdapter = new TeamMemberAdapter();
@@ -139,7 +177,7 @@ public class ContestRecruitmentDetailFragment extends Fragment implements Commen
                     if (response.isSuccessful()) {
                         Toast.makeText(getContext(), "댓글이 등록되었습니다.", Toast.LENGTH_SHORT).show();
                         resetCommentInput();
-                        loadComments();
+                        loadComments(); // 댓글만 다시 로드
                     } else {
                         handleApiError("댓글 등록 실패", response.code());
                     }
@@ -171,18 +209,19 @@ public class ContestRecruitmentDetailFragment extends Fragment implements Commen
                         binding.tvPostContent.setText(currentPost.getContent());
                     }
 
+                    // 연관된 데이터 로딩 시작
                     loadContestDetails(currentPost.getContestId());
                     loadTeamMembersAndCheckRole(currentPost.getRecruitmentCount());
-                    loadComments();
-                    checkUserRole();
                 } else {
                     handleApiError("게시글 정보 로딩 실패", response.code());
+                    checkAllDataLoaded(); // 실패해도 카운트 감소
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<RecruitmentPostResponse> call, @NonNull Throwable t) {
                 handleApiFailure("getRecruitmentPost", t);
+                checkAllDataLoaded(); // 실패해도 카운트 감소
             }
         });
     }
@@ -191,7 +230,7 @@ public class ContestRecruitmentDetailFragment extends Fragment implements Commen
         apiService.getContestDetail(contestId).enqueue(new Callback<ContestInformation>() {
             @Override
             public void onResponse(@NonNull Call<ContestInformation> call, @NonNull Response<ContestInformation> response) {
-                if (binding == null) return; // Fragment가 destroy된 경우 처리하지 않음
+                if (binding == null) return;
 
                 if (response.isSuccessful() && response.body() != null) {
                     currentContest = response.body();
@@ -216,10 +255,12 @@ public class ContestRecruitmentDetailFragment extends Fragment implements Commen
 
                     }
                 }
+                checkAllDataLoaded(); // ▼▼▼ 수정된 부분 ▼▼▼
             }
             @Override
             public void onFailure(@NonNull Call<ContestInformation> call, @NonNull Throwable t) {
                 handleApiFailure("getContestDetail", t);
+                checkAllDataLoaded(); // ▼▼▼ 수정된 부분 ▼▼▼
             }
         });
     }
@@ -237,9 +278,8 @@ public class ContestRecruitmentDetailFragment extends Fragment implements Commen
                         String memberCountText = String.format(Locale.getDefault(), "팀원 (%d / %d)", currentMembersCount, totalRecruitmentCount);
                         binding.teamMemberCount.setText(memberCountText);
                     }
-
-                    checkUserRole();
                 }
+                // checkUserRole(); // 역할 확인은 별도 API 호출에서 처리
             }
             @Override
             public void onFailure(@NonNull Call<List<ApplicationResponse>> call, @NonNull Throwable t) {
@@ -252,19 +292,16 @@ public class ContestRecruitmentDetailFragment extends Fragment implements Commen
         apiService.getCommentsByPost(recruitmentPostId).enqueue(new Callback<List<CommentWithReplies>>() {
             @Override
             public void onResponse(@NonNull Call<List<CommentWithReplies>> call, @NonNull Response<List<CommentWithReplies>> response) {
-                if (binding == null) return; // 프래그먼트가 소멸된 경우
+                if (binding == null) return;
 
                 if (response.isSuccessful() && response.body() != null) {
                     List<CommentWithReplies> comments = response.body();
                     flatCommentList.clear();
 
-                    // ▼▼▼ 추가된 로직 ▼▼▼
                     if (comments.isEmpty()) {
-                        // 1. 댓글이 없을 경우: 안내 문구 보이기
                         binding.rvComments.setVisibility(View.GONE);
                         binding.tvNoComments.setVisibility(View.VISIBLE);
                     } else {
-                        // 2. 댓글이 있을 경우: 댓글 목록 보이기
                         binding.rvComments.setVisibility(View.VISIBLE);
                         binding.tvNoComments.setVisibility(View.GONE);
 
@@ -276,22 +313,21 @@ public class ContestRecruitmentDetailFragment extends Fragment implements Commen
                         }
                     }
                     commentAdapter.notifyDataSetChanged();
-                    // ▲▲▲ 추가된 로직 ▲▲▲
                 } else {
-                    // 응답이 실패하거나 body가 null인 경우에도 댓글 없음 처리
                     binding.rvComments.setVisibility(View.GONE);
                     binding.tvNoComments.setVisibility(View.VISIBLE);
                 }
+                checkAllDataLoaded(); // ▼▼▼ 수정된 부분 ▼▼▼
             }
 
             @Override
             public void onFailure(@NonNull Call<List<CommentWithReplies>> call, @NonNull Throwable t) {
                 handleApiFailure("getCommentsByPost", t);
                 if (binding != null) {
-                    // 네트워크 오류 시에도 댓글 없음 처리
                     binding.rvComments.setVisibility(View.GONE);
                     binding.tvNoComments.setVisibility(View.VISIBLE);
                 }
+                checkAllDataLoaded(); // ▼▼▼ 수정된 부분 ▼▼▼
             }
         });
     }
@@ -300,7 +336,7 @@ public class ContestRecruitmentDetailFragment extends Fragment implements Commen
         apiService.checkPostAuthor(recruitmentPostId, currentUserId).enqueue(new Callback<CheckAuthorResponse>() {
             @Override
             public void onResponse(@NonNull Call<CheckAuthorResponse> call, @NonNull Response<CheckAuthorResponse> response) {
-                if (binding == null) return; // Fragment가 destroy된 경우 처리하지 않음
+                if (binding == null) return;
 
                 UserRole role = UserRole.APPLICANT;
                 if (response.isSuccessful() && response.body() != null) {
@@ -317,10 +353,12 @@ public class ContestRecruitmentDetailFragment extends Fragment implements Commen
                     }
                 }
                 updateUiBasedOnRole(role);
+                checkAllDataLoaded(); // ▼▼▼ 수정된 부분 ▼▼▼
             }
             @Override
             public void onFailure(@NonNull Call<CheckAuthorResponse> call, @NonNull Throwable t) {
                 handleApiFailure("checkPostAuthor", t);
+                checkAllDataLoaded(); // ▼▼▼ 수정된 부분 ▼▼▼
             }
         });
     }
@@ -330,15 +368,7 @@ public class ContestRecruitmentDetailFragment extends Fragment implements Commen
 
         binding.btnApply.setEnabled(false);
         binding.tvApplyText.setText("지원 완료");
-
-        // XML 레이아웃의 화살표 이미지뷰 ID가 'ivApplyArrow'라고 가정합니다.
-        // 실제 ID가 다를 경우 이 부분을 수정해주세요.
-         binding.ivApplyArrowRight.setVisibility(View.GONE);
-
-        // (선택 사항) 지원 완료 시 배경색 등 디자인 변경
-        // if (getContext() != null) {
-        //     binding.btnApplyContainer.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.light_gray));
-        // }
+        binding.ivApplyArrowRight.setVisibility(View.GONE);
     }
 
     private void checkApplicationStatus() {
@@ -355,6 +385,7 @@ public class ContestRecruitmentDetailFragment extends Fragment implements Commen
                         setAppliedState();
                     }
                 }
+                // 이 API는 UI의 주요 부분을 제어하지 않으므로, 여기서 카운터를 감소시키지 않음
             }
             @Override
             public void onFailure(@NonNull Call<List<Application>> call, @NonNull Throwable t) {

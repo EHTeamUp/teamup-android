@@ -114,11 +114,26 @@ public class ContestListFragment extends Fragment {
         adapter.submitList(ongoingContests);
     }
 
+    // ▼▼▼ 수정된 부분 ▼▼▼
+    private void showLoading(boolean isLoading) {
+        if (binding == null) return;
+        if (isLoading) {
+            binding.progressBar.setVisibility(View.VISIBLE);
+            binding.recyclerviewContests.setVisibility(View.GONE);
+        } else {
+            binding.progressBar.setVisibility(View.GONE);
+            binding.recyclerviewContests.setVisibility(View.VISIBLE);
+        }
+    }
+    // ▲▲▲ 수정된 부분 ▲▲▲
+
     // 전체 공모전을 로드 (필터 없음)
     private void loadAllContests() {
+        showLoading(true); // ▼▼▼ 수정된 부분 ▼▼▼
         apiService.getContests().enqueue(new Callback<ContestsListResponse>() {
             @Override
             public void onResponse(@NonNull Call<ContestsListResponse> call, @NonNull Response<ContestsListResponse> response) {
+                showLoading(false); // ▼▼▼ 수정된 부분 ▼▼▼
                 if (response.isSuccessful() && response.body() != null) {
                     sortAndDisplayContests(response.body().getContests());
                     binding.tvOngoingTitle.setText("전체 공모전 목록");
@@ -130,6 +145,7 @@ public class ContestListFragment extends Fragment {
 
             @Override
             public void onFailure(@NonNull Call<ContestsListResponse> call, @NonNull Throwable t) {
+                showLoading(false); // ▼▼▼ 수정된 부분 ▼▼▼
                 Log.e("ContestListFragment", "API Call Failed: " + t.getMessage());
                 Toast.makeText(getContext(), "네트워크 오류가 발생했습니다.", Toast.LENGTH_SHORT).show();
             }
@@ -138,9 +154,11 @@ public class ContestListFragment extends Fragment {
 
     // 특정 필터로 공모전을 로드
     private void loadContestsByFilter(int filterId) {
+        showLoading(true); // ▼▼▼ 수정된 부분 ▼▼▼
         apiService.getContestsByFilter(filterId).enqueue(new Callback<ContestsListResponse>() {
             @Override
             public void onResponse(@NonNull Call<ContestsListResponse> call, @NonNull Response<ContestsListResponse> response) {
+                showLoading(false); // ▼▼▼ 수정된 부분 ▼▼▼
                 if (response.isSuccessful() && response.body() != null) {
                     List<ContestInformation> contestsFromServer = response.body().getContests();
                     if (contestsFromServer != null) {
@@ -163,6 +181,7 @@ public class ContestListFragment extends Fragment {
 
             @Override
             public void onFailure(@NonNull Call<ContestsListResponse> call, @NonNull Throwable t) {
+                showLoading(false); // ▼▼▼ 수정된 부분 ▼▼▼
                 Log.e("ContestListFragment", "Filtered API Call Failed: " + t.getMessage());
                 Toast.makeText(getContext(), "네트워크 오류가 발생했습니다.", Toast.LENGTH_SHORT).show();
             }
@@ -175,6 +194,7 @@ public class ContestListFragment extends Fragment {
             loadAllContests();
             return;
         }
+        showLoading(true); // ▼▼▼ 수정된 부분 ▼▼▼
 
         // 동시성 환경에서 안전한 Map을 사용하여 중복을 제거하고 결과를 저장
         final Map<Integer, ContestInformation> combinedContestsMap = new ConcurrentHashMap<>();
@@ -206,7 +226,10 @@ public class ContestListFragment extends Fragment {
                     if (completedRequests.incrementAndGet() == totalFilters) {
                         List<ContestInformation> finalList = new ArrayList<>(combinedContestsMap.values());
                         if (getActivity() != null) {
-                            getActivity().runOnUiThread(() -> sortAndDisplayContests(finalList));
+                            getActivity().runOnUiThread(() -> {
+                                showLoading(false); // ▼▼▼ 수정된 부분 ▼▼▼
+                                sortAndDisplayContests(finalList);
+                            });
 
                         }
                     }

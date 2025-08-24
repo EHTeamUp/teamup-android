@@ -8,6 +8,17 @@
     android:background="@android:color/white"
     tools:context="kr.mojuk.teamup.MainActivity">
 
+    <!-- ProgressBar 추가 -->
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="visible"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
     <!-- 진행중인 공모전 목록 제목 -->
     <TextView
         android:id="@+id/tv_ongoing_title"
@@ -158,12 +169,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         tools:listitem="@layout/item_contest_information"
-        tools:itemCount="5"/>
+        tools:itemCount="5"
+        android:visibility="gone"
+        tools:visibility="visible"/> <!-- ▼▼▼ 수정된 부분 ▼▼▼ -->
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-
-
-
-

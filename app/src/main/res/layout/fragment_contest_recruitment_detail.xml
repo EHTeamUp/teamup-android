@@ -7,6 +7,16 @@
     android:layout_height="match_parent"
     android:background="@android:color/white">
 
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="visible"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
     <!-- 1. 댓글 입력창을 화면 하단에 고정 -->
     <LinearLayout
         android:id="@+id/ll_comment_input"
@@ -20,7 +30,9 @@
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
         android:paddingTop="8dp"
-        android:paddingBottom="8dp">
+        android:paddingBottom="8dp"
+        android:visibility="gone"
+        tools:visibility="visible"> <!-- ▼▼▼ 수정된 부분 ▼▼▼ -->
 
         <EditText
             android:id="@+id/et_comment_input"
@@ -44,7 +56,6 @@
     </LinearLayout>
 
     <!-- 2. 스크롤될 모든 콘텐츠를 NestedScrollView에 배치 -->
-    <!-- 상단 타이틀과 하단 입력창 사이의 모든 공간을 차지하도록 제약조건 설정 -->
     <androidx.core.widget.NestedScrollView
         android:id="@+id/sv_content"
         android:layout_width="0dp"
@@ -54,7 +65,9 @@
         app:layout_constraintBottom_toTopOf="@id/ll_comment_input"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:fillViewport="true">
+        android:fillViewport="true"
+        android:visibility="gone"
+        tools:visibility="visible"> <!-- ▼▼▼ 수정된 부분 ▼▼▼ -->
 
         <!-- 기존의 LinearLayout 구조를 그대로 사용 -->
         <LinearLayout
@@ -294,8 +307,7 @@
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
-    <!-- ▼▼▼ 수정된 부분 ▼▼▼ -->
-    <!-- 플로팅 버튼들을 가로로 정렬하기 위한 LinearLayout 컨테이너 -->
+    <!-- 플로팅 버튼 -->
     <LinearLayout
         android:id="@+id/fab_container"
         android:layout_width="wrap_content"
