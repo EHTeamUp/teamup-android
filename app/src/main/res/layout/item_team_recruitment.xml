@@ -45,13 +45,13 @@
         </LinearLayout>
 
 
-        <!-- 모집 인원 및 모집자 -->
+        <!-- 모집 인원, 모집자, 작성일 -->
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:gravity="start">
+            android:gravity="start|center_vertical">
 
             <TextView
                 android:id="@+id/peopleText"
@@ -65,6 +65,15 @@
                 android:text="모집자: hong_gil"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
+
+            <!-- ▼▼▼ 추가된 TextView ▼▼▼ -->
+            <TextView
+                android:id="@+id/creationDateText"
+                android:text="작성일: 25-08-24"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"/>
+            <!-- ▲▲▲ 추가된 TextView ▲▲▲ -->
         </LinearLayout>
 
         <!-- 구분선 -->

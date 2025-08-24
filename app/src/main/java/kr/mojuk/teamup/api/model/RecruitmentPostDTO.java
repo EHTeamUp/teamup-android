@@ -48,6 +48,7 @@ public class RecruitmentPostDTO {
     public String getDueDate() { return dueDate; }
     public int getAcceptedCount() { return acceptedCount; }
 
+    // ▼▼▼ 수정된 부분 ▼▼▼
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -58,14 +59,17 @@ public class RecruitmentPostDTO {
                 contestId == that.contestId &&
                 acceptedCount == that.acceptedCount &&
                 Objects.equals(title, that.title) &&
-                Objects.equals(contestName, that.contestName) && // --- 추가: equals 비교 ---
+                Objects.equals(content, that.content) &&
+                Objects.equals(contestName, that.contestName) &&
                 Objects.equals(userId, that.userId) &&
+                Objects.equals(createdAt, that.createdAt) && // createdAt 비교 추가
                 Objects.equals(dueDate, that.dueDate);
     }
 
     @Override
     public int hashCode() {
-        // --- 수정: hashCode에 contestName 추가 ---
-        return Objects.hash(recruitmentPostId, title, recruitmentCount, contestId, contestName, userId, dueDate, acceptedCount);
+        // createdAt 해시코드 추가
+        return Objects.hash(recruitmentPostId, title, content, recruitmentCount, contestId, contestName, userId, createdAt, dueDate, acceptedCount);
     }
+    // ▲▲▲ 수정된 부분 ▲▲▲
 }
