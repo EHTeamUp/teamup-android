@@ -8,24 +8,16 @@
     android:background="@drawable/popup_background"
     android:padding="16dp">
 
-    <ImageView
-        android:id="@+id/icon_arrow_right"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:src="@drawable/ic_arrow_right"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        tools:ignore="ContentDescription" />
-
     <TextView
         android:id="@+id/apply_title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:text="지원 한마디"
+        android:paddingLeft="3dp"
+        android:paddingRight="3dp"
         android:textSize="16sp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toStartOf="@id/icon_arrow_right"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -36,7 +28,7 @@
         android:layout_marginTop="8dp"
         android:background="@drawable/edittext_border"
         android:gravity="top"
-        android:hint="Java 경험이 아직 부족하지만 공부하면서 잘 따라갈 수 있습니다!"
+        android:hint="예시 : Java 경험이 아직 부족하지만 공부하면서 잘 따라갈 수 있습니다!"
         android:minHeight="80dp"
         android:padding="12dp"
         app:layout_constraintEnd_toEndOf="parent"

@@ -79,23 +79,31 @@ public class ContestInformationDetailFragment extends Fragment {
         }
 
         // 뒤로가기 버튼
-        if (binding != null) {
-            binding.btnBackTitle.setOnClickListener(v -> {
-                if (getActivity() != null) {
-                    // 뒤로가기 시 공모전 탭으로 네비게이션 상태 복원
-                    if (getActivity() instanceof MainActivity) {
-                        ((MainActivity) getActivity()).setBottomNavigationItem(R.id.navigation_contest);
-                    }
-                    getActivity().getSupportFragmentManager().popBackStack();
-                }
-            });
+        binding.btnBackTitle.setOnClickListener(v -> {
+            if (getActivity() != null) {
+                getActivity().getSupportFragmentManager().popBackStack();
+            }
+        });
+    }
+
+    private void showLoading(boolean isLoading) {
+        if (binding == null) return;
+        if (isLoading) {
+            binding.progressBar.setVisibility(View.VISIBLE);
+            binding.scrollView.setVisibility(View.GONE);
+        } else {
+            binding.progressBar.setVisibility(View.GONE);
+            binding.scrollView.setVisibility(View.VISIBLE);
+
         }
     }
 
     private void loadContestDetailsFromApi(int contestId) {
+        showLoading(true); 
         apiService.getContestDetail(contestId).enqueue(new Callback<ContestInformation>() {
             @Override
             public void onResponse(@NonNull Call<ContestInformation> call, @NonNull Response<ContestInformation> response) {
+                showLoading(false); 
                 if (response.isSuccessful() && response.body() != null) {
                     ContestInformation contestDetail = response.body();
 
@@ -119,6 +127,7 @@ public class ContestInformationDetailFragment extends Fragment {
 
             @Override
             public void onFailure(@NonNull Call<ContestInformation> call, @NonNull Throwable t) {
+                showLoading(false); 
                 Log.e("ContestDetailFragment", "API Call Failed: " + t.getMessage());
                 Toast.makeText(getContext(), "네트워크 오류가 발생했습니다.", Toast.LENGTH_SHORT).show();
             }
@@ -126,10 +135,6 @@ public class ContestInformationDetailFragment extends Fragment {
     }
 
     private void updateUi(ContestInformation contestDetail) {
-        if (binding == null) {
-            return; // Fragment가 destroy된 상태면 UI 업데이트하지 않음
-        }
-
         binding.contestTitleTextInBar.setText(contestDetail.getName());
 
         // 포스터 이미지 로드
@@ -150,8 +155,8 @@ public class ContestInformationDetailFragment extends Fragment {
         // 공모전 사이트 URL 처리
         final String siteUrl = contestDetail.getContestUrl();
         if (siteUrl != null && !siteUrl.isEmpty()) {
-            binding.btnGoToSite.setVisibility(View.VISIBLE);
-            binding.btnGoToSite.setOnClickListener(v -> {
+            binding.tvGoToSite.setVisibility(View.VISIBLE);
+            binding.tvGoToSite.setOnClickListener(v -> {
                 try {
                     Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(siteUrl));
                     startActivity(browserIntent);
@@ -160,11 +165,11 @@ public class ContestInformationDetailFragment extends Fragment {
                 }
             });
         } else {
-            binding.btnGoToSite.setVisibility(View.GONE);
+            binding.tvGoToSite.setVisibility(View.GONE);
         }
 
         // 글 작성 버튼
-        binding.btnCreatePost.setOnClickListener(v -> {
+        binding.tvCreatePost.setOnClickListener(v -> {
             if (getActivity() != null) {
                 RecruitmentPostFragment recruitmentFragment = RecruitmentPostFragment.newInstanceForCreate(
                         contestDetail.getContestId(),

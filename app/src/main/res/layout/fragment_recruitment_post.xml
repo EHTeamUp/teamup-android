@@ -5,29 +5,16 @@
     android:layout_height="match_parent"
     android:background="#FFFFFF">
 
-    <!-- 상단 Title -->
-    <TextView
-        android:id="@+id/title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="TeamUp"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:textColor="#000000"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
     <!-- 콘테스트 이름 박스 -->
     <LinearLayout
         android:id="@+id/contest_name_box"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:background="@drawable/rounded_box_border"
+        android:background="@drawable/mypage_menu_item_background"
         android:padding="16dp"
         android:gravity="center_vertical"
-        app:layout_constraintTop_toBottomOf="@id/title"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginHorizontal="16dp"
@@ -50,11 +37,12 @@
             android:textStyle="bold" />
     </LinearLayout>
 
-    <!-- 제목 라벨 (변경 없음) -->
+    <!-- 제목 필드 -->
     <TextView
         android:id="@+id/subject_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
         android:text="제목"
         android:textSize="16sp"
         android:textColor="#000000"
@@ -64,12 +52,11 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="24dp" />
 
-    <!-- 제목 입력 박스: TextView를 EditText로 변경 -->
     <EditText
         android:id="@+id/et_subject_input"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@drawable/background_rounded_white_border"
+        android:background="@drawable/edit_text_background"
         android:hint="제목을 입력하세요 (예: 프론트 잘하시는 분 모집합니다!)"
         android:inputType="text"
         android:padding="16dp"
@@ -81,11 +68,12 @@
         android:layout_marginHorizontal="16dp"
         android:layout_marginTop="8dp" />
 
-    <!-- 모집 인원 수 라벨 (변경 없음) -->
+    <!-- 모집 인원 수 필드 -->
     <TextView
         android:id="@+id/member_count_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
         android:text="모집 인원 수"
         android:textSize="16sp"
         android:textColor="#000000"
@@ -95,12 +83,11 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="24dp" />
 
-    <!-- 인원 수 선택 UI: 기존 LinearLayout을 Spinner로 변경 -->
     <Spinner
         android:id="@+id/spinner_member_count"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@drawable/rounded_box_border"
+        android:background="@drawable/mypage_menu_item_background"
         android:padding="4dp"
         android:minHeight="48dp"
         app:layout_constraintTop_toBottomOf="@id/member_count_label"
@@ -109,11 +96,12 @@
         android:layout_marginHorizontal="16dp"
         android:layout_marginTop="8dp" />
 
-    <!-- 내용 라벨 (변경 없음) -->
+    <!-- 내용 필드 -->
     <TextView
         android:id="@+id/content_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
         android:text="내용"
         android:textSize="16sp"
         android:textColor="#000000"
@@ -128,7 +116,7 @@
         android:id="@+id/et_content_input"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="@drawable/background_rounded_white_border"
+        android:background="@drawable/edit_text_background"
         android:gravity="top"
         android:hint="모집글 내용을 입력해주세요. (예: 어떤 주제로 무엇을 개발할 계획인지, 어떤 팀원이면 좋은지 등)"
         android:inputType="textMultiLine"
@@ -162,11 +150,3 @@
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-
-
-
-
-
-

@@ -8,6 +8,17 @@
     android:background="@android:color/white"
     tools:context="kr.mojuk.teamup.MainActivity">
 
+    <!-- ProgressBar 추가 -->
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="visible"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
     <!-- 진행중인 공모전 목록 제목 -->
     <TextView
         android:id="@+id/tv_ongoing_title"
@@ -16,7 +27,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        android:background="@drawable/rounded_box_border"
+        android:background="@drawable/mypage_menu_item_background"
         android:drawableEnd="@drawable/ic_arrow_down"
         android:drawablePadding="8dp"
         android:gravity="center_vertical"
@@ -37,7 +48,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
-        android:background="@drawable/rounded_box_border"
+        android:background="@drawable/mypage_menu_item_background"
         android:orientation="vertical"
         android:padding="12dp"
         android:visibility="gone"
@@ -123,9 +134,9 @@
                 android:text="초기화"
                 android:textColor="@android:color/black"
                 android:textSize="16sp"
+                app:cornerRadius="10dp"
                 app:strokeColor="#000000"
-                app:strokeWidth="1dp"
-                app:cornerRadius="10dp"/>
+                app:strokeWidth="1dp" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_apply"
@@ -135,7 +146,7 @@
                 android:text="적용"
                 android:textColor="@android:color/white"
                 android:textSize="16sp"
-                app:cornerRadius="10dp"/>
+                app:cornerRadius="10dp" />
 
         </LinearLayout>
 
@@ -158,12 +169,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         tools:listitem="@layout/item_contest_information"
-        tools:itemCount="5"/>
+        tools:itemCount="5"
+        android:visibility="gone"
+        tools:visibility="visible"/> <!-- ▼▼▼ 수정된 부분 ▼▼▼ -->
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-
-
-
-

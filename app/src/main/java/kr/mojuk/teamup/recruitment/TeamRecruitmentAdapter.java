@@ -12,6 +12,7 @@ import kr.mojuk.teamup.api.model.RecruitmentPostDTO;
 import kr.mojuk.teamup.databinding.ItemTeamRecruitmentBinding;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Locale;
@@ -84,6 +85,10 @@ public class TeamRecruitmentAdapter extends ListAdapter<RecruitmentPostDTO, Team
 
             // 3. D-Day 계산 및 색상 적용
             binding.dDayText.setText(calculateDday(post.getDueDate()));
+
+            //추가
+            // 4. 작성일 포맷팅 및 바인딩
+            binding.creationDateText.setText(formatCreationDate(post.getCreatedAt()));
         }
 
         private String calculateDday(String dueDateString) {
@@ -114,5 +119,30 @@ public class TeamRecruitmentAdapter extends ListAdapter<RecruitmentPostDTO, Team
                 return "-";
             }
         }
+
+        // ▼▼▼ 추가된 메서드 ▼▼▼
+        /**
+         * "2025-08-24T08:24:47.278Z" 형식의 문자열을 "작성일: yy-MM-dd"로 변환합니다.
+         */
+        private String formatCreationDate(String createdAtString) {
+            if (createdAtString == null || createdAtString.isEmpty()) {
+                return "작성일: -";
+            }
+            try {
+                // ISO_DATE_TIME 포맷으로 파싱 (예: 2025-08-24T08:24:47.278Z)
+                LocalDateTime dateTime = LocalDateTime.parse(createdAtString, DateTimeFormatter.ISO_DATE_TIME);
+                // "yy-MM-dd" 형식으로 포맷 변경
+                DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("yy-MM-dd");
+                return "작성일: " + dateTime.format(outputFormatter);
+            } catch (Exception e) {
+                e.printStackTrace();
+                // 파싱 실패 시 원본 데이터의 날짜 부분만 잘라서 표시 (예외 처리)
+                if (createdAtString.contains("T")) {
+                    return "작성일: " + createdAtString.split("T")[0];
+                }
+                return "작성일: -";
+            }
+        }
+        // ▲▲▲ 추가된 메서드 ▲▲▲
     }
 }

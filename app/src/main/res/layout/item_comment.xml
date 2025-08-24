@@ -15,21 +15,31 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/tv_comment_user"
-            android:layout_width="wrap_content"
+        <!-- 유저명과 날짜를 한 줄에 배치 -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="user_nickname"
-            android:textStyle="bold"
-            android:textColor="@android:color/black"/>
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
-        <TextView
-            android:id="@+id/tv_comment_timestamp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:textSize="12sp"
-            android:textColor="@android:color/darker_gray"/>
+            <TextView
+                android:id="@+id/tv_comment_user"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="user_nickname"
+                android:textStyle="bold"
+                android:textColor="@android:color/black"/>
+
+            <TextView
+                android:id="@+id/tv_comment_timestamp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="1시간 전"
+                android:textSize="12sp"
+                android:textColor="@android:color/darker_gray"/>
+
+        </LinearLayout>
 
         <TextView
             android:id="@+id/tv_comment_content"
@@ -140,3 +150,4 @@
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>
+
