@@ -44,8 +44,8 @@
         </LinearLayout>
 
         <TextView
-            android:id="@+id/tv_team_members"
-            android:text="팀원: hong_gil 외 1명"
+            android:id="@+id/tv_team_leader"
+            android:text="팀장: team_leader_id"
             android:textSize="12sp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />

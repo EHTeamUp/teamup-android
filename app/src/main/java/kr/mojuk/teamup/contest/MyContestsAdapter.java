@@ -71,9 +71,10 @@ public class MyContestsAdapter extends ListAdapter<MyContestItem, MyContestsAdap
             int otherMembersCount = item.getOtherMembersCount();
             if (otherMembersCount > 0) {
                 String teamInfo = String.format(Locale.getDefault(), "팀원: %s 외 %d명", item.getTeamLeaderId(), otherMembersCount);
-                binding.tvTeamMembers.setText(teamInfo);
+                binding.tvTeamLeader.setText(teamInfo);
             } else {
-                binding.tvTeamMembers.setText("팀원: " + item.getTeamLeaderId());
+                String teamLeaderInfo = "팀장: " + item.getTeamLeaderId();
+                binding.tvTeamLeader.setText(teamLeaderInfo);
             }
         }
     }
