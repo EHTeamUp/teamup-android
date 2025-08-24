@@ -104,6 +104,7 @@ public class ContestInformationDetailFragment extends Fragment {
             @Override
             public void onResponse(@NonNull Call<ContestInformation> call, @NonNull Response<ContestInformation> response) {
                 showLoading(false); 
+                if (binding == null) return; // Fragment가 destroy된 경우 처리하지 않음
                 if (response.isSuccessful() && response.body() != null) {
                     ContestInformation contestDetail = response.body();
 
@@ -128,6 +129,7 @@ public class ContestInformationDetailFragment extends Fragment {
             @Override
             public void onFailure(@NonNull Call<ContestInformation> call, @NonNull Throwable t) {
                 showLoading(false); 
+                if (binding == null) return; // Fragment가 destroy된 경우 처리하지 않음
                 Log.e("ContestDetailFragment", "API Call Failed: " + t.getMessage());
                 Toast.makeText(getContext(), "네트워크 오류가 발생했습니다.", Toast.LENGTH_SHORT).show();
             }
@@ -135,6 +137,8 @@ public class ContestInformationDetailFragment extends Fragment {
     }
 
     private void updateUi(ContestInformation contestDetail) {
+        if (binding == null) return; // Fragment가 destroy된 경우 처리하지 않음
+        
         binding.contestTitleTextInBar.setText(contestDetail.getName());
 
         // 포스터 이미지 로드
@@ -186,6 +190,8 @@ public class ContestInformationDetailFragment extends Fragment {
 
     // 태그를 표시하는 별도 메서드
     private void displayTags(List<Tag> tags) {
+        if (binding == null) return; // Fragment가 destroy된 경우 처리하지 않음
+        
         if (tags != null && !tags.isEmpty()) {
             // 태그들을 "#태그명" 형식으로 변환하고 공백으로 연결
             String hashtags = tags.stream()

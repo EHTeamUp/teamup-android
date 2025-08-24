@@ -132,9 +132,9 @@ public class HomeFragment extends Fragment {
                                         ((MainActivity) getActivity()).showFragment(fragment);
                                         Log.d("HomeFragment", "MainActivity.showFragment 호출 완료");
                                         
-                                        // DetailFragment 표시 시에는 하단 네비게이션 상태 변경하지 않음
-                                        // (BottomNavigationView listener가 DetailFragment를 덮어쓰지 않도록)
-                                        Log.d("HomeFragment", "DetailFragment 표시 완료 - 네비게이션 상태 변경 안함");
+                                        // 하단 네비게이션 바 공모전 탭 활성화 (Fragment 전환 없이)
+                                        ((MainActivity) getActivity()).setBottomNavigationItem(R.id.navigation_contest);
+                                        Log.d("HomeFragment", "DetailFragment 표시 완료 - 네비게이션 상태 변경 완료");
                                     }
                                 } catch (Exception e) {
                                     Log.e("HomeFragment", "Fragment 전환 중 오류: " + e.getMessage(), e);
@@ -203,9 +203,9 @@ public class HomeFragment extends Fragment {
                                         ((MainActivity) getActivity()).showFragment(fragment);
                                         Log.d("HomeFragment", "팀원 모집 MainActivity.showFragment 호출 완료");
                                         
-                                        // DetailFragment 표시 시에는 하단 네비게이션 상태 변경하지 않음
-                                        // (BottomNavigationView listener가 DetailFragment를 덮어쓰지 않도록)
-                                        Log.d("HomeFragment", "팀원 모집 DetailFragment 표시 완료 - 네비게이션 상태 변경 안함");
+                                        // 하단 네비게이션 바 게시판 탭 활성화 (Fragment 전환 없이)
+                                        ((MainActivity) getActivity()).setBottomNavigationItem(R.id.navigation_board);
+                                        Log.d("HomeFragment", "팀원 모집 DetailFragment 표시 완료 - 네비게이션 상태 변경 완료");
                                     }
                                 } catch (Exception e) {
                                     Log.e("HomeFragment", "팀원 모집 Fragment 전환 중 오류: " + e.getMessage(), e);

@@ -131,6 +131,7 @@ public class ContestListFragment extends Fragment {
             @Override
             public void onResponse(@NonNull Call<ContestsListResponse> call, @NonNull Response<ContestsListResponse> response) {
                 showLoading(false); 
+                if (binding == null) return; 
                 if (response.isSuccessful() && response.body() != null) {
                     sortAndDisplayContests(response.body().getContests());
                     binding.tvOngoingTitle.setText("전체 공모전 목록");
@@ -143,6 +144,7 @@ public class ContestListFragment extends Fragment {
             @Override
             public void onFailure(@NonNull Call<ContestsListResponse> call, @NonNull Throwable t) {
                 showLoading(false);
+                if (binding == null) return;
                 Log.e("ContestListFragment", "API Call Failed: " + t.getMessage());
                 Toast.makeText(getContext(), "네트워크 오류가 발생했습니다.", Toast.LENGTH_SHORT).show();
             }
@@ -156,7 +158,7 @@ public class ContestListFragment extends Fragment {
             @Override
             public void onResponse(@NonNull Call<ContestsListResponse> call, @NonNull Response<ContestsListResponse> response) {
                 showLoading(false);
-                if (binding == null) return; // Fragment가 destroy된 경우 처리하지 않음
+                if (binding == null) return; 
                 if (response.isSuccessful() && response.body() != null) {
                     List<ContestInformation> contestsFromServer = response.body().getContests();
                     if (contestsFromServer != null) {
@@ -180,6 +182,7 @@ public class ContestListFragment extends Fragment {
             @Override
             public void onFailure(@NonNull Call<ContestsListResponse> call, @NonNull Throwable t) {
                 showLoading(false);
+                if (binding == null) return; 
                 Log.e("ContestListFragment", "Filtered API Call Failed: " + t.getMessage());
                 Toast.makeText(getContext(), "네트워크 오류가 발생했습니다.", Toast.LENGTH_SHORT).show();
             }
