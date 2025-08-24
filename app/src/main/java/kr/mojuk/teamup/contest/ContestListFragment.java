@@ -119,6 +119,8 @@ public class ContestListFragment extends Fragment {
         apiService.getContests().enqueue(new Callback<ContestsListResponse>() {
             @Override
             public void onResponse(@NonNull Call<ContestsListResponse> call, @NonNull Response<ContestsListResponse> response) {
+                if (binding == null) return; // Fragment가 destroy된 경우 처리하지 않음
+                
                 if (response.isSuccessful() && response.body() != null) {
                     sortAndDisplayContests(response.body().getContests());
                     binding.tvOngoingTitle.setText("전체 공모전 목록");
@@ -141,6 +143,8 @@ public class ContestListFragment extends Fragment {
         apiService.getContestsByFilter(filterId).enqueue(new Callback<ContestsListResponse>() {
             @Override
             public void onResponse(@NonNull Call<ContestsListResponse> call, @NonNull Response<ContestsListResponse> response) {
+                if (binding == null) return; // Fragment가 destroy된 경우 처리하지 않음
+                
                 if (response.isSuccessful() && response.body() != null) {
                     List<ContestInformation> contestsFromServer = response.body().getContests();
                     if (contestsFromServer != null) {
@@ -186,6 +190,8 @@ public class ContestListFragment extends Fragment {
             apiService.getContestsByFilter(filterId).enqueue(new Callback<ContestsListResponse>() {
                 @Override
                 public void onResponse(@NonNull Call<ContestsListResponse> call, @NonNull Response<ContestsListResponse> response) {
+                    if (binding == null) return; // Fragment가 destroy된 경우 처리하지 않음
+                    
                     if (response.isSuccessful() && response.body() != null && response.body().getContests() != null) {
                         for (ContestInformation contest : response.body().getContests()) {
                             combinedContestsMap.put(contest.getContestId(), contest);
@@ -220,6 +226,8 @@ public class ContestListFragment extends Fragment {
         apiService.getFilters().enqueue(new Callback<List<FilterItem>>() {
             @Override
             public void onResponse(@NonNull Call<List<FilterItem>> call, @NonNull Response<List<FilterItem>> response) {
+                if (binding == null) return; // Fragment가 destroy된 경우 처리하지 않음
+                
                 if (response.isSuccessful() && response.body() != null) {
                     availableFilters.clear();
                     availableFilters.addAll(response.body());

@@ -16,3 +16,6 @@
 local.properties
 
 google-services.json
+
+# API URL 설정 파일 
+app/src/main/java/kr/mojuk/teamup/api/ApiUrl.java

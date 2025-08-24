@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -115,18 +116,22 @@ public class ApplicantListFragment extends Fragment {
     }
 
     private void setupSelectionControls() {
-        // 뒤로가기 화살표
-        View backArrow = getView().findViewById(R.id.iv_back_arrow);
-        if (backArrow != null) {
-            backArrow.setOnClickListener(new View.OnClickListener() {
+        // 네비게이션 바 전체에 뒤로가기 클릭 리스너
+        LinearLayout navigationBar = getView().findViewById(R.id.navigation_bar);
+        if (navigationBar != null) {
+            Log.d(TAG, "네비게이션 바 클릭 리스너 설정됨");
+            navigationBar.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    Log.d(TAG, "네비게이션 바 클릭됨");
                     // 프래그먼트 백스택에서 제거
                     if (getActivity() != null) {
                         getActivity().getSupportFragmentManager().popBackStack();
                     }
                 }
             });
+        } else {
+            Log.e(TAG, "네비게이션 바를 찾을 수 없음");
         }
         
         // 시너지 확인 버튼
@@ -149,23 +154,26 @@ public class ApplicantListFragment extends Fragment {
 //                Log.d(TAG, "현재 로그인한 사용자 ID: " + currentUserId);
             }
             
-            // 선택된 지원자들의 user_id 목록 생성
+            // 세션에 저장된 ID를 맨 처음에 넣어서 전달
             List<String> selectedUserIds = new ArrayList<>();
+            
+            // 현재 로그인한 사용자 ID를 맨 처음에 추가
+            if (currentUserId != null) {
+                selectedUserIds.add(currentUserId);
+//                Log.d(TAG, "세션에 저장된 ID를 맨 처음에 추가: " + currentUserId);
+            } else {
+//                Log.w(TAG, "현재 로그인한 사용자 ID를 가져올 수 없음");
+            }
+            
+            // 선택된 지원자들의 user_id 목록 추가
 //            Log.d(TAG, "=== 선택된 지원자 정보 ===");
             for (Application applicant : selectedApplicants) {
                 String applicantId = applicant.getUserId();
-                selectedUserIds.add(applicantId);
-//                Log.d(TAG, "선택된 지원자 ID: " + applicantId + ", 이름: " + applicant.getUserName());
-            }
-            
-            // 현재 로그인한 사용자 ID도 추가
-            if (currentUserId != null && !selectedUserIds.contains(currentUserId)) {
-                selectedUserIds.add(currentUserId);
-//                Log.d(TAG, "현재 로그인한 사용자 ID 추가됨: " + currentUserId);
-            } else if (currentUserId != null) {
-//                Log.d(TAG, "현재 로그인한 사용자 ID가 이미 선택된 목록에 포함되어 있음: " + currentUserId);
-            } else {
-//                Log.w(TAG, "현재 로그인한 사용자 ID를 가져올 수 없음");
+                // 중복 방지
+                if (!selectedUserIds.contains(applicantId)) {
+                    selectedUserIds.add(applicantId);
+//                    Log.d(TAG, "선택된 지원자 ID 추가: " + applicantId + ", 이름: " + applicant.getUserName());
+                }
             }
             
             // TeamSynergyScoreFragment로 이동하면서 선택된 사용자 ID들 전달
