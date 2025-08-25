@@ -4,8 +4,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="6dp"
-    android:layout_marginTop="8dp"
-    android:background="#F5F5F5">
+    android:layout_marginTop="8dp">
 
     <!-- ==================== 읽기 모드 UI ==================== -->
     <!-- 평소에 보여지는 댓글 정보입니다. -->
