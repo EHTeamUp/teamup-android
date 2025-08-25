@@ -64,8 +64,10 @@ public class MypageInterestFragment extends Fragment {
     // Language related views
     private ScrollView scrollViewSkills;
     private ChipGroup chipGroupLanguages;
-    private EditText etLanguageInput;
-    private Button btnAddLanguage;
+    
+    // Skills arrow buttons
+    private TextView btnIndicatorSkillsLeft;
+    private TextView btnIndicatorSkillsRight;
     
     // Skills pagination
     private LinearLayout llSkillsPageIndicator;
@@ -75,23 +77,19 @@ public class MypageInterestFragment extends Fragment {
     // Role related views
     private ScrollView scrollViewRoles;
     private ChipGroup chipGroupRoles;
-    private EditText etRoleInput;
-    private Button btnAddRole;
+    
+    // Roles arrow buttons
+    private TextView btnIndicatorRolesLeft;
+    private TextView btnIndicatorRolesRight;
     
     // Roles pagination
     private LinearLayout llRolesPageIndicator;
     private int currentRolesPage = 0;
     private List<Role> allRoles = new ArrayList<>();
     
-    // 커스텀 추가 리스트
-    private List<String> customSkills = new ArrayList<>();
-    private List<String> customRoles = new ArrayList<>();
-    
     // 선택된 아이템들 (마이페이지용) - 중복 방지를 위해 Set 사용
     private Set<Integer> selectedSkillIds = new HashSet<>();
     private Set<Integer> selectedRoleIds = new HashSet<>();
-    private List<String> selectedCustomSkills = new ArrayList<>();
-    private List<String> selectedCustomRoles = new ArrayList<>();
     
     // 제스처 감지
     private GestureDetector skillsGestureDetector;
@@ -160,8 +158,10 @@ public class MypageInterestFragment extends Fragment {
         // Language views
         scrollViewSkills = view.findViewById(R.id.scrollViewSkills);
         chipGroupLanguages = view.findViewById(R.id.chipGroupLanguages);
-        etLanguageInput = view.findViewById(R.id.et_language_input);
-        btnAddLanguage = view.findViewById(R.id.btn_add_language);
+        
+        // Skills arrow buttons
+        btnIndicatorSkillsLeft = view.findViewById(R.id.btn_indicator_skills_left);
+        btnIndicatorSkillsRight = view.findViewById(R.id.btn_indicator_skills_right);
         
         // Skills pagination views
         llSkillsPageIndicator = view.findViewById(R.id.ll_skills_page_indicator);
@@ -169,8 +169,10 @@ public class MypageInterestFragment extends Fragment {
         // Role views
         scrollViewRoles = view.findViewById(R.id.scrollViewRoles);
         chipGroupRoles = view.findViewById(R.id.chipGroupRoles);
-        etRoleInput = view.findViewById(R.id.et_role_input);
-        btnAddRole = view.findViewById(R.id.btn_add_role);
+        
+        // Roles arrow buttons
+        btnIndicatorRolesLeft = view.findViewById(R.id.btn_indicator_roles_left);
+        btnIndicatorRolesRight = view.findViewById(R.id.btn_indicator_roles_right);
         
         // Roles pagination views
         llRolesPageIndicator = view.findViewById(R.id.ll_roles_page_indicator);
@@ -279,6 +281,17 @@ public class MypageInterestFragment extends Fragment {
         llBackNavigation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // 마이페이지 모드에서는 변경사항을 서버에 저장
+                if (SOURCE_MYPAGE.equals(source)) {
+                    Log.d(TAG, "뒤로가기 버튼 클릭 - 변경사항 저장");
+                    Log.d(TAG, "저장할 스킬: " + selectedSkillIds.size() + "개");
+                    Log.d(TAG, "저장할 역할: " + selectedRoleIds.size() + "개");
+                    
+                    // 스킬과 역할 모두 저장
+                    updateUserSkills();
+                    updateUserRoles();
+                }
+                
                 // 마이페이지 프로필로 돌아가기
                 if (getActivity() instanceof MainActivity) {
                     ((MainActivity) getActivity()).showFragment(new MypageProfileFragment());
@@ -286,70 +299,42 @@ public class MypageInterestFragment extends Fragment {
             }
         });
 
-        btnAddLanguage.setOnClickListener(new View.OnClickListener() {
+
+
+        // Skills arrow buttons
+        btnIndicatorSkillsLeft.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String newLanguage = etLanguageInput.getText().toString().trim();
-                if (!newLanguage.isEmpty()) {
-                    addLanguageChip(newLanguage);
-                    etLanguageInput.setText("");
-                }
+                previousSkillsPage();
             }
         });
 
-        btnAddRole.setOnClickListener(new View.OnClickListener() {
+        btnIndicatorSkillsRight.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String newRole = etRoleInput.getText().toString().trim();
-                if (!newRole.isEmpty()) {
-                    addRoleChip(newRole);
-                    etRoleInput.setText("");
-                }
+                nextSkillsPage();
+            }
+        });
+
+        // Roles arrow buttons
+        btnIndicatorRolesLeft.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                previousRolesPage();
+            }
+        });
+
+        btnIndicatorRolesRight.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                nextRolesPage();
             }
         });
 
 
     }
 
-    private void addLanguageChip(String language) {
-        if (!language.trim().isEmpty()) {
-            customSkills.add(language.trim());
-            Log.d(TAG, "커스텀 스킬 추가: " + language + ", 총 커스텀 스킬: " + customSkills.size());
-            
-            // 페이징 재계산
-            int totalSkills = allSkills.size() + customSkills.size();
-            int totalPages = (int) Math.ceil((double) totalSkills / ITEMS_PER_PAGE);
-            
-            // 새로 추가된 아이템이 있는 페이지로 이동
-            if (totalPages > 1) {
-                currentSkillsPage = totalPages - 1;
-                Log.d(TAG, "커스텀 스킬 추가 후 페이지 이동: " + currentSkillsPage + "/" + (totalPages-1));
-            }
-            
-            updateSkillsPage();
-            setupSkillsPagination();
-        }
-    }
 
-    private void addRoleChip(String role) {
-        if (!role.trim().isEmpty()) {
-            customRoles.add(role.trim());
-            Log.d(TAG, "커스텀 역할 추가: " + role + ", 총 커스텀 역할: " + customRoles.size());
-            
-            // 페이징 재계산
-            int totalRoles = allRoles.size() + customRoles.size();
-            int totalPages = (int) Math.ceil((double) totalRoles / ITEMS_PER_PAGE);
-            
-            // 새로 추가된 아이템이 있는 페이지로 이동
-            if (totalPages > 1) {
-                currentRolesPage = totalPages - 1;
-                Log.d(TAG, "커스텀 역할 추가 후 페이지 이동: " + currentRolesPage + "/" + (totalPages-1));
-            }
-            
-            updateRolesPage();
-            setupRolesPagination();
-        }
-    }
 
     /**
      * 마이페이지용: 사용자 기존 스킬/역할 로드
@@ -420,9 +405,7 @@ public class MypageInterestFragment extends Fragment {
                         Log.d(TAG, "스킬 추가 전: " + beforeSize + "개, 추가 후: " + afterSize + "개");
                         Log.d(TAG, "최종 selectedSkillIds: " + selectedSkillIds.toString());
                         
-                        // 커스텀 스킬들도 추가
-                        customSkills.addAll(skills.getCustomSkills());
-                        Log.d(TAG, "커스텀 스킬: " + customSkills.size() + "개");
+
                         
                         currentSkillsPage = 0;
                         updateSkillsPage();
@@ -466,9 +449,7 @@ public class MypageInterestFragment extends Fragment {
                         Log.d(TAG, "역할 추가 전: " + beforeSize + "개, 추가 후: " + afterSize + "개");
                         Log.d(TAG, "최종 selectedRoleIds: " + selectedRoleIds.toString());
                         
-                        // 커스텀 역할들도 추가
-                        customRoles.addAll(roles.getCustomRoles());
-                        Log.d(TAG, "커스텀 역할: " + customRoles.size() + "개");
+
                         
                         currentRolesPage = 0;
                         updateRolesPage();
@@ -543,12 +524,7 @@ public class MypageInterestFragment extends Fragment {
     private void updateSkillsPage() {
         chipGroupLanguages.removeAllViews();
         
-        // 전체 아이템 리스트 생성 (기존 스킬 + 커스텀 스킬)
-        List<Object> allItems = new ArrayList<>();
-        allItems.addAll(allSkills);
-        allItems.addAll(customSkills);
-        
-        int totalSkills = allItems.size();
+        int totalSkills = allSkills.size();
         int startIndex = currentSkillsPage * ITEMS_PER_PAGE;
         int endIndex = Math.min(startIndex + ITEMS_PER_PAGE, totalSkills);
         
@@ -556,27 +532,15 @@ public class MypageInterestFragment extends Fragment {
         
         // 현재 페이지에 해당하는 아이템들만 표시
         for (int i = startIndex; i < endIndex; i++) {
-            Object item = allItems.get(i);
+            Skill skill = allSkills.get(i);
             Chip chip = (Chip) getLayoutInflater().inflate(R.layout.view_chip_choice, chipGroupLanguages, false);
             
-            if (item instanceof Skill) {
-                Skill skill = (Skill) item;
-                chip.setText(skill.getName());
-                chip.setTag(skill.getSkillId());
-                
-                // 선택 상태 표시 (마이페이지 모드 또는 회원가입 모드에서 저장된 데이터가 있는 경우)
-                if (selectedSkillIds.contains(skill.getSkillId())) {
-                    chip.setChecked(true);
-                }
-            } else if (item instanceof String) {
-                String customSkill = (String) item;
-                chip.setText(customSkill);
-                chip.setTag("custom_" + customSkill);
-                
-                // 선택 상태 표시 (마이페이지 모드 또는 회원가입 모드에서 저장된 데이터가 있는 경우)
-                if (selectedCustomSkills.contains(customSkill)) {
-                    chip.setChecked(true);
-                }
+            chip.setText(skill.getName());
+            chip.setTag(skill.getSkillId());
+            
+            // 선택 상태 표시 (마이페이지 모드 또는 회원가입 모드에서 저장된 데이터가 있는 경우)
+            if (selectedSkillIds.contains(skill.getSkillId())) {
+                chip.setChecked(true);
             }
             
             // Chip 클릭 리스너 설정
@@ -598,6 +562,9 @@ public class MypageInterestFragment extends Fragment {
         int totalPages = (int) Math.ceil((double) totalSkills / ITEMS_PER_PAGE);
         updateSkillsPageIndicator(totalPages);
         
+        // 화살표 버튼 가시성 업데이트
+        updateSkillsArrowButtons(totalPages);
+        
         Log.d(TAG, "updateSkillsPage: 표시된 칩 개수=" + chipGroupLanguages.getChildCount());
     }
 
@@ -607,12 +574,7 @@ public class MypageInterestFragment extends Fragment {
     private void updateRolesPage() {
         chipGroupRoles.removeAllViews();
         
-        // 전체 아이템 리스트 생성 (기존 역할 + 커스텀 역할)
-        List<Object> allItems = new ArrayList<>();
-        allItems.addAll(allRoles);
-        allItems.addAll(customRoles);
-        
-        int totalRoles = allItems.size();
+        int totalRoles = allRoles.size();
         int startIndex = currentRolesPage * ITEMS_PER_PAGE;
         int endIndex = Math.min(startIndex + ITEMS_PER_PAGE, totalRoles);
         
@@ -620,27 +582,15 @@ public class MypageInterestFragment extends Fragment {
         
         // 현재 페이지에 해당하는 아이템들만 표시
         for (int i = startIndex; i < endIndex; i++) {
-            Object item = allItems.get(i);
+            Role role = allRoles.get(i);
             Chip chip = (Chip) getLayoutInflater().inflate(R.layout.view_chip_choice, chipGroupRoles, false);
             
-            if (item instanceof Role) {
-                Role role = (Role) item;
-                chip.setText(role.getName());
-                chip.setTag(role.getRoleId());
-                
-                // 선택 상태 표시 (마이페이지 모드 또는 회원가입 모드에서 저장된 데이터가 있는 경우)
-                if (selectedRoleIds.contains(role.getRoleId())) {
-                    chip.setChecked(true);
-                }
-            } else if (item instanceof String) {
-                String customRole = (String) item;
-                chip.setText(customRole);
-                chip.setTag("custom_" + customRole);
-                
-                // 선택 상태 표시 (마이페이지 모드 또는 회원가입 모드에서 저장된 데이터가 있는 경우)
-                if (selectedCustomRoles.contains(customRole)) {
-                    chip.setChecked(true);
-                }
+            chip.setText(role.getName());
+            chip.setTag(role.getRoleId());
+            
+            // 선택 상태 표시 (마이페이지 모드 또는 회원가입 모드에서 저장된 데이터가 있는 경우)
+            if (selectedRoleIds.contains(role.getRoleId())) {
+                chip.setChecked(true);
             }
             
             // Chip 클릭 리스너 설정
@@ -662,6 +612,9 @@ public class MypageInterestFragment extends Fragment {
         int totalPages = (int) Math.ceil((double) totalRoles / ITEMS_PER_PAGE);
         updateRolesPageIndicator(totalPages);
         
+        // 화살표 버튼 가시성 업데이트
+        updateRolesArrowButtons(totalPages);
+        
         Log.d(TAG, "updateRolesPage: 표시된 칩 개수=" + chipGroupRoles.getChildCount());
     }
 
@@ -669,7 +622,7 @@ public class MypageInterestFragment extends Fragment {
      * 기술 페이징 설정
      */
     private void setupSkillsPagination() {
-        int totalSkills = allSkills.size() + customSkills.size();
+        int totalSkills = allSkills.size();
         int totalPages = (int) Math.ceil((double) totalSkills / ITEMS_PER_PAGE);
         Log.d(TAG, "setupSkillsPagination: totalPages=" + totalPages);
         if (totalPages > 1) {
@@ -685,7 +638,7 @@ public class MypageInterestFragment extends Fragment {
      * 역할 페이징 설정
      */
     private void setupRolesPagination() {
-        int totalRoles = allRoles.size() + customRoles.size();
+        int totalRoles = allRoles.size();
         int totalPages = (int) Math.ceil((double) totalRoles / ITEMS_PER_PAGE);
         if (totalPages > 1) {
             llRolesPageIndicator.setVisibility(View.VISIBLE);
@@ -721,44 +674,57 @@ public class MypageInterestFragment extends Fragment {
     }
 
     /**
+     * 기술 화살표 버튼 가시성 업데이트
+     */
+    private void updateSkillsArrowButtons(int totalPages) {
+        if (totalPages <= 1) {
+            // 페이지가 1개 이하면 화살표 버튼 숨기기
+            btnIndicatorSkillsLeft.setVisibility(View.GONE);
+            btnIndicatorSkillsRight.setVisibility(View.GONE);
+        } else {
+            // 첫 번째 페이지면 왼쪽 화살표 숨기기
+            if (currentSkillsPage == 0) {
+                btnIndicatorSkillsLeft.setVisibility(View.GONE);
+            } else {
+                btnIndicatorSkillsLeft.setVisibility(View.VISIBLE);
+            }
+            
+            // 마지막 페이지면 오른쪽 화살표 숨기기
+            if (currentSkillsPage == totalPages - 1) {
+                btnIndicatorSkillsRight.setVisibility(View.GONE);
+            } else {
+                btnIndicatorSkillsRight.setVisibility(View.VISIBLE);
+            }
+        }
+    }
+
+    /**
      * 저장된 데이터 복원
      */
     private void restoreSavedData() {
         // 저장된 스킬 데이터 복원
         List<Skill> savedSkills = registrationManager.getSavedSkills();
-        List<String> savedCustomSkills = registrationManager.getSavedCustomSkills();
         
         // 기존 선택 상태 초기화
         selectedSkillIds.clear();
-        selectedCustomSkills.clear();
         
         // 저장된 스킬 ID 복원
         for (Skill savedSkill : savedSkills) {
             selectedSkillIds.add(savedSkill.getSkillId());
         }
         
-        // 저장된 커스텀 스킬 복원
-        selectedCustomSkills.addAll(savedCustomSkills);
-        customSkills.addAll(savedCustomSkills);
-        
         // 저장된 역할 데이터 복원
         List<Role> savedRoles = registrationManager.getSavedRoles();
-        List<String> savedCustomRoles = registrationManager.getSavedCustomRoles();
         
         // 기존 선택 상태 초기화
         selectedRoleIds.clear();
-        selectedCustomRoles.clear();
         
         // 저장된 역할 ID 복원
         for (Role savedRole : savedRoles) {
             selectedRoleIds.add(savedRole.getRoleId());
         }
         
-        // 저장된 커스텀 역할 복원
-        selectedCustomRoles.addAll(savedCustomRoles);
-        customRoles.addAll(savedCustomRoles);
-        
-        Log.d(TAG, "저장된 데이터 복원 완료: " + selectedSkillIds.size() + "개 스킬, " + selectedCustomSkills.size() + "개 커스텀 스킬, " + selectedRoleIds.size() + "개 역할, " + selectedCustomRoles.size() + "개 커스텀 역할");
+        Log.d(TAG, "저장된 데이터 복원 완료: " + selectedSkillIds.size() + "개 스킬, " + selectedRoleIds.size() + "개 역할");
     }
     
     /**
@@ -784,10 +750,35 @@ public class MypageInterestFragment extends Fragment {
     }
 
     /**
+     * 역할 화살표 버튼 가시성 업데이트
+     */
+    private void updateRolesArrowButtons(int totalPages) {
+        if (totalPages <= 1) {
+            // 페이지가 1개 이하면 화살표 버튼 숨기기
+            btnIndicatorRolesLeft.setVisibility(View.GONE);
+            btnIndicatorRolesRight.setVisibility(View.GONE);
+        } else {
+            // 첫 번째 페이지면 왼쪽 화살표 숨기기
+            if (currentRolesPage == 0) {
+                btnIndicatorRolesLeft.setVisibility(View.GONE);
+            } else {
+                btnIndicatorRolesLeft.setVisibility(View.VISIBLE);
+            }
+            
+            // 마지막 페이지면 오른쪽 화살표 숨기기
+            if (currentRolesPage == totalPages - 1) {
+                btnIndicatorRolesRight.setVisibility(View.GONE);
+            } else {
+                btnIndicatorRolesRight.setVisibility(View.VISIBLE);
+            }
+        }
+    }
+
+    /**
      * 이전 기술 페이지로 이동
      */
     private void previousSkillsPage() {
-        int totalSkills = allSkills.size() + customSkills.size();
+        int totalSkills = allSkills.size();
         int totalPages = (int) Math.ceil((double) totalSkills / ITEMS_PER_PAGE);
         
         if (currentSkillsPage > 0) {
@@ -801,7 +792,7 @@ public class MypageInterestFragment extends Fragment {
      * 다음 기술 페이지로 이동
      */
     private void nextSkillsPage() {
-        int totalSkills = allSkills.size() + customSkills.size();
+        int totalSkills = allSkills.size();
         int totalPages = (int) Math.ceil((double) totalSkills / ITEMS_PER_PAGE);
         
         if (currentSkillsPage < totalPages - 1) {
@@ -815,7 +806,7 @@ public class MypageInterestFragment extends Fragment {
      * 이전 역할 페이지로 이동
      */
     private void previousRolesPage() {
-        int totalRoles = allRoles.size() + customRoles.size();
+        int totalRoles = allRoles.size();
         int totalPages = (int) Math.ceil((double) totalRoles / ITEMS_PER_PAGE);
         
         if (currentRolesPage > 0) {
@@ -829,7 +820,7 @@ public class MypageInterestFragment extends Fragment {
      * 다음 역할 페이지로 이동
      */
     private void nextRolesPage() {
-        int totalRoles = allRoles.size() + customRoles.size();
+        int totalRoles = allRoles.size();
         int totalPages = (int) Math.ceil((double) totalRoles / ITEMS_PER_PAGE);
         
         if (currentRolesPage < totalPages - 1) {
@@ -869,27 +860,7 @@ public class MypageInterestFragment extends Fragment {
             
             // DB 업데이트
             updateUserSkills();
-        } else if (tag instanceof String && ((String) tag).startsWith("custom_")) {
-            String customSkill = ((String) tag).substring(7); // "custom_" 제거
-            Log.d(TAG, "커스텀 스킬 처리: customSkill=" + customSkill);
-            Log.d(TAG, "처리 전 selectedCustomSkills: " + selectedCustomSkills.toString());
-            
-            if (isChecked) {
-                if (!selectedCustomSkills.contains(customSkill)) {
-                    selectedCustomSkills.add(customSkill);
-                    Log.d(TAG, "커스텀 스킬 추가됨: " + customSkill);
-                } else {
-                    Log.d(TAG, "커스텀 스킬 이미 선택되어 있음: " + customSkill);
-                }
-            } else {
-                boolean removed = selectedCustomSkills.remove(customSkill);
-                Log.d(TAG, "커스텀 스킬 제거 시도: " + customSkill + ", 제거됨: " + removed);
-            }
-            
-            Log.d(TAG, "처리 후 selectedCustomSkills: " + selectedCustomSkills.toString());
-            
-            // DB 업데이트
-            updateUserSkills();
+
         } else {
             Log.w(TAG, "알 수 없는 tag 형식: " + tag);
         }
@@ -926,27 +897,7 @@ public class MypageInterestFragment extends Fragment {
             
             // DB 업데이트
             updateUserRoles();
-        } else if (tag instanceof String && ((String) tag).startsWith("custom_")) {
-            String customRole = ((String) tag).substring(7); // "custom_" 제거
-            Log.d(TAG, "커스텀 역할 처리: customRole=" + customRole);
-            Log.d(TAG, "처리 전 selectedCustomRoles: " + selectedCustomRoles.toString());
-            
-            if (isChecked) {
-                if (!selectedCustomRoles.contains(customRole)) {
-                    selectedCustomRoles.add(customRole);
-                    Log.d(TAG, "커스텀 역할 추가됨: " + customRole);
-                } else {
-                    Log.d(TAG, "커스텀 역할 이미 선택되어 있음: " + customRole);
-                }
-            } else {
-                boolean removed = selectedCustomRoles.remove(customRole);
-                Log.d(TAG, "커스텀 역할 제거 시도: " + customRole + ", 제거됨: " + removed);
-            }
-            
-            Log.d(TAG, "처리 후 selectedCustomRoles: " + selectedCustomRoles.toString());
-            
-            // DB 업데이트
-            updateUserRoles();
+
         } else {
             Log.w(TAG, "알 수 없는 tag 형식: " + tag);
         }
@@ -976,25 +927,9 @@ public class MypageInterestFragment extends Fragment {
                 boolean removed = selectedSkillIds.remove(skillId);
                 Log.d(TAG, "스킬 제거됨: " + skillId + ", 제거 성공: " + removed);
             }
-        } else if (tag instanceof String && ((String) tag).startsWith("custom_")) {
-            String customSkill = ((String) tag).substring(7); // "custom_" 제거
-            Log.d(TAG, "커스텀 스킬 처리: customSkill=" + customSkill);
-            
-            if (isChecked) {
-                if (!selectedCustomSkills.contains(customSkill)) {
-                    selectedCustomSkills.add(customSkill);
-                    Log.d(TAG, "커스텀 스킬 추가됨: " + customSkill);
-                } else {
-                    Log.d(TAG, "커스텀 스킬 이미 선택되어 있음: " + customSkill);
-                }
-            } else {
-                boolean removed = selectedCustomSkills.remove(customSkill);
-                Log.d(TAG, "커스텀 스킬 제거됨: " + customSkill + ", 제거 성공: " + removed);
-            }
         }
         
         Log.d(TAG, "현재 선택된 스킬 IDs: " + selectedSkillIds.toString());
-        Log.d(TAG, "현재 선택된 커스텀 스킬: " + selectedCustomSkills.toString());
         Log.d(TAG, "=== 회원가입 스킬 선택 처리 끝 ===");
     }
 
@@ -1021,25 +956,9 @@ public class MypageInterestFragment extends Fragment {
                 boolean removed = selectedRoleIds.remove(roleId);
                 Log.d(TAG, "역할 제거됨: " + roleId + ", 제거 성공: " + removed);
             }
-        } else if (tag instanceof String && ((String) tag).startsWith("custom_")) {
-            String customRole = ((String) tag).substring(7); // "custom_" 제거
-            Log.d(TAG, "커스텀 역할 처리: customRole=" + customRole);
-            
-            if (isChecked) {
-                if (!selectedCustomRoles.contains(customRole)) {
-                    selectedCustomRoles.add(customRole);
-                    Log.d(TAG, "커스텀 역할 추가됨: " + customRole);
-                } else {
-                    Log.d(TAG, "커스텀 역할 이미 선택되어 있음: " + customRole);
-                }
-            } else {
-                boolean removed = selectedCustomRoles.remove(customRole);
-                Log.d(TAG, "커스텀 역할 제거됨: " + customRole + ", 제거 성공: " + removed);
-            }
         }
         
         Log.d(TAG, "현재 선택된 역할 IDs: " + selectedRoleIds.toString());
-        Log.d(TAG, "현재 선택된 커스텀 역할: " + selectedCustomRoles.toString());
         Log.d(TAG, "=== 회원가입 역할 선택 처리 끝 ===");
     }
 
@@ -1049,12 +968,11 @@ public class MypageInterestFragment extends Fragment {
     private void updateUserSkills() {
         Log.d(TAG, "=== 스킬 API 업데이트 시작 ===");
         Log.d(TAG, "selectedSkillIds: " + selectedSkillIds.toString());
-        Log.d(TAG, "selectedCustomSkills: " + selectedCustomSkills.toString());
         
         ProfileManager.getInstance(requireContext()).updateUserSkills(
             requireContext(), 
             new ArrayList<>(selectedSkillIds), 
-            selectedCustomSkills, 
+            new ArrayList<>(), 
             new ProfileManager.ProfileUpdateCallback() {
                 @Override
                 public void onSuccess(ProfileUpdateResponse response) {
@@ -1072,7 +990,13 @@ public class MypageInterestFragment extends Fragment {
                     if (getActivity() != null) {
                         getActivity().runOnUiThread(() -> {
                             Log.e(TAG, "❌ 스킬 업데이트 API 실패: " + errorMessage);
-                            android.widget.Toast.makeText(requireContext(), "스킬 업데이트 실패: " + errorMessage, android.widget.Toast.LENGTH_LONG).show();
+                            
+                            // 서버에서 이미 존재하는 스킬 에러인지 확인
+                            if (errorMessage.contains("이미 존재합니다") || errorMessage.contains("기존 스킬을 선택해주세요")) {
+                                android.widget.Toast.makeText(requireContext(), "이미 존재하는 스킬입니다. 기존 스킬 목록에서 선택해주세요.", android.widget.Toast.LENGTH_LONG).show();
+                            } else {
+                                android.widget.Toast.makeText(requireContext(), "스킬 업데이트 실패: " + errorMessage, android.widget.Toast.LENGTH_LONG).show();
+                            }
                         });
                     }
                 }
@@ -1087,7 +1011,6 @@ public class MypageInterestFragment extends Fragment {
     private void updateUserRoles() {
         Log.d(TAG, "=== 역할 API 업데이트 시작 ===");
         Log.d(TAG, "selectedRoleIds: " + selectedRoleIds.toString());
-        Log.d(TAG, "selectedCustomRoles: " + selectedCustomRoles.toString());
         
         // 토큰 확인
         TokenManager tokenManager = TokenManager.getInstance(requireContext());
@@ -1100,7 +1023,7 @@ public class MypageInterestFragment extends Fragment {
         Log.d(TAG, "토큰 확인 완료");
         
         // RoleUpdate 객체 생성
-        RoleUpdate roleUpdate = new RoleUpdate(new ArrayList<>(selectedRoleIds), selectedCustomRoles);
+        RoleUpdate roleUpdate = new RoleUpdate(new ArrayList<>(selectedRoleIds), new ArrayList<>());
         Log.d(TAG, "RoleUpdate 객체 생성 완료");
         
         // API 호출
@@ -1122,16 +1045,25 @@ public class MypageInterestFragment extends Fragment {
                         }
                     } else {
                         Log.e(TAG, "❌ 역할 업데이트 API 실패: " + response.code() + " " + response.message());
+                        String errorBody = "에러 바디 없음";
                         try {
-                            String errorBody = response.errorBody() != null ? response.errorBody().string() : "에러 바디 없음";
+                            errorBody = response.errorBody() != null ? response.errorBody().string() : "에러 바디 없음";
                             Log.e(TAG, "에러 바디: " + errorBody);
                         } catch (Exception e) {
                             Log.e(TAG, "에러 바디 읽기 실패", e);
+                            errorBody = "에러 바디 읽기 실패";
                         }
+                        
+                        final String finalErrorBody = errorBody;  // final 변수로 복사
                         
                         if (getActivity() != null) {
                             getActivity().runOnUiThread(() -> {
-                                android.widget.Toast.makeText(requireContext(), "역할 업데이트 실패: " + response.code(), android.widget.Toast.LENGTH_LONG).show();
+                                // 서버에서 이미 존재하는 역할 에러인지 확인
+                                if (finalErrorBody.contains("이미 존재합니다") || finalErrorBody.contains("기존 역할을 선택해주세요")) {
+                                    android.widget.Toast.makeText(requireContext(), "이미 존재하는 역할입니다. 기존 역할 목록에서 선택해주세요.", android.widget.Toast.LENGTH_LONG).show();
+                                } else {
+                                    android.widget.Toast.makeText(requireContext(), "역할 업데이트 실패: " + response.code(), android.widget.Toast.LENGTH_LONG).show();
+                                }
                             });
                         }
                     }
@@ -1166,17 +1098,13 @@ public class MypageInterestFragment extends Fragment {
         return new java.util.ArrayList<>(selectedSkillIds);
     }
 
-    public java.util.List<String> getSelectedCustomSkills() {
-        return new java.util.ArrayList<>(selectedCustomSkills);
-    }
+
 
     public java.util.List<Integer> getSelectedRoleIds() {
         return new java.util.ArrayList<>(selectedRoleIds);
     }
 
-    public java.util.List<String> getSelectedCustomRoles() {
-        return new java.util.ArrayList<>(selectedCustomRoles);
-    }
+
     
     /**
      * 선택된 스킬 객체들을 반환

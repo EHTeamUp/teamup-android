@@ -9,6 +9,8 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
+import java.util.ArrayList;
+
 import kr.mojuk.teamup.R;
 import kr.mojuk.teamup.api.model.StepResponse;
 import kr.mojuk.teamup.fragments.MypageInterestFragment;
@@ -54,37 +56,31 @@ public class SignupInterestActivity extends AppCompatActivity {
             
             // 선택된 기술과 역할 가져오기
             java.util.List<Integer> selectedSkillIds = interestFragment.getSelectedSkillIds();
-            java.util.List<String> selectedCustomSkills = interestFragment.getSelectedCustomSkills();
             java.util.List<Integer> selectedRoleIds = interestFragment.getSelectedRoleIds();
-            java.util.List<String> selectedCustomRoles = interestFragment.getSelectedCustomRoles();
             
             // 디버깅을 위한 로그 추가
             Log.d(TAG, "=== API 요청 데이터 ===");
             Log.d(TAG, "selectedSkillIds: " + selectedSkillIds.toString());
-            Log.d(TAG, "selectedCustomSkills: " + selectedCustomSkills.toString());
             Log.d(TAG, "selectedRoleIds: " + selectedRoleIds.toString());
-            Log.d(TAG, "selectedCustomRoles: " + selectedCustomRoles.toString());
             Log.d(TAG, "========================");
             
             // 유효성 검사
-            if (selectedSkillIds.isEmpty() && selectedCustomSkills.isEmpty()) {
-                Toast.makeText(this, "기술과 역할은 1개 이상 선택해야 합니다.", Toast.LENGTH_SHORT).show();
+            if (selectedSkillIds.isEmpty()) {
+                Toast.makeText(this, "기술은 1개 이상 선택해야 합니다.", Toast.LENGTH_SHORT).show();
                 return;
             }
             
-            if (selectedRoleIds.isEmpty() && selectedCustomRoles.isEmpty()) {
-                Toast.makeText(this, "기술과 역할은 1개 이상 선택해야 합니다.", Toast.LENGTH_SHORT).show();
+            if (selectedRoleIds.isEmpty()) {
+                Toast.makeText(this, "역할은 1개 이상 선택해야 합니다.", Toast.LENGTH_SHORT).show();
                 return;
             }
             
             // 선택된 데이터를 RegistrationManager에 저장
             registrationManager.saveSkills(interestFragment.getSelectedSkills());
             registrationManager.saveRoles(interestFragment.getSelectedRoles());
-            registrationManager.saveCustomSkills(interestFragment.getSelectedCustomSkills());
-            registrationManager.saveCustomRoles(interestFragment.getSelectedCustomRoles());
             
             // 2단계 완료 API 호출
-            registrationManager.completeStep2(userId, selectedSkillIds, selectedCustomSkills, selectedRoleIds, selectedCustomRoles, new RegistrationManager.StepCallback() {
+            registrationManager.completeStep2(userId, selectedSkillIds, new ArrayList<>(), selectedRoleIds, new ArrayList<>(), new RegistrationManager.StepCallback() {
                 @Override
                 public void onSuccess(StepResponse response) {
                     runOnUiThread(() -> {

@@ -44,14 +44,6 @@
     </LinearLayout>
 
     <!-- Title -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="수상 경력 및 공모전 활동"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:textColor="@android:color/black"
-        android:layout_marginTop="16dp" />
 
     <!-- Experience Forms Container -->
     <ScrollView

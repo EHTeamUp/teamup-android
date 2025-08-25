@@ -87,48 +87,73 @@
                 </com.google.android.material.chip.ChipGroup>
             </ScrollView>
 
-            <!-- 기술 페이지 인디케이터 -->
-            <LinearLayout
-                android:id="@+id/ll_skills_page_indicator"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center"
-                android:layout_marginBottom="8dp"
-                android:visibility="gone">
-            </LinearLayout>
+            <!-- 기술 페이지 인디케이터 + 화살표 -->
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center"
+    android:layout_marginBottom="8dp"
+    android:visibility="visible">
+
+    <!-- 왼쪽 화살표 컨테이너 -->
+    <LinearLayout
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:minHeight="32dp"
+        android:gravity="center"
+        android:layout_marginEnd="8dp">
+
+        <TextView
+            android:id="@+id/btn_indicator_skills_left"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="&lt;"
+            android:textSize="16sp"
+            android:textColor="@android:color/white"
+            android:background="@drawable/arrow_button_background"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:visibility="gone"/>
+    </LinearLayout>
+
+    <!-- 인디케이터 점들 들어갈 곳 -->
+    <LinearLayout
+        android:id="@+id/ll_skills_page_indicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"/>
+
+    <!-- 오른쪽 화살표 컨테이너 -->
+    <LinearLayout
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:minHeight="32dp"
+        android:gravity="center"
+        android:layout_marginStart="8dp">
+
+        <TextView
+            android:id="@+id/btn_indicator_skills_right"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="&gt;"
+            android:textSize="16sp"
+            android:textColor="@android:color/white"
+            android:background="@drawable/arrow_button_background"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?android:attr/selectableItemBackground"/>
+    </LinearLayout>
+
+</LinearLayout>
 
 
 
-            <!-- 언어 추가 입력 필드 -->
-            <LinearLayout
-                android:id="@+id/ll_language_input"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginBottom="32dp">
 
-                <EditText
-                    android:id="@+id/et_language_input"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:hint="다른 기술 추가"
-                    android:padding="12dp"
-                    android:background="@drawable/edit_text_background"
-                    android:layout_marginEnd="8dp" />
-
-                <Button
-                    android:id="@+id/btn_add_language"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="추가"
-                    app:cornerRadius="10dp"
-                    android:textColor="@android:color/white"
-                    android:backgroundTint="@android:color/black"
-                    android:padding="12dp" />
-
-            </LinearLayout>
 
             <!-- 역할 타이틀 -->
             <TextView
@@ -158,47 +183,73 @@
                 </com.google.android.material.chip.ChipGroup>
             </ScrollView>
 
-            <!-- 역할 페이지 인디케이터 -->
-            <LinearLayout
-                android:id="@+id/ll_roles_page_indicator"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center"
-                android:layout_marginBottom="8dp"
-                android:visibility="gone">
-            </LinearLayout>
+           <!-- 역할 페이지 인디케이터 + 화살표 -->
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center"
+    android:layout_marginBottom="8dp"
+    android:visibility="visible">
+
+    <!-- 왼쪽 화살표 컨테이너 -->
+    <LinearLayout
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:minHeight="32dp"
+        android:gravity="center"
+        android:layout_marginEnd="8dp">
+
+        <TextView
+            android:id="@+id/btn_indicator_roles_left"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="&lt;"
+            android:textSize="16sp"
+            android:textColor="@android:color/white"
+            android:background="@drawable/arrow_button_background"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:visibility="gone"/>
+    </LinearLayout>
+
+    <!-- 인디케이터 점들 들어갈 곳 -->
+    <LinearLayout
+        android:id="@+id/ll_roles_page_indicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"/>
+
+    <!-- 오른쪽 화살표 컨테이너 -->
+    <LinearLayout
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:minHeight="32dp"
+        android:gravity="center"
+        android:layout_marginStart="8dp">
+
+        <TextView
+            android:id="@+id/btn_indicator_roles_right"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="&gt;"
+            android:textSize="16sp"
+            android:textColor="@android:color/white"
+            android:background="@drawable/arrow_button_background"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?android:attr/selectableItemBackground"/>
+    </LinearLayout>
+
+</LinearLayout>
 
 
 
-            <!-- 역할 추가 입력 필드 -->
-            <LinearLayout
-                android:id="@+id/ll_role_input"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
 
-                <EditText
-                    android:id="@+id/et_role_input"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:hint="다른 역할 추가"
-                    android:padding="12dp"
-                    android:background="@drawable/edit_text_background"
-                    android:layout_marginEnd="8dp" />
-
-                <Button
-                    android:id="@+id/btn_add_role"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="추가"
-                    app:cornerRadius="10dp"
-                    android:textColor="@android:color/white"
-                    android:backgroundTint="@android:color/black"
-                    android:padding="12dp" />
-
-            </LinearLayout>
 
         </LinearLayout>
 
