@@ -81,6 +81,7 @@ public class ContestListFragment extends Fragment {
     // --- 수정: 정렬 로직을 처리하는 공통 메서드 ---
     private void sortAndDisplayContests(List<ContestInformation> contests) {
         if (contests == null || contests.isEmpty()) {
+            showEmptyMessage(true);
             adapter.submitList(new ArrayList<>());
             return;
         }
@@ -112,17 +113,38 @@ public class ContestListFragment extends Fragment {
         // 3. 두 리스트를 합침 (진행 중 -> 마감 순)
         ongoingContests.addAll(finishedContests);
 
-        // 4. 어댑터에 최종 리스트 전달
+        // 4. 최종 리스트가 비어있는지 확인
+        if (ongoingContests.isEmpty()) {
+            showEmptyMessage(true);
+        } else {
+            showEmptyMessage(false);
+        }
+
+        // 5. 어댑터에 최종 리스트 전달
         adapter.submitList(ongoingContests);
     }
+
+    private void showEmptyMessage(boolean isEmpty) {
+        if (binding == null) return;
+
+        if (isEmpty) {
+            binding.tvNoContests.setVisibility(View.VISIBLE);
+            binding.recyclerviewContests.setVisibility(View.GONE);
+        } else {
+            binding.tvNoContests.setVisibility(View.GONE);
+            binding.recyclerviewContests.setVisibility(View.VISIBLE);
+        }
+    }
+
+
     private void showLoading(boolean isLoading) {
         if (binding == null) return;
         if (isLoading) {
             binding.progressBar.setVisibility(View.VISIBLE);
             binding.recyclerviewContests.setVisibility(View.GONE);
+            binding.tvNoContests.setVisibility(View.GONE); // 로딩 중일 때 빈 메시지 숨김
         } else {
             binding.progressBar.setVisibility(View.GONE);
-            binding.recyclerviewContests.setVisibility(View.VISIBLE);
         }
     }
 
@@ -137,7 +159,7 @@ public class ContestListFragment extends Fragment {
                 if (response.isSuccessful() && response.body() != null) {
                     sortAndDisplayContests(response.body().getContests());
                     if (lastAppliedFilterIds.isEmpty()) {
-                        binding.tvOngoingTitle.setText("전체 공모전 목록");
+                        binding.tvCategoryTitle.setText("전체 공모전 목록");
                     }
 
                 } else {
@@ -345,10 +367,10 @@ public class ContestListFragment extends Fragment {
         if (binding == null) return;
 
         if (selectedIds.isEmpty()) {
-            binding.tvOngoingTitle.setText("전체 공모전 목록");
+            binding.tvCategoryTitle.setText("전체 공모전 목록");
         } else if (selectedIds.size() == 1) {
             String filterName = getFilterNameById(selectedIds.get(0));
-            binding.tvOngoingTitle.setText(filterName);
+            binding.tvCategoryTitle.setText(filterName);
         } else {
             // ID를 정렬하여 항상 동일한 첫 번째 필터 이름이 표시되도록 합니다.
             List<Integer> sortedIds = new ArrayList<>(selectedIds);
@@ -357,7 +379,7 @@ public class ContestListFragment extends Fragment {
             String firstFilterName = getFilterNameById(sortedIds.get(0));
             int otherFiltersCount = sortedIds.size() - 1;
             String title = firstFilterName + " 외 " + otherFiltersCount + "개";
-            binding.tvOngoingTitle.setText(title);
+            binding.tvCategoryTitle.setText(title);
         }
     }
 
