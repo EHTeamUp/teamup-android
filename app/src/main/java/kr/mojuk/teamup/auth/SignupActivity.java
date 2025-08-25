@@ -207,12 +207,6 @@ public class SignupActivity extends AppCompatActivity {
             Toast.makeText(this, "이메일을 먼저 입력해주세요.", Toast.LENGTH_SHORT).show();
             return;
         }
-        
-        // @itc.ac.kr 형식 검증
-        if (!email.endsWith("@itc.ac.kr")) {
-            Toast.makeText(this, "인하공전 이메일(@itc.ac.kr)만 사용 가능합니다.", Toast.LENGTH_SHORT).show();
-            return;
-        }
 
         EmailVerificationCode request = new EmailVerificationCode(email, inputCode);
         RetrofitClient.getInstance().getApiService().verifyEmail(request).enqueue(new Callback<EmailVerificationResponse>() {

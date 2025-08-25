@@ -89,6 +89,16 @@ public class HomeFragment extends Fragment {
 
         return root;
     }
+
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        // HomeFragment가 숨겨지지 않고 보여질 때 네비게이션 바의 Home 탭 활성화
+        if (!hidden && getActivity() instanceof MainActivity) {
+            ((MainActivity) getActivity()).setBottomNavigationItem(R.id.navigation_home);
+        }
+    }
+
     // 최신 공모전 목록 로드
     private void loadLatestContests() {
         Log.d("HomeFragment", "🔍 loadLatestContests 시작");

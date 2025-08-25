@@ -36,12 +36,18 @@ public class ContestInformationDetailFragment extends Fragment {
     private FragmentContestInformationDetailBinding binding;
     private ApiService apiService;
     private int contestId = -1;
+    private boolean fromHome = false;
 
     // Fragment 인스턴스를 생성하고 arguments를 설정하는 정적 메서드
     public static ContestInformationDetailFragment newInstance(ContestInformation contest) {
+        return newInstance(contest, false);
+    }
+    
+    public static ContestInformationDetailFragment newInstance(ContestInformation contest, boolean fromHome) {
         ContestInformationDetailFragment fragment = new ContestInformationDetailFragment();
         Bundle args = new Bundle();
         args.putInt("CONTEST_ID", contest.getContestId());
+        args.putBoolean("FROM_HOME", fromHome);
         fragment.setArguments(args);
         return fragment;
     }
@@ -52,6 +58,7 @@ public class ContestInformationDetailFragment extends Fragment {
         // Arguments에서 contestId를 안전하게 가져옴
         if (getArguments() != null) {
             contestId = getArguments().getInt("CONTEST_ID", -1);
+            fromHome = getArguments().getBoolean("FROM_HOME", false);
         }
     }
 
@@ -81,6 +88,10 @@ public class ContestInformationDetailFragment extends Fragment {
         // 뒤로가기 버튼
         binding.btnBackTitle.setOnClickListener(v -> {
             if (getActivity() != null) {
+                // Home에서 접근한 경우에만 하단 네비게이션을 Home 탭으로 이동
+                if (fromHome && getActivity() instanceof MainActivity) {
+                    ((MainActivity) getActivity()).setBottomNavigationItem(R.id.navigation_home);
+                }
                 getActivity().getSupportFragmentManager().popBackStack();
             }
         });
