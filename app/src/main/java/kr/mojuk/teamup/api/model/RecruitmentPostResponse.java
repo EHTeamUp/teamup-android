@@ -29,6 +29,9 @@ public class RecruitmentPostResponse {
     
     @SerializedName("due_date")
     private String dueDate;
+    
+    @SerializedName("filter_id")
+    private Integer filterId;
 
     public RecruitmentPostResponse(int recruitmentPostId, String title, String content, 
                                  int recruitmentCount, int contestId, String userId, 
@@ -66,4 +69,7 @@ public class RecruitmentPostResponse {
 
     public String getDueDate() { return dueDate; }
     public void setDueDate(String dueDate) { this.dueDate = dueDate; }
+    
+    public Integer getFilterId() { return filterId; }
+    public void setFilterId(Integer filterId) { this.filterId = filterId; }
 }

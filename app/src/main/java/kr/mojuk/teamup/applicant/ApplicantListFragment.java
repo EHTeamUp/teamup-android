@@ -51,6 +51,7 @@ public class ApplicantListFragment extends Fragment {
     private MaterialButton btnAcceptSelected;
     private ApiService apiService;
     private int currentRecruitmentPostId; // 현재 게시글 ID
+    private Integer currentFilterId; // 현재 게시글의 filter_id
 
     // Fragment 인스턴스를 생성하고 arguments를 설정하는 정적 메서드
     public static ApplicantListFragment newInstance(int recruitmentPostId) {
@@ -110,6 +111,8 @@ public class ApplicantListFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
         
+        // 모집 게시글 정보 로드 (filter_id 포함)
+        loadRecruitmentPostInfo();
         // API에서 지원자 목록 로드
         loadApplicantsFromApi();
         Log.d(TAG, "setupRecyclerView 완료");
@@ -176,11 +179,15 @@ public class ApplicantListFragment extends Fragment {
                 }
             }
             
-            // TeamSynergyScoreFragment로 이동하면서 선택된 사용자 ID들 전달
+            // TeamSynergyScoreFragment로 이동하면서 선택된 사용자 ID들과 filter_id 전달
             if (getActivity() != null) {
                 TeamSynergyScoreFragment fragment = new TeamSynergyScoreFragment();
                 Bundle args = new Bundle();
                 args.putStringArrayList("selected_user_ids", new ArrayList<>(selectedUserIds));
+                if (currentFilterId != null) {
+                    args.putInt("filter_id", currentFilterId);
+                    Log.d(TAG, "filter_id 전달: " + currentFilterId);
+                }
                 fragment.setArguments(args);
                 
                 getActivity().getSupportFragmentManager()
@@ -238,6 +245,9 @@ public class ApplicantListFragment extends Fragment {
             public void onResponse(Call<RecruitmentPostResponse> call, Response<RecruitmentPostResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     RecruitmentPostResponse post = response.body();
+                    // filter_id 저장
+                    currentFilterId = post.getFilterId();
+                    Log.d(TAG, "filter_id 저장됨: " + currentFilterId);
                     // 모집 게시글 정보를 받은 후 공모전 정보 로드
                     loadContestInfo(post.getContestId());
                 } else {

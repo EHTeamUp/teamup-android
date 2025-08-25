@@ -36,6 +36,7 @@ public class TeamSynergyScoreFragment extends Fragment {
     private List<TeamMemberData> teamMemberList;
     private TextView tvSynergyScore;
     private TokenManager tokenManager;
+    private int filterId; // filter_id 저장 변수
 
     @Nullable
     @Override
@@ -49,6 +50,12 @@ public class TeamSynergyScoreFragment extends Fragment {
         
         // TokenManager 초기화
         tokenManager = TokenManager.getInstance(requireContext());
+        
+        // filter_id 받아오기
+        if (getArguments() != null) {
+            filterId = getArguments().getInt("filter_id", 1); // 기본값 1
+            Log.d("TeamSynergyScore", "filter_id 받음: " + filterId);
+        }
         
         initViews(view);
         setupRecyclerView();
@@ -152,8 +159,9 @@ public class TeamSynergyScoreFragment extends Fragment {
             return;
         }
 
-        // 시너지 분석 요청 생성
-        SynergyAnalysisRequest request = new SynergyAnalysisRequest(userIds);
+        // 시너지 분석 요청 생성 (filter_id 포함)
+        SynergyAnalysisRequest request = new SynergyAnalysisRequest(userIds, filterId);
+        Log.d("TeamSynergyScore", "filter_id 포함하여 요청 생성: " + filterId);
 
         Log.d("TeamSynergyScore", "시너지 분석 API 호출 시작");
         Log.d("TeamSynergyScore", "요청 데이터: " + userIds);
