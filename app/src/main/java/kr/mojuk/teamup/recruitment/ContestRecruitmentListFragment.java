@@ -14,6 +14,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -23,7 +24,7 @@ import java.util.Set;
 import kr.mojuk.teamup.R;
 import kr.mojuk.teamup.api.ApiService;
 import kr.mojuk.teamup.api.RetrofitClient;
-import kr.mojuk.teamup.api.model.FilterItem; // 필터 모델 import 추가
+import kr.mojuk.teamup.api.model.FilterItem;
 import kr.mojuk.teamup.api.model.RecruitmentPostDTO;
 import kr.mojuk.teamup.databinding.FragmentContestRecruitmentListBinding;
 import retrofit2.Call;
@@ -36,10 +37,11 @@ public class ContestRecruitmentListFragment extends Fragment {
     private ApiService apiService;
     private TeamRecruitmentAdapter adapter;
 
-    // 원본 및 필터링된 데이터 저장을 위한 리스트
     private List<RecruitmentPostDTO> allPosts = new ArrayList<>();
     private List<RecruitmentPostDTO> currentlyDisplayedPosts = new ArrayList<>();
-    private List<FilterItem> availableFilters = new ArrayList<>(); // 서버에서 받아올 필터 목록
+    private List<FilterItem> availableFilters = new ArrayList<>();
+
+    private List<Integer> lastAppliedFilterIds = new ArrayList<>();
 
     @Nullable
     @Override
@@ -56,11 +58,16 @@ public class ContestRecruitmentListFragment extends Fragment {
 
         setupRecyclerView();
         setupClickListeners();
-        loadFilters(); // 필터 목록 먼저 불러오기
+        loadFilters();
         loadRecruitmentPosts();
+
+        binding.spinnerSortFilter.setVisibility(View.GONE);
+
+        if (lastAppliedFilterIds.isEmpty()) {
+            binding.tvCategoryFilterTitle.setText("카테고리로 게시글 필터링");
+        }
     }
 
-    // RecyclerView 설정
     private void setupRecyclerView() {
         adapter = new TeamRecruitmentAdapter();
         binding.recyclerViewBoard.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -76,9 +83,7 @@ public class ContestRecruitmentListFragment extends Fragment {
         });
     }
 
-    // 모든 클릭 리스너 설정
     private void setupClickListeners() {
-        // ▼▼▼ 추가된 부분: 드롭다운 메뉴 토글 ▼▼▼
         binding.tvCategoryFilterTitle.setOnClickListener(v -> {
             if (binding.layoutCheckboxFilterBox.getVisibility() == View.GONE) {
                 binding.layoutCheckboxFilterBox.setVisibility(View.VISIBLE);
@@ -86,11 +91,12 @@ public class ContestRecruitmentListFragment extends Fragment {
                 binding.layoutCheckboxFilterBox.setVisibility(View.GONE);
             }
         });
-        // ▲▲▲ 추가된 부분 ▲▲▲
 
-        // '적용' 버튼 리스너 (1차 필터링)
         binding.btnApply.setOnClickListener(v -> {
             List<Integer> selectedFilterIds = getSelectedFilterIds();
+            lastAppliedFilterIds.clear();
+            lastAppliedFilterIds.addAll(selectedFilterIds);
+            updateFilterTitle(selectedFilterIds);
             List<RecruitmentPostDTO> filteredList = new ArrayList<>();
 
             if (selectedFilterIds.isEmpty()) {
@@ -102,12 +108,13 @@ public class ContestRecruitmentListFragment extends Fragment {
                     }
                 }
             }
-            updateRecyclerView(filteredList);
+            sortAndDisplayPosts(filteredList); // 정렬 메서드 호출로 변경
             updateContestSpinner(filteredList);
-            binding.layoutCheckboxFilterBox.setVisibility(View.GONE); // 적용 후 메뉴 닫기
+            binding.layoutCheckboxFilterBox.setVisibility(View.GONE);
+
+            binding.spinnerSortFilter.setVisibility(View.VISIBLE);
         });
 
-        // '초기화' 버튼 리스너
         binding.btnReset.setOnClickListener(v -> {
             binding.checkboxWebApp.setChecked(false);
             binding.checkboxAi.setChecked(false);
@@ -115,13 +122,14 @@ public class ContestRecruitmentListFragment extends Fragment {
             binding.checkboxIot.setChecked(false);
             binding.checkboxPlanning.setChecked(false);
             binding.checkboxSecurity.setChecked(false);
-
+            lastAppliedFilterIds.clear();
+            updateFilterTitle(new ArrayList<>());
             binding.spinnerSortFilter.setAdapter(null);
-            updateRecyclerView(allPosts);
-            binding.layoutCheckboxFilterBox.setVisibility(View.GONE); // 초기화 후 메뉴 닫기
+            sortAndDisplayPosts(allPosts); // 정렬 메서드 호출로 변경
+            binding.spinnerSortFilter.setVisibility(View.GONE);
+            binding.layoutCheckboxFilterBox.setVisibility(View.GONE);
         });
 
-        // Spinner 아이템 선택 리스너 (2차 필터링)
         binding.spinnerSortFilter.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -141,13 +149,10 @@ public class ContestRecruitmentListFragment extends Fragment {
             }
 
             @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                // 필수 구현 메서드
-            }
+            public void onNothingSelected(AdapterView<?> parent) {}
         });
     }
 
-    // ▼▼▼ 추가된 부분: 서버에서 필터 목록 불러오기 ▼▼▼
     private void loadFilters() {
         apiService.getFilters().enqueue(new Callback<List<FilterItem>>() {
             @Override
@@ -166,9 +171,7 @@ public class ContestRecruitmentListFragment extends Fragment {
             }
         });
     }
-    // ▲▲▲ 추가된 부분 ▲▲▲
 
-    // 서버에서 모든 게시글 데이터 불러오기
     private void loadRecruitmentPosts() {
         apiService.getAllRecruitmentPosts().enqueue(new Callback<List<RecruitmentPostDTO>>() {
             @Override
@@ -176,7 +179,16 @@ public class ContestRecruitmentListFragment extends Fragment {
                 if (response.isSuccessful() && response.body() != null) {
                     allPosts.clear();
                     allPosts.addAll(response.body());
-                    updateRecyclerView(allPosts); // 초기 화면 설정
+                    // ▼▼▼ 수정된 부분 ▼▼▼
+                    // 뷰가 다시 생성되었을 때를 대비해 필터 상태를 복원합니다.
+                    if (!lastAppliedFilterIds.isEmpty()) {
+                        // 저장된 필터 ID가 있으면 필터링을 다시 적용합니다.
+                        applySavedFilters();
+                    } else {
+                        // 저장된 필터가 없으면 전체 목록을 정렬하여 보여줍니다.
+                        sortAndDisplayPosts(allPosts);
+                    }
+                    // ▲▲▲ 여기까지 ▲▲▲
                 } else {
                     Toast.makeText(getContext(), "모집글을 불러오지 못했습니다.", Toast.LENGTH_SHORT).show();
                 }
@@ -192,7 +204,97 @@ public class ContestRecruitmentListFragment extends Fragment {
         });
     }
 
-    // Spinner 내용 업데이트
+    private void applySavedFilters() {
+        List<RecruitmentPostDTO> filteredList = new ArrayList<>();
+
+        if (lastAppliedFilterIds.isEmpty()) {
+            filteredList.addAll(allPosts);
+        } else {
+            for (RecruitmentPostDTO post : allPosts) {
+                if (lastAppliedFilterIds.contains(post.getFilterId())) {
+                    filteredList.add(post);
+                }
+            }
+        }
+
+        updateFilterTitle(lastAppliedFilterIds);
+        sortAndDisplayPosts(filteredList);
+        updateContestSpinner(filteredList);
+        binding.spinnerSortFilter.setVisibility(View.VISIBLE);
+        updateCheckboxes();
+    }
+    private void updateCheckboxes() {
+        if (binding == null) return;
+        binding.checkboxWebApp.setChecked(lastAppliedFilterIds.contains(getFilterIdByName("웹/앱")));
+        binding.checkboxAi.setChecked(lastAppliedFilterIds.contains(getFilterIdByName("AI/데이터")));
+        binding.checkboxPlanning.setChecked(lastAppliedFilterIds.contains(getFilterIdByName("아이디어/기획")));
+        binding.checkboxIot.setChecked(lastAppliedFilterIds.contains(getFilterIdByName("IoT/임베디드")));
+        binding.checkboxGame.setChecked(lastAppliedFilterIds.contains(getFilterIdByName("게임")));
+        binding.checkboxSecurity.setChecked(lastAppliedFilterIds.contains(getFilterIdByName("정보보안/블록체인")));
+    }
+
+    // ▼▼▼ 새로 추가된 정렬 메서드 ▼▼▼
+    private void sortAndDisplayPosts(List<RecruitmentPostDTO> posts) {
+        if (posts == null) {
+            posts = new ArrayList<>();
+        }
+
+        List<RecruitmentPostDTO> ongoingPosts = new ArrayList<>();
+        List<RecruitmentPostDTO> finishedPosts = new ArrayList<>();
+        LocalDate today = LocalDate.now();
+
+        for (RecruitmentPostDTO post : posts) {
+            LocalDate dueDate = post.getDueDateAsDate();
+            if (dueDate != null && dueDate.isBefore(today)) {
+                finishedPosts.add(post);
+            } else {
+                ongoingPosts.add(post);
+            }
+        }
+
+        Collections.sort(ongoingPosts, (p1, p2) -> {
+            LocalDate d1 = p1.getDueDateAsDate();
+            LocalDate d2 = p2.getDueDateAsDate();
+            if (d1 == null && d2 == null) return 0;
+            if (d1 == null) return 1;
+            if (d2 == null) return -1;
+            return d1.compareTo(d2);
+        });
+
+        ongoingPosts.addAll(finishedPosts);
+        updateRecyclerView(ongoingPosts);
+    }
+
+    //필터 ID로 필터 이름을 찾기
+    private String getFilterNameById(int filterId) {
+        for (FilterItem filter : availableFilters) {
+            if (filter.getFilterId() == filterId) {
+                return filter.getName();
+            }
+        }
+        return "필터"; // 찾지 못한 경우 기본값
+    }
+
+    // 선택된 필터 ID 목록을 기반으로 드롭다운 제목을 업데이트
+    private void updateFilterTitle(List<Integer> selectedIds) {
+        if (binding == null) return;
+
+        if (selectedIds.isEmpty()) {
+            binding.tvCategoryFilterTitle.setText("카테고리로 게시글 필터링");
+        } else if (selectedIds.size() == 1) {
+            String filterName = getFilterNameById(selectedIds.get(0));
+            binding.tvCategoryFilterTitle.setText(filterName);
+        } else {
+            List<Integer> sortedIds = new ArrayList<>(selectedIds);
+            Collections.sort(sortedIds);
+
+            String firstFilterName = getFilterNameById(sortedIds.get(0));
+            int otherFiltersCount = sortedIds.size() - 1;
+            String title = firstFilterName + " 외 " + otherFiltersCount + "개";
+            binding.tvCategoryFilterTitle.setText(title);
+        }
+    }
+
     private void updateContestSpinner(List<RecruitmentPostDTO> posts) {
         Set<String> contestNamesSet = new HashSet<>();
         for (RecruitmentPostDTO post : posts) {
@@ -208,14 +310,12 @@ public class ContestRecruitmentListFragment extends Fragment {
         binding.spinnerSortFilter.setAdapter(spinnerAdapter);
     }
 
-    // RecyclerView와 현재 표시 목록 업데이트
     private void updateRecyclerView(List<RecruitmentPostDTO> postsToShow) {
         currentlyDisplayedPosts.clear();
         currentlyDisplayedPosts.addAll(postsToShow);
         adapter.submitList(new ArrayList<>(currentlyDisplayedPosts));
     }
 
-    // ▼▼▼ 수정된 부분: 동적으로 필터 ID를 찾도록 변경 ▼▼▼
     private List<Integer> getSelectedFilterIds() {
         List<Integer> selectedIds = new ArrayList<>();
         if (binding.checkboxWebApp.isChecked()) selectedIds.add(getFilterIdByName("웹/앱"));
@@ -225,20 +325,18 @@ public class ContestRecruitmentListFragment extends Fragment {
         if (binding.checkboxGame.isChecked()) selectedIds.add(getFilterIdByName("게임"));
         if (binding.checkboxSecurity.isChecked()) selectedIds.add(getFilterIdByName("정보보안/블록체인"));
 
-        selectedIds.removeIf(id -> id == -1); // 찾지 못한 ID는 제거
+        selectedIds.removeIf(id -> id == -1);
         return selectedIds;
     }
 
-    // 필터 이름으로 ID를 찾는 헬퍼 메서드
     private int getFilterIdByName(String filterName) {
         for (FilterItem filter : availableFilters) {
             if (filter.getName().equals(filterName)) {
                 return filter.getFilterId();
             }
         }
-        return -1; // 해당 이름의 필터를 찾지 못한 경우
+        return -1;
     }
-    // ▲▲▲ 수정된 부분 ▲▲▲
 
     @Override
     public void onDestroyView() {

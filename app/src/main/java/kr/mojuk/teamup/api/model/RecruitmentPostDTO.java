@@ -1,6 +1,9 @@
 package kr.mojuk.teamup.api.model;
 
 import com.google.gson.annotations.SerializedName;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
 public class RecruitmentPostDTO {
@@ -36,7 +39,7 @@ public class RecruitmentPostDTO {
     @SerializedName("accepted_count")
     private int acceptedCount;
 
-    @SerializedName("filter_id ")
+    @SerializedName("filter_id")
     private int filterId;
 
     // --- Getter 메서드들 ---
@@ -51,6 +54,19 @@ public class RecruitmentPostDTO {
     public String getDueDate() { return dueDate; }
     public int getAcceptedCount() { return acceptedCount; }
     public int getFilterId(){ return filterId; }
+
+    public LocalDate getDueDateAsDate() {
+        if (dueDate == null || dueDate.isEmpty()) {
+            return null;
+        }
+        try {
+            // "yyyy-MM-dd" 형식의 문자열을 LocalDate로 파싱합니다.
+            return LocalDate.parse(dueDate, DateTimeFormatter.ISO_LOCAL_DATE);
+        } catch (Exception e) {
+            // 파싱 중 오류가 발생하면 null을 반환합니다.
+            return null;
+        }
+    }
 
     // ▼▼▼ 수정된 부분 ▼▼▼
     @Override

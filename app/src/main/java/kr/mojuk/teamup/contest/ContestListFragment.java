@@ -39,6 +39,9 @@ public class ContestListFragment extends Fragment {
     private List<FilterItem> availableFilters = new ArrayList<>();
     private ApiService apiService;
 
+    // 마지막 필터 상태를 저장할 변수
+    private List<Integer> lastAppliedFilterIds = new ArrayList<>();
+
     public ContestListFragment() {
     }
 
@@ -55,7 +58,6 @@ public class ContestListFragment extends Fragment {
         apiService = RetrofitClient.getInstance().getApiService();
         setupRecyclerView();
         loadFilters();
-        loadAllContests();
         setupDropdownMenu();
         setupFilterButtons();
     }
@@ -134,7 +136,9 @@ public class ContestListFragment extends Fragment {
                 if (binding == null) return; 
                 if (response.isSuccessful() && response.body() != null) {
                     sortAndDisplayContests(response.body().getContests());
-                    binding.tvOngoingTitle.setText("전체 공모전 목록");
+                    if (lastAppliedFilterIds.isEmpty()) {
+                        binding.tvOngoingTitle.setText("전체 공모전 목록");
+                    }
 
                 } else {
                     Toast.makeText(getContext(), "공모전 정보를 불러오지 못했습니다.", Toast.LENGTH_SHORT).show();
@@ -162,17 +166,7 @@ public class ContestListFragment extends Fragment {
                 if (response.isSuccessful() && response.body() != null) {
                     List<ContestInformation> contestsFromServer = response.body().getContests();
                     if (contestsFromServer != null) {
-                        // 날짜순 정렬
-                        Collections.sort(contestsFromServer, (c1, c2) -> {
-                            LocalDate d1 = c1.getDueDate();
-                            LocalDate d2 = c2.getDueDate();
-                            if (d1 == null || d2 == null) return 0;
-                            return d1.compareTo(d2);
-                        });
-
-                        if (binding != null) {
-                            adapter.submitList(new ArrayList<>(contestsFromServer));
-                        }
+                        sortAndDisplayContests(response.body().getContests());
                     }
                 } else {
                     Toast.makeText(getContext(), "필터된 공모전 정보를 불러오지 못했습니다.", Toast.LENGTH_SHORT).show();
@@ -252,6 +246,8 @@ public class ContestListFragment extends Fragment {
                     availableFilters.clear();
                     availableFilters.addAll(response.body());
                     Log.d("ContestListFragment", "Loaded " + availableFilters.size() + " filters");
+
+                    restoreStateAndLoadContests();
                 } else {
                     Log.e("ContestListFragment", "Failed to load filters");
                     Toast.makeText(getContext(), "필터 정보를 불러오지 못했습니다.", Toast.LENGTH_SHORT).show();
@@ -264,6 +260,33 @@ public class ContestListFragment extends Fragment {
                 Toast.makeText(getContext(), "필터 정보를 불러오지 못했습니다.", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void restoreStateAndLoadContests() {
+        // 체크박스 UI 상태를 먼저 복원합니다.
+        updateCheckboxes();
+
+        updateFilterTitle(lastAppliedFilterIds);
+
+        // 저장된 필터 ID에 따라 적절한 데이터 로드 메서드를 호출합니다.
+        if (lastAppliedFilterIds.isEmpty()) {
+            loadAllContests();
+        } else if (lastAppliedFilterIds.size() == 1) {
+            loadContestsByFilter(lastAppliedFilterIds.get(0));
+        } else {
+            loadContestsByMultipleFilters(lastAppliedFilterIds);
+        }
+    }
+
+    private void updateCheckboxes() {
+        if (binding == null) return;
+        // getFilterIdByName이 제대로 동작하려면 availableFilters가 로드된 후에 호출되어야 합니다.
+        binding.checkboxWebApp.setChecked(lastAppliedFilterIds.contains(getFilterIdByName("웹/앱")));
+        binding.checkboxAi.setChecked(lastAppliedFilterIds.contains(getFilterIdByName("AI/데이터 사이언스")));
+        binding.checkboxPlanning.setChecked(lastAppliedFilterIds.contains(getFilterIdByName("아이디어/기획")));
+        binding.checkboxDataAnalysis.setChecked(lastAppliedFilterIds.contains(getFilterIdByName("IoT/임베디드")));
+        binding.checkboxIdea.setChecked(lastAppliedFilterIds.contains(getFilterIdByName("게임")));
+        binding.checkboxIot.setChecked(lastAppliedFilterIds.contains(getFilterIdByName("정보보안/블록체인")));
     }
 
     private void setupDropdownMenu() {
@@ -286,6 +309,10 @@ public class ContestListFragment extends Fragment {
     private void applyFilter() {
         List<Integer> selectedFilterIds = getSelectedFilterIds();
 
+        lastAppliedFilterIds.clear();
+        lastAppliedFilterIds.addAll(selectedFilterIds);
+        updateFilterTitle(selectedFilterIds);
+
         if (selectedFilterIds.isEmpty()) {
             // 필터가 선택되지 않으면 전체 공모전 로드
             loadAllContests();
@@ -303,10 +330,34 @@ public class ContestListFragment extends Fragment {
     }
 
     private void resetFilter() {
+        lastAppliedFilterIds.clear();
         uncheckAllFilters();
         loadAllContests();
+
+        updateFilterTitle(new ArrayList<>());
+
         if (binding != null) {
             binding.layoutFilterBox.setVisibility(View.GONE);
+        }
+    }
+
+    private void updateFilterTitle(List<Integer> selectedIds) {
+        if (binding == null) return;
+
+        if (selectedIds.isEmpty()) {
+            binding.tvOngoingTitle.setText("전체 공모전 목록");
+        } else if (selectedIds.size() == 1) {
+            String filterName = getFilterNameById(selectedIds.get(0));
+            binding.tvOngoingTitle.setText(filterName);
+        } else {
+            // ID를 정렬하여 항상 동일한 첫 번째 필터 이름이 표시되도록 합니다.
+            List<Integer> sortedIds = new ArrayList<>(selectedIds);
+            Collections.sort(sortedIds);
+
+            String firstFilterName = getFilterNameById(sortedIds.get(0));
+            int otherFiltersCount = sortedIds.size() - 1;
+            String title = firstFilterName + " 외 " + otherFiltersCount + "개";
+            binding.tvOngoingTitle.setText(title);
         }
     }
 
