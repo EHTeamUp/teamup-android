@@ -244,15 +244,11 @@ public class ContestRecruitmentDetailFragment extends Fragment implements Commen
                         binding.btnApply.setEnabled(false);
                         binding.tvApplyText.setText("모집 마감");
 
-                        if (getContext() != null) {
-                            binding.btnApply.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.light_gray));
-                        }
 
                         binding.ivApplyArrowRight.setVisibility(View.GONE); // 화살표 숨기기
                         // 댓글 작성 비활성화
                         binding.etCommentInput.setEnabled(false);
-                        binding.btnCommentSubmit.setEnabled(false);
-                        binding.etCommentInput.setHint("모집이 마감되어 댓글을 작성할 수 없습니다.");
+                        binding.etCommentInput.setHint("댓글을 작성 할 수 없습니다");
                     } else {
                         binding.ddayText.setText(dDayText);
 
