@@ -64,7 +64,7 @@ public class ContestRecruitmentListFragment extends Fragment {
         binding.spinnerSortFilter.setVisibility(View.GONE);
 
         if (lastAppliedFilterIds.isEmpty()) {
-            binding.tvCategoryFilterTitle.setText("카테고리로 게시글 필터링");
+            binding.tvCategoryFilterTitle.setText("전체 게시글 목록");
         }
     }
 
@@ -226,7 +226,7 @@ public class ContestRecruitmentListFragment extends Fragment {
     private void updateCheckboxes() {
         if (binding == null) return;
         binding.checkboxWebApp.setChecked(lastAppliedFilterIds.contains(getFilterIdByName("웹/앱")));
-        binding.checkboxAi.setChecked(lastAppliedFilterIds.contains(getFilterIdByName("AI/데이터")));
+        binding.checkboxAi.setChecked(lastAppliedFilterIds.contains(getFilterIdByName("AI/데이터 사이언스")));
         binding.checkboxPlanning.setChecked(lastAppliedFilterIds.contains(getFilterIdByName("아이디어/기획")));
         binding.checkboxIot.setChecked(lastAppliedFilterIds.contains(getFilterIdByName("IoT/임베디드")));
         binding.checkboxGame.setChecked(lastAppliedFilterIds.contains(getFilterIdByName("게임")));
@@ -280,7 +280,7 @@ public class ContestRecruitmentListFragment extends Fragment {
         if (binding == null) return;
 
         if (selectedIds.isEmpty()) {
-            binding.tvCategoryFilterTitle.setText("카테고리로 게시글 필터링");
+            binding.tvCategoryFilterTitle.setText("전체 게시글 목록");
         } else if (selectedIds.size() == 1) {
             String filterName = getFilterNameById(selectedIds.get(0));
             binding.tvCategoryFilterTitle.setText(filterName);
@@ -319,7 +319,7 @@ public class ContestRecruitmentListFragment extends Fragment {
     private List<Integer> getSelectedFilterIds() {
         List<Integer> selectedIds = new ArrayList<>();
         if (binding.checkboxWebApp.isChecked()) selectedIds.add(getFilterIdByName("웹/앱"));
-        if (binding.checkboxAi.isChecked()) selectedIds.add(getFilterIdByName("AI/데이터"));
+        if (binding.checkboxAi.isChecked()) selectedIds.add(getFilterIdByName("AI/데이터 사이언스"));
         if (binding.checkboxPlanning.isChecked()) selectedIds.add(getFilterIdByName("아이디어/기획"));
         if (binding.checkboxIot.isChecked()) selectedIds.add(getFilterIdByName("IoT/임베디드"));
         if (binding.checkboxGame.isChecked()) selectedIds.add(getFilterIdByName("게임"));
