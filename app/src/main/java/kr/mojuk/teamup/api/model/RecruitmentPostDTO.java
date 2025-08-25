@@ -36,6 +36,9 @@ public class RecruitmentPostDTO {
     @SerializedName("accepted_count")
     private int acceptedCount;
 
+    @SerializedName("filter_id ")
+    private int filterId;
+
     // --- Getter 메서드들 ---
     public int getRecruitmentPostId() { return recruitmentPostId; }
     public String getTitle() { return title; }
@@ -47,6 +50,7 @@ public class RecruitmentPostDTO {
     public String getCreatedAt() { return createdAt; }
     public String getDueDate() { return dueDate; }
     public int getAcceptedCount() { return acceptedCount; }
+    public int getFilterId(){ return filterId; }
 
     // ▼▼▼ 수정된 부분 ▼▼▼
     @Override
