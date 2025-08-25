@@ -56,19 +56,11 @@ public class SignupTestBaseActivity extends AppCompatActivity {
 
         btnPrevious.setOnClickListener(v -> goToPreviousStep());
         btnNext.setOnClickListener(v -> proceedToNextStep());
-<<<<<<< HEAD
 
         // 초기에는 Next 버튼 숨기기 (테스트 결과 페이지가 아니므로)
         updateNextButtonVisibility();
     }
 
-=======
-        
-        // 초기에는 Next 버튼 숨기기 (테스트 결과 페이지가 아니므로)
-        updateNextButtonVisibility();
-    }
-    
->>>>>>> d6c5de5 (Design: signup 내 UI 일부 수정, test 진행 시 Next 버튼 hiding)
     /**
      * 현재 Fragment에 따라 Next 버튼 표시/숨김 제어
      */
@@ -83,21 +75,13 @@ public class SignupTestBaseActivity extends AppCompatActivity {
             btnNext.setVisibility(View.GONE);
         }
     }
-<<<<<<< HEAD
 
-=======
-    
->>>>>>> d6c5de5 (Design: signup 내 UI 일부 수정, test 진행 시 Next 버튼 hiding)
     private void proceedToNextStep() {
         Intent intent = new Intent(SignupTestBaseActivity.this, SignupFinishActivity.class);
         intent.putExtra("userId", userId);
         startActivity(intent);
     }
-<<<<<<< HEAD
 
-=======
-    
->>>>>>> d6c5de5 (Design: signup 내 UI 일부 수정, test 진행 시 Next 버튼 hiding)
     private void checkPersonalityTestCompletion() {
         RetrofitClient.getInstance()
                 .getApiService()
@@ -152,11 +136,7 @@ public class SignupTestBaseActivity extends AppCompatActivity {
         FrameLayout fragmentContainer = findViewById(R.id.fragment_container);
         fragmentContainer.removeAllViews();
         fragmentContainer.addView(personalityTestView);
-<<<<<<< HEAD
 
-=======
-        
->>>>>>> d6c5de5 (Design: signup 내 UI 일부 수정, test 진행 시 Next 버튼 hiding)
         // Next 버튼 숨기기 (테스트 시작 화면이므로)
         updateNextButtonVisibility();
     }
@@ -197,11 +177,7 @@ public class SignupTestBaseActivity extends AppCompatActivity {
                 .replace(R.id.fragment_container, fragment)
                 .addToBackStack(null) // 뒤로가기 스택에 추가
                 .commit();
-<<<<<<< HEAD
 
-=======
-        
->>>>>>> d6c5de5 (Design: signup 내 UI 일부 수정, test 진행 시 Next 버튼 hiding)
         // Fragment 트랜잭션 완료 후 Next 버튼 숨기기
         getSupportFragmentManager().executePendingTransactions();
         updateNextButtonVisibility();
@@ -228,11 +204,7 @@ public class SignupTestBaseActivity extends AppCompatActivity {
                 .replace(R.id.fragment_container, fragment)
                 .addToBackStack(null) // 뒤로가기 스택에 추가
                 .commit();
-<<<<<<< HEAD
 
-=======
-        
->>>>>>> d6c5de5 (Design: signup 내 UI 일부 수정, test 진행 시 Next 버튼 hiding)
         // Fragment 트랜잭션 완료 후 Next 버튼 표시
         getSupportFragmentManager().executePendingTransactions();
         updateNextButtonVisibility();

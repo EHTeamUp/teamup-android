@@ -25,6 +25,7 @@ import kr.mojuk.teamup.fragments.HomeFragment;
 import kr.mojuk.teamup.fragments.MypageFragment;
 import kr.mojuk.teamup.fragments.ExperienceFragment;
 import kr.mojuk.teamup.fragments.MypageProfileFragment;
+import kr.mojuk.teamup.personality.PersonalityTestQuestionFragment;
 import kr.mojuk.teamup.applicant.ApplicantListFragment;
 import kr.mojuk.teamup.recruitment.TeamSynergyScoreFragment;
 import kr.mojuk.teamup.notification.FcmTokenManager;
@@ -203,6 +204,27 @@ public class MainActivity extends AppCompatActivity implements ExperienceFragmen
     public void showMypageProfileFragment() {
         Fragment fragment = new MypageProfileFragment();
         showFragment(fragment);
+    }
+
+    /**
+     * 마이페이지에서 성향 테스트 시작 Fragment 표시
+     */
+    public void showPersonalityTestInMypage() {
+        // PersonalityTestQuestionFragment 생성
+        PersonalityTestQuestionFragment fragment = new PersonalityTestQuestionFragment();
+        
+        // Bundle로 데이터 전달 (마이페이지에서 접근함을 표시)
+        Bundle args = new Bundle();
+        args.putBoolean("fromMypage", true);
+        args.putString("userId", tokenManager.getUserId()); // 현재 로그인된 사용자 ID 전달
+        fragment.setArguments(args);
+        
+        // Fragment 교체
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragment_container, fragment)
+                .addToBackStack(null)
+                .commit();
     }
 
     /**
