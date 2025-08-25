@@ -25,6 +25,7 @@ import kr.mojuk.teamup.api.model.RegistrationStep4;
 import kr.mojuk.teamup.api.model.StepResponse;
 import kr.mojuk.teamup.MainActivity;
 import kr.mojuk.teamup.auth.SignupTestBaseActivity;
+import kr.mojuk.teamup.auth.TokenManager;
 import com.google.android.material.button.MaterialButton;
 import com.google.gson.Gson;
 import retrofit2.Call;
@@ -47,6 +48,7 @@ public class PersonalityTestQuestionFragment extends Fragment implements Persona
     private Map<Integer, String> selectedTypes;
     private String userId;
     private boolean fromSignup;
+    private boolean fromMypage;
 
     @Nullable
     @Override
@@ -63,7 +65,19 @@ public class PersonalityTestQuestionFragment extends Fragment implements Persona
         if (args != null) {
             userId = args.getString("userId");
             fromSignup = args.getBoolean("fromSignup", false);
+            fromMypage = args.getBoolean("fromMypage", false);
         }
+        
+        // userId가 null이면 TokenManager에서 직접 가져오기
+        if (userId == null || userId.isEmpty()) {
+            TokenManager tokenManager = TokenManager.getInstance(requireContext());
+            userId = tokenManager.getUserId();
+            Log.d(TAG, "TokenManager에서 가져온 userId: " + userId);
+        }
+        
+        // userId 디버깅 로그
+        Log.d(TAG, "PersonalityTestQuestionFragment - userId: " + userId);
+        Log.d(TAG, "PersonalityTestQuestionFragment - fromMypage: " + fromMypage);
 
         // 초기화
         selectedAnswers = new HashMap<>();
@@ -183,15 +197,19 @@ public class PersonalityTestQuestionFragment extends Fragment implements Persona
                 String typeA = options.get(0).getType();
                 String typeB = options.get(1).getType();
                 
-                Log.d(TAG, "옵션 A: " + optionA + " (" + typeA + ")");
-                Log.d(TAG, "옵션 B: " + optionB + " (" + typeB + ")");
+                // API에서 받은 실제 옵션 ID 사용
+                int optionAId = options.get(0).getId();
+                int optionBId = options.get(1).getId();
                 
-                                 PersonalityQuestion localQuestion = new PersonalityQuestion(
-                     apiQuestion.getId(),
-                     apiQuestion.getText(),
-                     optionA, optionB,
-                     typeA, typeB
-                 );
+                Log.d(TAG, "옵션 A: " + optionA + " (ID: " + optionAId + ", Type: " + typeA + ")");
+                Log.d(TAG, "옵션 B: " + optionB + " (ID: " + optionBId + ", Type: " + typeB + ")");
+                
+                PersonalityQuestion localQuestion = new PersonalityQuestion(
+                    apiQuestion.getId(),
+                    apiQuestion.getText(),
+                    optionA, optionB,
+                    optionAId, optionBId
+                );
                 
                 localQuestions.add(localQuestion);
                 Log.d(TAG, "질문 변환 완료: " + localQuestion.getQuestion());
@@ -293,14 +311,14 @@ public class PersonalityTestQuestionFragment extends Fragment implements Persona
             Log.d(TAG, "선택된 답변: " + selectedAnswer);
             Log.d(TAG, "A: " + question.getOptionA() + ", B: " + question.getOptionB());
             
-            int optionId = 1; // 기본값
+            int optionId = question.getOptionAId(); // 기본값을 A 옵션 ID로 설정
             if (selectedAnswer != null) {
                 if (selectedAnswer.equals("A")) {
-                    optionId = 1;
-                    Log.d(TAG, "→ A 옵션 선택 (option_id: 1)");
+                    optionId = question.getOptionAId();
+                    Log.d(TAG, "→ A 옵션 선택 (option_id: " + optionId + ")");
                 } else if (selectedAnswer.equals("B")) {
-                    optionId = 2;
-                    Log.d(TAG, "→ B 옵션 선택 (option_id: 2)");
+                    optionId = question.getOptionBId();
+                    Log.d(TAG, "→ B 옵션 선택 (option_id: " + optionId + ")");
                 } else {
                     Log.e(TAG, "알 수 없는 선택: " + selectedAnswer);
                 }
@@ -313,8 +331,19 @@ public class PersonalityTestQuestionFragment extends Fragment implements Persona
         }
         
         // API 요청 객체 생성
+        Log.d(TAG, "=== API 요청 전 userId 확인 ===");
+        Log.d(TAG, "userId: " + userId);
+        Log.d(TAG, "userId가 비어있는가: " + (userId != null && userId.isEmpty()));
+        
         PersonalityTestRequest request = new PersonalityTestRequest(userId, answers);
         Log.d(TAG, "API 요청: userId=" + userId + ", answers count=" + answers.size());
+        
+        // API 요청 JSON 형태 확인
+        Gson gson = new Gson();
+        String requestJson = gson.toJson(request);
+        Log.d(TAG, "=== API 요청 JSON ===");
+        Log.d(TAG, requestJson);
+        Log.d(TAG, "=== API 요청 JSON 끝 ===");
         
         // API 호출
         RetrofitClient.getInstance()
@@ -333,6 +362,21 @@ public class PersonalityTestQuestionFragment extends Fragment implements Persona
                             if (fromSignup && getActivity() instanceof SignupTestBaseActivity) {
                                 // 회원가입에서 온 경우: 회원가입 4단계 완료 후 SignupTestBaseActivity로 결과 전달
                                 completeRegistrationStep4(profile);
+                            } else if (fromMypage && getActivity() instanceof MainActivity) {
+                                // 마이페이지에서 온 경우: 결과 Fragment로 이동 (하단 네비게이션 유지)
+                                PersonalityTestResultFragment resultFragment = new PersonalityTestResultFragment();
+                                Bundle args = new Bundle();
+                                args.putString("personalityType", profile.getProfileCode());
+                                Gson gson = new Gson();
+                                String traitsJson = gson.toJson(profile.getTraits());
+                                Log.d(TAG, "=== PersonalityTestResultFragment로 전달할 데이터 (마이페이지) ===");
+                                Log.d(TAG, "personalityType: " + profile.getProfileCode());
+                                Log.d(TAG, "traitsJson: " + traitsJson);
+                                args.putString("personalityTraitsJson", traitsJson);
+                                args.putBoolean("isFromSignup", false); // 마이페이지에서 접근
+                                resultFragment.setArguments(args);
+                               
+                                ((MainActivity) getActivity()).showFragment(resultFragment);
                             } else {
                                 // 일반적인 경우: 결과 Fragment로 이동
                                 PersonalityTestResultFragment resultFragment = new PersonalityTestResultFragment();
@@ -340,6 +384,9 @@ public class PersonalityTestQuestionFragment extends Fragment implements Persona
                                 args.putString("personalityType", profile.getProfileCode());
                                 Gson gson = new Gson();
                                 String traitsJson = gson.toJson(profile.getTraits());
+                                Log.d(TAG, "=== PersonalityTestResultFragment로 전달할 데이터 (일반) ===");
+                                Log.d(TAG, "personalityType: " + profile.getProfileCode());
+                                Log.d(TAG, "traitsJson: " + traitsJson);
                                 args.putString("personalityTraitsJson", traitsJson);
                                 args.putBoolean("isFromSignup", false); // 일반적인 경우
                                 resultFragment.setArguments(args);

@@ -134,7 +134,7 @@ public class ContestRecruitmentDetailFragment extends Fragment implements Commen
 
     private void loadAllData() {
         showLoading(true);
-        loadingCounter = new AtomicInteger(4); // 4개의 API 호출을 기다림
+        loadingCounter = new AtomicInteger(5); // 5개의 API 호출을 기다림
 
         loadInitialRecruitmentPost();
         loadComments();
@@ -279,11 +279,13 @@ public class ContestRecruitmentDetailFragment extends Fragment implements Commen
                         binding.teamMemberCount.setText(memberCountText);
                     }
                 }
+                checkAllDataLoaded(); // 로딩 카운터 감소
                 // checkUserRole(); // 역할 확인은 별도 API 호출에서 처리
             }
             @Override
             public void onFailure(@NonNull Call<List<ApplicationResponse>> call, @NonNull Throwable t) {
                 handleApiFailure("getAcceptedApplicationsByPost", t);
+                checkAllDataLoaded(); // 실패해도 카운트 감소
             }
         });
     }
@@ -385,11 +387,12 @@ public class ContestRecruitmentDetailFragment extends Fragment implements Commen
                         setAppliedState();
                     }
                 }
-                // 이 API는 UI의 주요 부분을 제어하지 않으므로, 여기서 카운터를 감소시키지 않음
+                checkAllDataLoaded(); // 로딩 카운터 감소
             }
             @Override
             public void onFailure(@NonNull Call<List<Application>> call, @NonNull Throwable t) {
                 handleApiFailure("getApplicationsByPost", t);
+                checkAllDataLoaded(); // 실패해도 카운트 감소
             }
         });
     }

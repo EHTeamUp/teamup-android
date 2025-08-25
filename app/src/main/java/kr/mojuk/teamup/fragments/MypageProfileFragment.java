@@ -32,13 +32,13 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MypageProfileFragment extends Fragment {
 
     private static final String TAG = "MypageProfileFragment";
 
-    private TextView tvBackArrow;
     private LinearLayout llUserId;
     private LinearLayout llLanguagesAndRoles;
     private LinearLayout llExperience;
@@ -111,7 +111,6 @@ public class MypageProfileFragment extends Fragment {
     }
 
     private void initViews(View view) {
-        tvBackArrow = view.findViewById(R.id.tv_back_arrow);
         llUserId = view.findViewById(R.id.ll_user_id);
         llLanguagesAndRoles = view.findViewById(R.id.ll_languages_and_roles);
         llExperience = view.findViewById(R.id.ll_experience);
@@ -418,45 +417,37 @@ public class MypageProfileFragment extends Fragment {
         
         Log.d(TAG, "=== 스킬 표시 형식 생성 ===");
         Log.d(TAG, "스킬 ID 개수: " + (skills.getSkillIds() != null ? skills.getSkillIds().size() : 0));
+        Log.d(TAG, "커스텀 스킬 개수: " + (skills.getCustomSkills() != null ? skills.getCustomSkills().size() : 0));
         
-        // 기존 스킬들 처리
+        // 전체 스킬 리스트 생성 (기존 + 커스텀)
+        List<String> allSkills = new ArrayList<>();
+        
+        // 기존 스킬들 추가
         if (skills.getSkillIds() != null && !skills.getSkillIds().isEmpty()) {
-            Log.d(TAG, "스킬 ID 리스트: " + skills.getSkillIds().toString());
-            
-            for (int i = 0; i < skills.getSkillIds().size(); i++) {
-                Integer skillId = skills.getSkillIds().get(i);
+            for (Integer skillId : skills.getSkillIds()) {
                 String skillName = getSkillNameById(skillId);
-                Log.d(TAG, "스킬 처리: ID=" + skillId + " -> " + skillName + " (인덱스: " + i + ")");
-                
-                if (i == 0) {
-                    result.append(skillName);
-                    Log.d(TAG, "첫 번째 스킬 추가: " + skillName + ", 현재 result: " + result.toString());
-                } else {
-                    // 2개 이상이면 첫 번째 + "등"
-                    result.append(" 등");
-                    Log.d(TAG, "2개 이상 스킬이므로 '등' 추가, 현재 result: " + result.toString());
-                    break;
+                if (skillName != null && !skillName.isEmpty()) {
+                    allSkills.add(skillName);
                 }
             }
         }
         
-        // 커스텀 스킬들 처리
+        // 커스텀 스킬들 추가
         if (skills.getCustomSkills() != null && !skills.getCustomSkills().isEmpty()) {
-            if (result.length() > 0) {
-                result.append(", ");
-            }
-            
-            for (int i = 0; i < skills.getCustomSkills().size(); i++) {
-                String customSkill = skills.getCustomSkills().get(i);
-                
-                if (i == 0) {
-                    result.append(customSkill);
-                } else {
-                    // 2개 이상이면 첫 번째 + "등"
-                    result.append(" 등");
-                    break;
-                }
-            }
+            allSkills.addAll(skills.getCustomSkills());
+        }
+        
+        Log.d(TAG, "전체 스킬 개수: " + allSkills.size());
+        
+        if (allSkills.isEmpty()) {
+            return "등록된 기술이 없습니다";
+        } else if (allSkills.size() == 1) {
+            return allSkills.get(0);
+        } else {
+            // 2개 이상이면 첫 번째 + "외 n개"
+            int remainingCount = allSkills.size() - 1;
+            result.append(allSkills.get(0)).append(" 외 ").append(remainingCount).append("개");
+            Log.d(TAG, "스킬 표시: " + allSkills.get(0) + " 외 " + remainingCount + "개");
         }
         
         Log.d(TAG, "스킬 표시 최종 결과: " + result.toString());
@@ -474,45 +465,37 @@ public class MypageProfileFragment extends Fragment {
         
         Log.d(TAG, "=== 역할 표시 형식 생성 ===");
         Log.d(TAG, "역할 ID 개수: " + (roles.getRoleIds() != null ? roles.getRoleIds().size() : 0));
+        Log.d(TAG, "커스텀 역할 개수: " + (roles.getCustomRoles() != null ? roles.getCustomRoles().size() : 0));
         
-        // 기존 역할들 처리
+        // 전체 역할 리스트 생성 (기존 + 커스텀)
+        List<String> allRoles = new ArrayList<>();
+        
+        // 기존 역할들 추가
         if (roles.getRoleIds() != null && !roles.getRoleIds().isEmpty()) {
-            Log.d(TAG, "역할 ID 리스트: " + roles.getRoleIds().toString());
-            
-            for (int i = 0; i < roles.getRoleIds().size(); i++) {
-                Integer roleId = roles.getRoleIds().get(i);
+            for (Integer roleId : roles.getRoleIds()) {
                 String roleName = getRoleNameById(roleId);
-                Log.d(TAG, "역할 처리: ID=" + roleId + " -> " + roleName + " (인덱스: " + i + ")");
-                
-                if (i == 0) {
-                    result.append(roleName);
-                    Log.d(TAG, "첫 번째 역할 추가: " + roleName + ", 현재 result: " + result.toString());
-                } else {
-                    // 2개 이상이면 첫 번째 + "등"
-                    result.append(" 등");
-                    Log.d(TAG, "2개 이상 역할이므로 '등' 추가, 현재 result: " + result.toString());
-                    break;
+                if (roleName != null && !roleName.isEmpty()) {
+                    allRoles.add(roleName);
                 }
             }
         }
         
-        // 커스텀 역할들 처리
+        // 커스텀 역할들 추가
         if (roles.getCustomRoles() != null && !roles.getCustomRoles().isEmpty()) {
-            if (result.length() > 0) {
-                result.append(", ");
-            }
-            
-            for (int i = 0; i < roles.getCustomRoles().size(); i++) {
-                String customRole = roles.getCustomRoles().get(i);
-                
-                if (i == 0) {
-                    result.append(customRole);
-                } else {
-                    // 2개 이상이면 첫 번째 + "등"
-                    result.append(" 등");
-                    break;
-                }
-            }
+            allRoles.addAll(roles.getCustomRoles());
+        }
+        
+        Log.d(TAG, "전체 역할 개수: " + allRoles.size());
+        
+        if (allRoles.isEmpty()) {
+            return "등록된 역할이 없습니다";
+        } else if (allRoles.size() == 1) {
+            return allRoles.get(0);
+        } else {
+            // 2개 이상이면 첫 번째 + "외 n개"
+            int remainingCount = allRoles.size() - 1;
+            result.append(allRoles.get(0)).append(" 외 ").append(remainingCount).append("개");
+            Log.d(TAG, "역할 표시: " + allRoles.get(0) + " 외 " + remainingCount + "개");
         }
         
         Log.d(TAG, "역할 표시 최종 결과: " + result.toString());
@@ -565,32 +548,18 @@ public class MypageProfileFragment extends Fragment {
         
         StringBuilder result = new StringBuilder();
         
-        for (int i = 0; i < experiences.size(); i++) {
-            Experience experience = experiences.get(i);
-            
-            if (i == 0) {
-                // 첫 번째 경험만 표시
-                result.append(experience.getAwardName());
-            } else {
-                // 2개 이상이면 첫 번째 + "등"
-                result.append(" 등");
-                break;
-            }
+        if (experiences.size() == 1) {
+            result.append(experiences.get(0).getContestName());
+        } else {
+            // 2개 이상이면 첫 번째 + "외 n개"
+            int remainingCount = experiences.size() - 1;
+            result.append(experiences.get(0).getContestName()).append(" 외 ").append(remainingCount).append("개");
         }
         
         return result.toString();
     }
 
     private void setClickListeners() {
-        tvBackArrow.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // 뒤로가기
-                if (getActivity() != null) {
-                    getActivity().onBackPressed();
-                }
-            }
-        });
 
 
         // ll_user_id에 뒤로가기 리스너 추가 (뷰 모드에서만)

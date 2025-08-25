@@ -95,6 +95,9 @@ public class MyContestsListFragment extends Fragment {
         binding.rvMyContests.setLayoutManager(new LinearLayoutManager(getContext()));
         binding.rvMyContests.setAdapter(adapter);
 
+        // 초기에는 안내 메시지 숨기고 RecyclerView 표시
+        hideEmptyMessage();
+
         adapter.setOnItemClickListener(recruitmentPostId -> {
             if (getActivity() != null) {
                 ContestRecruitmentDetailFragment detailFragment = ContestRecruitmentDetailFragment.newInstance(recruitmentPostId);
@@ -132,6 +135,7 @@ public class MyContestsListFragment extends Fragment {
         int totalItems = posts.size() + apps.size();
         if (totalItems == 0) {
             adapter.submitList(Collections.emptyList());
+            showEmptyMessage();
             return;
         }
 
@@ -200,7 +204,14 @@ public class MyContestsListFragment extends Fragment {
     private void checkIfAllDone(AtomicInteger counter, List<MyContestItem> items) {
         if (counter.decrementAndGet() == 0) {
             if (getActivity() != null) {
-                getActivity().runOnUiThread(() -> adapter.submitList(new ArrayList<>(items)));
+                getActivity().runOnUiThread(() -> {
+                    if (items.isEmpty()) {
+                        showEmptyMessage();
+                    } else {
+                        hideEmptyMessage();
+                        adapter.submitList(new ArrayList<>(items));
+                    }
+                });
             }
         }
     }
@@ -215,6 +226,26 @@ public class MyContestsListFragment extends Fragment {
         Log.e("MyContestsFragment", methodName + " API Call Failed: " + t.getMessage());
         if (getContext() != null) {
             Toast.makeText(getContext(), "네트워크 오류가 발생했습니다.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /**
+     * 공모전이 없을 때 안내 메시지 표시
+     */
+    private void showEmptyMessage() {
+        if (binding != null) {
+            binding.llEmptyMessage.setVisibility(View.VISIBLE);
+            binding.rvMyContests.setVisibility(View.GONE);
+        }
+    }
+
+    /**
+     * 안내 메시지 숨기고 RecyclerView 표시
+     */
+    private void hideEmptyMessage() {
+        if (binding != null) {
+            binding.llEmptyMessage.setVisibility(View.GONE);
+            binding.rvMyContests.setVisibility(View.VISIBLE);
         }
     }
 

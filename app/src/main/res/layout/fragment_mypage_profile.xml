@@ -9,6 +9,44 @@
     android:padding="24dp"
     tools:context="kr.mojuk.teamup.MainActivity">
 
+    <!-- User ID Section -->
+    <LinearLayout
+        android:id="@+id/ll_user_id"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:orientation="horizontal"
+        android:background="@drawable/mypage_menu_item_background"
+        android:padding="16dp"
+        android:layout_marginTop="16dp"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="16dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="?android:attr/selectableItemBackground">
+
+        <TextView
+            android:id="@+id/tv_back_arrow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="&lt;"
+            android:textSize="20sp"
+            android:textColor="@android:color/black"
+            android:layout_marginEnd="12dp" />
+
+        <TextView
+            android:id="@+id/tv_user_id"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text=""
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:textColor="@android:color/black"
+            android:gravity="start" />
+
+    </LinearLayout>
+
+
     <!-- Main Content Container -->
     <ScrollView
         android:layout_width="match_parent"
@@ -21,41 +59,6 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- User ID Section -->
-            <LinearLayout
-                android:id="@+id/ll_user_id"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:orientation="horizontal"
-                android:background="@drawable/mypage_menu_item_background"
-                android:padding="16dp"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="16dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?android:attr/selectableItemBackground">
-
-                <TextView
-                    android:id="@+id/tv_back_arrow"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="&lt;"
-                    android:textSize="20sp"
-                    android:textColor="@android:color/black"
-                    android:layout_marginEnd="12dp" />
-
-                <TextView
-                    android:id="@+id/tv_user_id"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text=""
-                    android:textStyle="bold"
-                    android:textSize="16sp"
-                    android:textColor="@android:color/black"
-                    android:gravity="start" />
-
-            </LinearLayout>
 
             <!-- 사용 가능한 기술/역할 Section -->
             <LinearLayout
@@ -94,6 +97,7 @@
                             android:layout_height="wrap_content"
                             android:text=""
                             android:textSize="14sp"
+                            android:maxWidth="290dp"
                             android:textColor="@android:color/black" />
 
                     </LinearLayout>

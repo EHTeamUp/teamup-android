@@ -7,6 +7,7 @@ import kr.mojuk.teamup.api.RetrofitClient;
 import kr.mojuk.teamup.api.model.*;
 
 import java.util.List;
+import java.util.ArrayList;
 
 import kr.mojuk.teamup.api.model.Experience;
 import kr.mojuk.teamup.api.model.ExperienceCreate;
@@ -65,7 +66,7 @@ public class ProfileManager {
                     public void onResponse(Call<UserSkillsResponse> call, Response<UserSkillsResponse> response) {
                         if (response.isSuccessful() && response.body() != null) {
                             UserSkillsResponse result = response.body();
-                            Log.d(TAG, "사용자 스킬 조회 성공: " + result.getSkillIds().size() + "개 기존, " + result.getCustomSkills().size() + "개 커스텀");
+                            Log.d(TAG, "사용자 스킬 조회 성공: " + (result.getSkillIds() != null ? result.getSkillIds().size() : 0) + "개");
                             callback.onSuccess(result);
                         } else {
                             String errorMessage = "스킬 조회 실패";
@@ -90,7 +91,7 @@ public class ProfileManager {
     /**
      * 사용자 스킬 수정
      */
-    public void updateUserSkills(Context context, List<Integer> skillIds, List<String> customSkills, ProfileUpdateCallback callback) {
+    public void updateUserSkills(Context context, List<Integer> skillIds, ProfileUpdateCallback callback) {
         if (!tokenManager.isLoggedIn()) {
             callback.onError("로그인이 필요합니다.");
             return;
@@ -102,7 +103,7 @@ public class ProfileManager {
             return;
         }
         
-        SkillUpdate skillUpdate = new SkillUpdate(skillIds, customSkills);
+        SkillUpdate skillUpdate = new SkillUpdate(skillIds, new ArrayList<>());
         
         RetrofitClient.getInstance()
                 .getApiService()
@@ -161,7 +162,7 @@ public class ProfileManager {
                     public void onResponse(Call<UserRolesResponse> call, Response<UserRolesResponse> response) {
                         if (response.isSuccessful() && response.body() != null) {
                             UserRolesResponse result = response.body();
-                            Log.d(TAG, "사용자 역할 조회 성공: " + result.getRoleIds().size() + "개 기존, " + result.getCustomRoles().size() + "개 커스텀");
+                            Log.d(TAG, "사용자 역할 조회 성공: " + (result.getRoleIds() != null ? result.getRoleIds().size() : 0) + "개");
                             callback.onSuccess(result);
                         } else {
                             String errorMessage = "역할 조회 실패";
@@ -186,7 +187,7 @@ public class ProfileManager {
     /**
      * 사용자 역할 수정
      */
-    public void updateUserRoles(Context context, List<Integer> roleIds, List<String> customRoles, ProfileUpdateCallback callback) {
+    public void updateUserRoles(Context context, List<Integer> roleIds, ProfileUpdateCallback callback) {
         if (!tokenManager.isLoggedIn()) {
             callback.onError("로그인이 필요합니다.");
             return;
@@ -198,7 +199,7 @@ public class ProfileManager {
             return;
         }
         
-        RoleUpdate roleUpdate = new RoleUpdate(roleIds, customRoles);
+        RoleUpdate roleUpdate = new RoleUpdate(roleIds, new ArrayList<>());
         
         RetrofitClient.getInstance()
                 .getApiService()

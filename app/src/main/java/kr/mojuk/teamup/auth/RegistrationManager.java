@@ -37,6 +37,13 @@ public class RegistrationManager {
     private static final String TAG = "RegistrationManager";
     private static RegistrationManager instance;
     
+    // 회원가입 과정에서 이전 단계 데이터 저장
+    private List<Skill> savedSkills = new ArrayList<>();
+    private List<Role> savedRoles = new ArrayList<>();
+    private List<Experience> savedExperiences = new ArrayList<>();
+    private List<String> savedCustomSkills = new ArrayList<>();
+    private List<String> savedCustomRoles = new ArrayList<>();
+    
     private RegistrationManager() {}
     
     public static synchronized RegistrationManager getInstance() {
@@ -51,6 +58,110 @@ public class RegistrationManager {
      */
     public ApiService getApiService() {
         return RetrofitClient.getInstance().getApiService();
+    }
+    
+    // ===== 회원가입 데이터 저장/복원 =====
+    
+    /**
+     * 스킬 데이터 저장
+     */
+    public void saveSkills(List<Skill> skills) {
+        this.savedSkills.clear();
+        if (skills != null) {
+            this.savedSkills.addAll(skills);
+        }
+        Log.d(TAG, "스킬 데이터 저장: " + savedSkills.size() + "개");
+    }
+    
+    /**
+     * 역할 데이터 저장
+     */
+    public void saveRoles(List<Role> roles) {
+        this.savedRoles.clear();
+        if (roles != null) {
+            this.savedRoles.addAll(roles);
+        }
+        Log.d(TAG, "역할 데이터 저장: " + savedRoles.size() + "개");
+    }
+    
+    /**
+     * 경험 데이터 저장
+     */
+    public void saveExperiences(List<Experience> experiences) {
+        this.savedExperiences.clear();
+        if (experiences != null) {
+            this.savedExperiences.addAll(experiences);
+        }
+        Log.d(TAG, "경험 데이터 저장: " + savedExperiences.size() + "개");
+    }
+    
+    /**
+     * 저장된 스킬 데이터 반환
+     */
+    public List<Skill> getSavedSkills() {
+        return new ArrayList<>(savedSkills);
+    }
+    
+    /**
+     * 저장된 역할 데이터 반환
+     */
+    public List<Role> getSavedRoles() {
+        return new ArrayList<>(savedRoles);
+    }
+    
+    /**
+     * 저장된 경험 데이터 반환
+     */
+    public List<Experience> getSavedExperiences() {
+        return new ArrayList<>(savedExperiences);
+    }
+    
+    /**
+     * 커스텀 스킬 데이터 저장
+     */
+    public void saveCustomSkills(List<String> customSkills) {
+        this.savedCustomSkills.clear();
+        if (customSkills != null) {
+            this.savedCustomSkills.addAll(customSkills);
+        }
+        Log.d(TAG, "커스텀 스킬 데이터 저장: " + savedCustomSkills.size() + "개");
+    }
+    
+    /**
+     * 커스텀 역할 데이터 저장
+     */
+    public void saveCustomRoles(List<String> customRoles) {
+        this.savedCustomRoles.clear();
+        if (customRoles != null) {
+            this.savedCustomRoles.addAll(customRoles);
+        }
+        Log.d(TAG, "커스텀 역할 데이터 저장: " + savedCustomRoles.size() + "개");
+    }
+    
+    /**
+     * 저장된 커스텀 스킬 데이터 반환
+     */
+    public List<String> getSavedCustomSkills() {
+        return new ArrayList<>(savedCustomSkills);
+    }
+    
+    /**
+     * 저장된 커스텀 역할 데이터 반환
+     */
+    public List<String> getSavedCustomRoles() {
+        return new ArrayList<>(savedCustomRoles);
+    }
+    
+    /**
+     * 모든 저장된 데이터 초기화
+     */
+    public void clearSavedData() {
+        savedSkills.clear();
+        savedRoles.clear();
+        savedExperiences.clear();
+        savedCustomSkills.clear();
+        savedCustomRoles.clear();
+        Log.d(TAG, "저장된 회원가입 데이터 초기화 완료");
     }
     
     // ===== 이메일 인증 관련 =====

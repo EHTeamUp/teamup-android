@@ -4,12 +4,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/contest_recruitment_list"
     android:layout_width="match_parent"
+    android:padding="24dp"
     android:layout_height="match_parent"
     android:background="@android:color/white"
     tools:context="kr.mojuk.teamup.MainActivity">
 
 
-    <!-- ▼▼▼ 새로 추가된 공모전 제목 바 ▼▼▼ -->
     <LinearLayout
         android:id="@+id/ll_contest_title_bar"
         android:layout_width="0dp"
@@ -17,7 +17,6 @@
         android:orientation="horizontal"
         android:gravity="center_vertical"
         android:padding="16dp"
-        android:layout_marginHorizontal="16dp"
         android:layout_marginTop="16dp"
         android:background="@drawable/mypage_menu_item_background"
         app:layout_constraintTop_toTopOf="parent"
@@ -34,7 +33,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:text="내참여 공모전 목록"
+            android:text="내 참여 공모전 목록"
             android:textColor="@android:color/black"
             android:textStyle="bold"
             android:textSize="16sp" />
@@ -43,10 +42,10 @@
     <!-- RecyclerView -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_my_contests"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
         android:clipToPadding="false"
-        android:paddingTop="8dp"
+        android:paddingTop="16dp"
         android:paddingBottom="8dp"
         android:layout_marginTop="8dp"
         app:layout_constraintTop_toBottomOf="@id/ll_contest_title_bar"
@@ -56,16 +55,55 @@
         tools:listitem="@layout/item_contest_mycontest"
         tools:itemCount="5"/>
 
+    <!-- 공모전이 없을 때 표시할 메시지 -->
+    <LinearLayout
+        android:id="@+id/ll_empty_message"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/ll_contest_title_bar"
+        app:layout_constraintBottom_toTopOf="@id/btn_go_to_contest"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageView
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:src="@drawable/ic_placeholder"
+            android:layout_marginBottom="16dp"
+            android:alpha="0.5"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="현재 참여한 공모전이 없습니다."
+            android:textSize="16sp"
+            android:textColor="@android:color/black"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="새 공모전에 도전해보세요!"
+            android:textSize="14sp"
+            android:textColor="#666666"
+            android:gravity="center"/>
+
+    </LinearLayout>
+
     <!-- 공모전 참여하러가기 버튼 -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_go_to_contest"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="공모전 참여하러가기"
         android:textColor="@android:color/white"
         android:backgroundTint="@android:color/black"
         android:textStyle="bold"
-        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="20dp"
         android:layout_marginBottom="8dp"
         app:cornerRadius="10dp"
         app:layout_constraintTop_toBottomOf="@id/rv_my_contests"

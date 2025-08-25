@@ -36,12 +36,18 @@ public class ContestInformationDetailFragment extends Fragment {
     private FragmentContestInformationDetailBinding binding;
     private ApiService apiService;
     private int contestId = -1;
+    private boolean fromHome = false;
 
     // Fragment 인스턴스를 생성하고 arguments를 설정하는 정적 메서드
     public static ContestInformationDetailFragment newInstance(ContestInformation contest) {
+        return newInstance(contest, false);
+    }
+    
+    public static ContestInformationDetailFragment newInstance(ContestInformation contest, boolean fromHome) {
         ContestInformationDetailFragment fragment = new ContestInformationDetailFragment();
         Bundle args = new Bundle();
         args.putInt("CONTEST_ID", contest.getContestId());
+        args.putBoolean("FROM_HOME", fromHome);
         fragment.setArguments(args);
         return fragment;
     }
@@ -52,6 +58,7 @@ public class ContestInformationDetailFragment extends Fragment {
         // Arguments에서 contestId를 안전하게 가져옴
         if (getArguments() != null) {
             contestId = getArguments().getInt("CONTEST_ID", -1);
+            fromHome = getArguments().getBoolean("FROM_HOME", false);
         }
     }
 
@@ -81,6 +88,10 @@ public class ContestInformationDetailFragment extends Fragment {
         // 뒤로가기 버튼
         binding.btnBackTitle.setOnClickListener(v -> {
             if (getActivity() != null) {
+                // Home에서 접근한 경우에만 하단 네비게이션을 Home 탭으로 이동
+                if (fromHome && getActivity() instanceof MainActivity) {
+                    ((MainActivity) getActivity()).setBottomNavigationItem(R.id.navigation_home);
+                }
                 getActivity().getSupportFragmentManager().popBackStack();
             }
         });
@@ -104,6 +115,7 @@ public class ContestInformationDetailFragment extends Fragment {
             @Override
             public void onResponse(@NonNull Call<ContestInformation> call, @NonNull Response<ContestInformation> response) {
                 showLoading(false); 
+                if (binding == null) return; // Fragment가 destroy된 경우 처리하지 않음
                 if (response.isSuccessful() && response.body() != null) {
                     ContestInformation contestDetail = response.body();
 
@@ -128,6 +140,7 @@ public class ContestInformationDetailFragment extends Fragment {
             @Override
             public void onFailure(@NonNull Call<ContestInformation> call, @NonNull Throwable t) {
                 showLoading(false); 
+                if (binding == null) return; // Fragment가 destroy된 경우 처리하지 않음
                 Log.e("ContestDetailFragment", "API Call Failed: " + t.getMessage());
                 Toast.makeText(getContext(), "네트워크 오류가 발생했습니다.", Toast.LENGTH_SHORT).show();
             }
@@ -135,6 +148,8 @@ public class ContestInformationDetailFragment extends Fragment {
     }
 
     private void updateUi(ContestInformation contestDetail) {
+        if (binding == null) return; // Fragment가 destroy된 경우 처리하지 않음
+        
         binding.contestTitleTextInBar.setText(contestDetail.getName());
 
         // 포스터 이미지 로드
@@ -186,6 +201,8 @@ public class ContestInformationDetailFragment extends Fragment {
 
     // 태그를 표시하는 별도 메서드
     private void displayTags(List<Tag> tags) {
+        if (binding == null) return; // Fragment가 destroy된 경우 처리하지 않음
+        
         if (tags != null && !tags.isEmpty()) {
             // 태그들을 "#태그명" 형식으로 변환하고 공백으로 연결
             String hashtags = tags.stream()

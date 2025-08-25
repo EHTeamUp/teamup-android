@@ -25,6 +25,7 @@ import kr.mojuk.teamup.fragments.HomeFragment;
 import kr.mojuk.teamup.fragments.MypageFragment;
 import kr.mojuk.teamup.fragments.ExperienceFragment;
 import kr.mojuk.teamup.fragments.MypageProfileFragment;
+import kr.mojuk.teamup.personality.PersonalityTestQuestionFragment;
 import kr.mojuk.teamup.applicant.ApplicantListFragment;
 import kr.mojuk.teamup.recruitment.TeamSynergyScoreFragment;
 import kr.mojuk.teamup.notification.FcmTokenManager;
@@ -109,41 +110,7 @@ public class MainActivity extends AppCompatActivity implements ExperienceFragmen
         }
       
         // 하단 탭 선택 리스너 설정
-        navView.setOnItemSelectedListener(item -> {
-            int itemId = item.getItemId();
-            
-            // 현재 Fragment 확인
-            Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-            
-            // DetailFragment가 현재 표시되어 있으면 네비게이션 무시
-            if (currentFragment instanceof ContestInformationDetailFragment ||
-                currentFragment instanceof ContestRecruitmentDetailFragment) {
-                Log.d(TAG, "DetailFragment가 표시 중이므로 네비게이션 무시: " + currentFragment.getClass().getSimpleName());
-                return false;
-            }
-            
-            Fragment selectedFragment = null;
-
-            if (itemId == R.id.navigation_profile) {
-                // 마이페이지는 MypageFragment로 처리
-                selectedFragment = new MypageFragment();
-            } else if (itemId == R.id.navigation_home) {
-                selectedFragment = new HomeFragment();
-            } else if (itemId == R.id.navigation_contest) {
-                selectedFragment = new ContestListFragment();
-            } else if (itemId == R.id.navigation_board) {
-                selectedFragment = new ContestRecruitmentListFragment();
-            }
-
-            if (selectedFragment != null) {
-                Log.d(TAG, "네비게이션 Fragment 전환: " + selectedFragment.getClass().getSimpleName());
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, selectedFragment)
-                        .commit();
-                return true;
-            }
-            return false;
-        });
+        setupBottomNavigationListener(navView);
     }
 
     /**
@@ -240,10 +207,66 @@ public class MainActivity extends AppCompatActivity implements ExperienceFragmen
     }
 
     /**
+     * 마이페이지에서 성향 테스트 시작 Fragment 표시
+     */
+    public void showPersonalityTestInMypage() {
+        // PersonalityTestQuestionFragment 생성
+        PersonalityTestQuestionFragment fragment = new PersonalityTestQuestionFragment();
+        
+        // Bundle로 데이터 전달 (마이페이지에서 접근함을 표시)
+        Bundle args = new Bundle();
+        args.putBoolean("fromMypage", true);
+        args.putString("userId", tokenManager.getUserId()); // 현재 로그인된 사용자 ID 전달
+        fragment.setArguments(args);
+        
+        // Fragment 교체
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragment_container, fragment)
+                .addToBackStack(null)
+                .commit();
+    }
+
+    /**
      * 하단 네비게이션 바 활성화
      */
     public void setBottomNavigationItem(int itemId) {
         BottomNavigationView navView = findViewById(R.id.bottom_navigation);
+        // 리스너를 일시적으로 제거하여 Fragment 전환 방지
+        navView.setOnItemSelectedListener(null);
         navView.setSelectedItemId(itemId);
+        // 리스너를 다시 설정
+        setupBottomNavigationListener(navView);
+    }
+
+    /**
+     * 하단 네비게이션 리스너 설정
+     */
+    private void setupBottomNavigationListener(BottomNavigationView navView) {
+        navView.setOnItemSelectedListener(item -> {
+            int itemId = item.getItemId();
+
+            Fragment selectedFragment = null;
+
+            if (itemId == R.id.navigation_profile) {
+                // 마이페이지는 MypageFragment로 처리
+                selectedFragment = new MypageFragment();
+            } else if (itemId == R.id.navigation_home) {
+                selectedFragment = new HomeFragment();
+            } else if (itemId == R.id.navigation_contest) {
+                selectedFragment = new ContestListFragment();
+            } else if (itemId == R.id.navigation_board) {
+                selectedFragment = new ContestRecruitmentListFragment();
+            }
+
+            if (selectedFragment != null) {
+                Log.d(TAG, "네비게이션 Fragment 전환: " + selectedFragment.getClass().getSimpleName());
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, selectedFragment)
+                        .commit();
+                return true;
+            }
+            return false;
+        });
     }
 }
