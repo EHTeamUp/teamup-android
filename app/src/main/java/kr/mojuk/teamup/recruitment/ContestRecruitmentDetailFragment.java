@@ -25,6 +25,7 @@ import kr.mojuk.teamup.api.RetrofitClient;
 import kr.mojuk.teamup.api.model.*;
 
 import kr.mojuk.teamup.auth.TokenManager;
+import kr.mojuk.teamup.contest.ContestInformationDetailFragment;
 import kr.mojuk.teamup.databinding.FragmentContestRecruitmentDetailBinding;
 import kr.mojuk.teamup.databinding.PopupApplyFormBinding;
 import kr.mojuk.teamup.util.PlaceholderFragment;
@@ -226,6 +227,8 @@ public class ContestRecruitmentDetailFragment extends Fragment implements Commen
         });
     }
 
+    // ContestRecruitmentDetailFragment.java에서 loadContestDetails() 메서드 수정
+
     private void loadContestDetails(int contestId) {
         apiService.getContestDetail(contestId).enqueue(new Callback<ContestInformation>() {
             @Override
@@ -243,16 +246,11 @@ public class ContestRecruitmentDetailFragment extends Fragment implements Commen
                         binding.ddayText.setText("마감");
                         binding.btnApply.setEnabled(false);
                         binding.tvApplyText.setText("모집 마감");
-
-
-                        binding.ivApplyArrowRight.setVisibility(View.GONE); // 화살표 숨기기
-                        // 댓글 작성 비활성화
+                        binding.ivApplyArrowRight.setVisibility(View.GONE);
                         binding.etCommentInput.setEnabled(false);
-                        binding.etCommentInput.setHint("댓글을 작성 할 수 없습니다");
+                        binding.etCommentInput.setHint("댓글을 작성할 수 없습니다");
                     } else {
                         binding.ddayText.setText(dDayText);
-
-                        // 모집 중일 경우 댓글 작성 활성화
                         binding.etCommentInput.setEnabled(true);
                         binding.btnCommentSubmit.setEnabled(true);
                         binding.etCommentInput.setHint("내용을 적어주세요.");
@@ -261,16 +259,36 @@ public class ContestRecruitmentDetailFragment extends Fragment implements Commen
                     if (getContext() != null) {
                         Glide.with(getContext()).load(currentContest.getPosterImgUrl()).into(binding.ivPoster);
 
+                        // ★ 포스터 클릭 리스너 추가 ★
+                        binding.ivPoster.setOnClickListener(v -> {
+                            navigateToContestDetail();
+                        });
                     }
                 }
-                checkAllDataLoaded(); // ▼▼▼ 수정된 부분 ▼▼▼
+                checkAllDataLoaded();
             }
+
             @Override
             public void onFailure(@NonNull Call<ContestInformation> call, @NonNull Throwable t) {
                 handleApiFailure("getContestDetail", t);
-                checkAllDataLoaded(); // ▼▼▼ 수정된 부분 ▼▼▼
+                checkAllDataLoaded();
             }
         });
+    }
+
+    private void navigateToContestDetail() {
+        if (currentContest != null && getActivity() != null) {
+            // ContestInformationDetailFragment로 이동
+            ContestInformationDetailFragment contestDetailFragment =
+                    ContestInformationDetailFragment.newInstance(currentContest);
+
+            getActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, contestDetailFragment)
+                    .addToBackStack(null)
+                    .commit();
+        } else {
+            Toast.makeText(getContext(), "공모전 정보를 불러올 수 없습니다.", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void loadTeamMembersAndCheckRole(int totalRecruitmentCount) {

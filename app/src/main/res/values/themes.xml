@@ -4,6 +4,12 @@
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
     </style>
-
     <style name="Theme.TeamUp" parent="Base.Theme.TeamUp" />
+
+
+    <style name="Theme.OneThree.Indicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
+        <item name="android:color">#bbbbbb</item>
+    </style>
+
+    <style name="Theme.OneThree" parent="Base.Theme.TeamUp" />
 </resources>

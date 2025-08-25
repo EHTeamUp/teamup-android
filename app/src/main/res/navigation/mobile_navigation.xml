@@ -7,25 +7,25 @@
 
     <fragment
         android:id="@+id/navigation_home"
-        android:name="kr.mojuk.teamup.ui.home.HomeFragment"
+        android:name="kr.mojuk.teamup.fragments.HomeFragment"
         android:label="@string/nav_home"
         tools:layout="@layout/fragment_home" />
 
     <fragment
         android:id="@+id/navigation_contest"
-        android:name="kr.mojuk.teamup.ui.home.HomeFragment"
+        android:name="kr.mojuk.teamup.contest.ContestListFragment"
         android:label="@string/nav_contest"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_contest_list" />
 
     <fragment
         android:id="@+id/navigation_board"
-        android:name="kr.mojuk.teamup.ui.home.HomeFragment"
+        android:name="kr.mojuk.teamup.recruitment.ContestRecruitmentListFragment"
         android:label="@string/nav_board"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_contest_recruitment_list" />
 
     <fragment
         android:id="@+id/navigation_profile"
-        android:name="kr.mojuk.teamup.ui.home.HomeFragment"
+        android:name="kr.mojuk.teamup.fragments.MypageFragment"
         android:label="@string/nav_profile"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_mypage" />
 </navigation>
