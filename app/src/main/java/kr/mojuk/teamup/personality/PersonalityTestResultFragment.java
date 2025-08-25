@@ -284,15 +284,22 @@ public class PersonalityTestResultFragment extends Fragment {
 
     private void setupBackButton(View view) {
         LinearLayout llBackNavigation = view.findViewById(R.id.ll_back_navigation);
-        llBackNavigation.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // MypageProfileFragment로 돌아가기
-                if (getActivity() instanceof MainActivity) {
-                    ((MainActivity) getActivity()).showMypageProfileFragment();
+        
+        if (isFromSignup) {
+            // 회원가입 과정이면 뒤로가기 버튼 숨기기
+            llBackNavigation.setVisibility(View.GONE);
+        } else {
+            // 마이페이지에서 접근한 경우에만 뒤로가기 버튼 표시
+            llBackNavigation.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // MypageProfileFragment로 돌아가기
+                    if (getActivity() instanceof MainActivity) {
+                        ((MainActivity) getActivity()).showMypageProfileFragment();
+                    }
                 }
-            }
-        });
+            });
+        }
     }
     
     private void setupRetakeButton(View view) {

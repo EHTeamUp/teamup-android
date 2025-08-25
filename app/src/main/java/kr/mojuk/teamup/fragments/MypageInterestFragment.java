@@ -972,7 +972,6 @@ public class MypageInterestFragment extends Fragment {
         ProfileManager.getInstance(requireContext()).updateUserSkills(
             requireContext(), 
             new ArrayList<>(selectedSkillIds), 
-            new ArrayList<>(), 
             new ProfileManager.ProfileUpdateCallback() {
                 @Override
                 public void onSuccess(ProfileUpdateResponse response) {
@@ -1012,73 +1011,37 @@ public class MypageInterestFragment extends Fragment {
         Log.d(TAG, "=== 역할 API 업데이트 시작 ===");
         Log.d(TAG, "selectedRoleIds: " + selectedRoleIds.toString());
         
-        // 토큰 확인
-        TokenManager tokenManager = TokenManager.getInstance(requireContext());
-        if (!tokenManager.isLoggedIn()) {
-            Log.e(TAG, "❌ 로그인되지 않음");
-            return;
-        }
-        
-        String token = "Bearer " + tokenManager.getAccessToken();
-        Log.d(TAG, "토큰 확인 완료");
-        
-        // RoleUpdate 객체 생성
-        RoleUpdate roleUpdate = new RoleUpdate(new ArrayList<>(selectedRoleIds), new ArrayList<>());
-        Log.d(TAG, "RoleUpdate 객체 생성 완료");
-        
-        // API 호출
-        RetrofitClient.getInstance().getApiService().updateUserRoles(token, roleUpdate)
-            .enqueue(new retrofit2.Callback<ProfileUpdateResponse>() {
+        ProfileManager.getInstance(requireContext()).updateUserRoles(
+            requireContext(), 
+            new ArrayList<>(selectedRoleIds), 
+            new ProfileManager.ProfileUpdateCallback() {
                 @Override
-                public void onResponse(retrofit2.Call<ProfileUpdateResponse> call, 
-                                     retrofit2.Response<ProfileUpdateResponse> response) {
-                    Log.d(TAG, "API 응답 받음: code=" + response.code() + ", isSuccessful=" + response.isSuccessful());
-                    
-                    if (response.isSuccessful() && response.body() != null) {
-                        ProfileUpdateResponse result = response.body();
-                        Log.d(TAG, "✅ 역할 업데이트 API 성공: " + result.getMessage());
-                        
-                        if (getActivity() != null) {
-                            getActivity().runOnUiThread(() -> {
-                                android.widget.Toast.makeText(requireContext(), "역할이 업데이트되었습니다", android.widget.Toast.LENGTH_SHORT).show();
-                            });
-                        }
-                    } else {
-                        Log.e(TAG, "❌ 역할 업데이트 API 실패: " + response.code() + " " + response.message());
-                        String errorBody = "에러 바디 없음";
-                        try {
-                            errorBody = response.errorBody() != null ? response.errorBody().string() : "에러 바디 없음";
-                            Log.e(TAG, "에러 바디: " + errorBody);
-                        } catch (Exception e) {
-                            Log.e(TAG, "에러 바디 읽기 실패", e);
-                            errorBody = "에러 바디 읽기 실패";
-                        }
-                        
-                        final String finalErrorBody = errorBody;  // final 변수로 복사
-                        
-                        if (getActivity() != null) {
-                            getActivity().runOnUiThread(() -> {
-                                // 서버에서 이미 존재하는 역할 에러인지 확인
-                                if (finalErrorBody.contains("이미 존재합니다") || finalErrorBody.contains("기존 역할을 선택해주세요")) {
-                                    android.widget.Toast.makeText(requireContext(), "이미 존재하는 역할입니다. 기존 역할 목록에서 선택해주세요.", android.widget.Toast.LENGTH_LONG).show();
-                                } else {
-                                    android.widget.Toast.makeText(requireContext(), "역할 업데이트 실패: " + response.code(), android.widget.Toast.LENGTH_LONG).show();
-                                }
-                            });
-                        }
-                    }
-                }
-                
-                @Override
-                public void onFailure(retrofit2.Call<ProfileUpdateResponse> call, Throwable t) {
-                    Log.e(TAG, "❌ 역할 업데이트 API 호출 실패", t);
+                public void onSuccess(ProfileUpdateResponse response) {
                     if (getActivity() != null) {
                         getActivity().runOnUiThread(() -> {
-                            android.widget.Toast.makeText(requireContext(), "네트워크 오류: " + t.getMessage(), android.widget.Toast.LENGTH_LONG).show();
+                            Log.d(TAG, "✅ 역할 업데이트 API 성공: " + response.getMessage());
+                            android.widget.Toast.makeText(requireContext(), "역할이 업데이트되었습니다", android.widget.Toast.LENGTH_SHORT).show();
                         });
                     }
                 }
-            });
+
+                @Override
+                public void onError(String errorMessage) {
+                    if (getActivity() != null) {
+                        getActivity().runOnUiThread(() -> {
+                            Log.e(TAG, "❌ 역할 업데이트 API 실패: " + errorMessage);
+                            
+                            // 서버에서 이미 존재하는 역할 에러인지 확인
+                            if (errorMessage.contains("이미 존재합니다") || errorMessage.contains("기존 역할을 선택해주세요")) {
+                                android.widget.Toast.makeText(requireContext(), "이미 존재하는 역할입니다. 기존 역할 목록에서 선택해주세요.", android.widget.Toast.LENGTH_LONG).show();
+                            } else {
+                                android.widget.Toast.makeText(requireContext(), "역할 업데이트 실패: " + errorMessage, android.widget.Toast.LENGTH_LONG).show();
+                            }
+                        });
+                    }
+                }
+            }
+        );
         Log.d(TAG, "=== 역할 API 업데이트 요청 완료 ===");
     }
 
