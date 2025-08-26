@@ -63,8 +63,11 @@ public class ContestRecruitmentListFragment extends Fragment {
 
         binding.spinnerSortFilter.setVisibility(View.GONE);
 
+        // 초기에는 빈 메시지를 숨김
+        showEmptyMessage(false);
+
         if (lastAppliedFilterIds.isEmpty()) {
-            binding.tvCategoryFilterTitle.setText("전체 게시글 목록");
+            binding.tvFilterTitle.setText("전체 게시글 목록");
         }
     }
 
@@ -235,8 +238,10 @@ public class ContestRecruitmentListFragment extends Fragment {
 
     // ▼▼▼ 새로 추가된 정렬 메서드 ▼▼▼
     private void sortAndDisplayPosts(List<RecruitmentPostDTO> posts) {
-        if (posts == null) {
-            posts = new ArrayList<>();
+        if (posts == null || posts.isEmpty()) {
+            showEmptyMessage(true);
+            updateRecyclerView(new ArrayList<>());
+            return;
         }
 
         List<RecruitmentPostDTO> ongoingPosts = new ArrayList<>();
@@ -262,7 +267,27 @@ public class ContestRecruitmentListFragment extends Fragment {
         });
 
         ongoingPosts.addAll(finishedPosts);
+
+        // 최종 리스트가 비어있는지 확인
+        if (ongoingPosts.isEmpty()) {
+            showEmptyMessage(true);
+        } else {
+            showEmptyMessage(false);
+        }
+
         updateRecyclerView(ongoingPosts);
+    }
+
+    private void showEmptyMessage(boolean isEmpty) {
+        if (binding == null) return;
+
+        if (isEmpty) {
+            binding.tvNoPosts.setVisibility(View.VISIBLE);
+            binding.recyclerViewBoard.setVisibility(View.GONE);
+        } else {
+            binding.tvNoPosts.setVisibility(View.GONE);
+            binding.recyclerViewBoard.setVisibility(View.VISIBLE);
+        }
     }
 
     //필터 ID로 필터 이름을 찾기
@@ -280,10 +305,10 @@ public class ContestRecruitmentListFragment extends Fragment {
         if (binding == null) return;
 
         if (selectedIds.isEmpty()) {
-            binding.tvCategoryFilterTitle.setText("전체 게시글 목록");
+            binding.tvFilterTitle.setText("전체 게시글 목록");
         } else if (selectedIds.size() == 1) {
             String filterName = getFilterNameById(selectedIds.get(0));
-            binding.tvCategoryFilterTitle.setText(filterName);
+            binding.tvFilterTitle.setText(filterName);
         } else {
             List<Integer> sortedIds = new ArrayList<>(selectedIds);
             Collections.sort(sortedIds);
@@ -291,7 +316,7 @@ public class ContestRecruitmentListFragment extends Fragment {
             String firstFilterName = getFilterNameById(sortedIds.get(0));
             int otherFiltersCount = sortedIds.size() - 1;
             String title = firstFilterName + " 외 " + otherFiltersCount + "개";
-            binding.tvCategoryFilterTitle.setText(title);
+            binding.tvFilterTitle.setText(title);
         }
     }
 
@@ -314,6 +339,12 @@ public class ContestRecruitmentListFragment extends Fragment {
         currentlyDisplayedPosts.clear();
         currentlyDisplayedPosts.addAll(postsToShow);
         adapter.submitList(new ArrayList<>(currentlyDisplayedPosts));
+
+        if (postsToShow.isEmpty()) {
+            binding.spinnerSortFilter.setVisibility(View.GONE);
+        } else if (!lastAppliedFilterIds.isEmpty()) {
+            binding.spinnerSortFilter.setVisibility(View.VISIBLE);
+        }
     }
 
     private List<Integer> getSelectedFilterIds() {

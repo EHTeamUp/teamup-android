@@ -6,24 +6,38 @@
     android:layout_height="match_parent"
     android:background="@android:color/white">
 
-    <TextView
+    <!-- 네비게이션 스타일로 통일된 드롭박스 -->
+    <LinearLayout
         android:id="@+id/tv_category_filter_title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        android:background="@drawable/mypage_menu_item_background"
-        android:drawableEnd="@drawable/ic_arrow_down"
-        android:drawablePadding="8dp"
+        android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:padding="12dp"
-        android:text="전체 게시글 목록"
-        android:textSize="16sp"
-        android:textStyle="bold"
+        android:padding="16dp"
+        android:background="@drawable/mypage_menu_item_background"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/tv_filter_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="전체 게시글 목록"
+            android:textColor="@android:color/black"
+            android:textStyle="bold"
+            android:textSize="16sp" />
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_arrow_down"/>
+
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/layout_checkbox_filter_box"
@@ -126,5 +140,20 @@
         app:layout_constraintEnd_toEndOf="parent"
         tools:listitem="@layout/item_team_recruitment"
         tools:itemCount="5"/>
+
+    <TextView
+        android:id="@+id/tv_no_posts"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="24dp"
+        android:text="현재 모집중인 게시글이 없습니다."
+        android:textColor="#555555"
+        android:textSize="16sp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/spinner_sort_filter"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -81,7 +81,7 @@ public class TeamRecruitmentAdapter extends ListAdapter<RecruitmentPostDTO, Team
             binding.peopleText.setText(peopleInfo);
 
             // 2. 공모전 제목 바인딩
-            binding.contestTitleText.setText("id:" + post.getFilterId());
+            binding.contestTitleText.setText(post.getContestName());
 
             // 3. D-Day 계산 및 색상 적용
             binding.dDayText.setText(calculateDday(post.getDueDate()));
