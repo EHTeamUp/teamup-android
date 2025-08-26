@@ -56,10 +56,19 @@ public class ContestListFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         apiService = RetrofitClient.getInstance().getApiService();
+        
+        // 초기 로딩 상태 설정 - 모든 UI 요소를 숨김
+        showLoading(true);
+        
+        // 드롭다운 필터 박스도 명시적으로 숨김
+        if (binding != null) {
+            binding.layoutFilterBox.setVisibility(View.GONE);
+        }
+        
         setupRecyclerView();
-        loadFilters();
         setupDropdownMenu();
         setupFilterButtons();
+        loadFilters();
     }
 
     private void setupRecyclerView() {
@@ -142,9 +151,15 @@ public class ContestListFragment extends Fragment {
         if (isLoading) {
             binding.progressBar.setVisibility(View.VISIBLE);
             binding.recyclerviewContests.setVisibility(View.GONE);
-            binding.tvNoContests.setVisibility(View.GONE); // 로딩 중일 때 빈 메시지 숨김
+            binding.tvNoContests.setVisibility(View.GONE);
+            binding.tvOngoingTitle.setVisibility(View.GONE); // 제목도 숨김
+            binding.layoutFilterBox.setVisibility(View.GONE); // 필터 박스도 숨김
         } else {
             binding.progressBar.setVisibility(View.GONE);
+            binding.recyclerviewContests.setVisibility(View.VISIBLE);
+            binding.tvOngoingTitle.setVisibility(View.VISIBLE); // 제목 다시 표시
+            // 필터 박스는 기본적으로 숨김 (사용자가 클릭할 때만 표시)
+            binding.layoutFilterBox.setVisibility(View.GONE); // 기본적으로 숨김
         }
     }
 

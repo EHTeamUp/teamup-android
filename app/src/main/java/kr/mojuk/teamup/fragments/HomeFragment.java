@@ -192,8 +192,17 @@ public class HomeFragment extends Fragment {
                             TextView dDayText = itemView.findViewById(R.id.dDayText);
                             TextView peopleText = itemView.findViewById(R.id.peopleText);
                             TextView organizerText = itemView.findViewById(R.id.organizerText);
+                            TextView contestTitleText = itemView.findViewById(R.id.contestTitleText);
 
                             titleText.setText(recruit.getTitle());
+                            
+                            // 공모전 이름 설정
+                            if (recruit.getContestName() != null && !recruit.getContestName().isEmpty()) {
+                                contestTitleText.setText(recruit.getContestName());
+                                contestTitleText.setVisibility(View.VISIBLE);
+                            } else {
+                                contestTitleText.setVisibility(View.GONE);
+                            }
 
                             // D-day 계산
                             String calculatedDDay = calculateDDay(recruit.getDueDate());

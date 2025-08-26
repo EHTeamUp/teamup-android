@@ -2,6 +2,8 @@ package kr.mojuk.teamup.auth;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
@@ -99,6 +101,12 @@ public class SignupActivity extends AppCompatActivity {
             Toast.makeText(this, "아이디를 입력해주세요.", Toast.LENGTH_SHORT).show();
             return;
         }
+        
+        // 9자리 숫자 검증
+        if (!userId.matches("^[0-9]{9}$")) {
+            Toast.makeText(this, "학번을 입력해 주세요.", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         btnIdCheck.setEnabled(false);
         btnIdCheck.setText("확인 중...");
@@ -157,7 +165,7 @@ public class SignupActivity extends AppCompatActivity {
         
         // @itc.ac.kr 형식 검증
         if (!email.endsWith("@itc.ac.kr")) {
-            Toast.makeText(this, "ITC 학원 이메일(@itc.ac.kr)만 사용 가능합니다.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "@itc.ac.kr만 사용 가능합니다.", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -289,6 +297,12 @@ public class SignupActivity extends AppCompatActivity {
 
         if (userId.isEmpty()) {
             Toast.makeText(this, "아이디를 입력해주세요.", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        
+        // 9자리 숫자 검증
+        if (!userId.matches("^[0-9]{9}$")) {
+            Toast.makeText(this, "학번을 입력해 주세요.", Toast.LENGTH_SHORT).show();
             return false;
         }
 

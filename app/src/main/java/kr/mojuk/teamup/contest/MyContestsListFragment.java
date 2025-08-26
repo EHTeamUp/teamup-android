@@ -64,6 +64,9 @@ public class MyContestsListFragment extends Fragment {
 
         apiService = RetrofitClient.getInstance().getApiService();
 
+        // 초기 로딩 상태 설정 - 모든 UI 요소를 숨김
+        showLoading(true);
+        
         setupRecyclerView();
         loadMyActivities();
 
@@ -95,9 +98,6 @@ public class MyContestsListFragment extends Fragment {
         binding.rvMyContests.setLayoutManager(new LinearLayoutManager(getContext()));
         binding.rvMyContests.setAdapter(adapter);
 
-        // 초기에는 안내 메시지 숨기고 RecyclerView 표시
-        hideEmptyMessage();
-
         adapter.setOnItemClickListener(recruitmentPostId -> {
             if (getActivity() != null) {
                 ContestRecruitmentDetailFragment detailFragment = ContestRecruitmentDetailFragment.newInstance(recruitmentPostId);
@@ -109,10 +109,26 @@ public class MyContestsListFragment extends Fragment {
         });
     }
 
+    private void showLoading(boolean isLoading) {
+        if (binding == null) return;
+        if (isLoading) {
+            binding.progressBar.setVisibility(View.VISIBLE);
+            binding.rvMyContests.setVisibility(View.GONE);
+            binding.llEmptyMessage.setVisibility(View.GONE);
+            binding.llContestTitleBar.setVisibility(View.GONE); // 제목 바도 숨김
+            binding.btnGoToContest.setVisibility(View.GONE); // 버튼도 숨김
+        } else {
+            binding.progressBar.setVisibility(View.GONE);
+            binding.llContestTitleBar.setVisibility(View.VISIBLE); // 제목 바 다시 표시
+            binding.btnGoToContest.setVisibility(View.VISIBLE); // 버튼 다시 표시
+        }
+    }
+
     private void loadMyActivities() {
         apiService.getUserActivity(currentUserId).enqueue(new Callback<UserActivityResponse>() {
             @Override
             public void onResponse(@NonNull Call<UserActivityResponse> call, @NonNull Response<UserActivityResponse> response) {
+                showLoading(false);
                 if (response.isSuccessful() && response.body() != null) {
                     processActivityResponse(response.body());
                 } else {
@@ -122,6 +138,7 @@ public class MyContestsListFragment extends Fragment {
 
             @Override
             public void onFailure(@NonNull Call<UserActivityResponse> call, @NonNull Throwable t) {
+                showLoading(false);
                 handleApiFailure("getUserActivity", t);
             }
         });

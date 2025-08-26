@@ -90,14 +90,14 @@ public class MypageProfileFragment extends Fragment {
         profileManager = ProfileManager.getInstance(requireContext());
         registrationManager = RegistrationManager.getInstance();
         
-        // 대상 사용자 ID 가져오기
-        if (getArguments() != null) {
-            targetUserId = getArguments().getString("TARGET_USER_ID");
-        }
-
         // 인자 확인하여 모드 설정
         if (getArguments() != null) {
-            targetUserId = getArguments().getString("target_user_id");
+            // TARGET_USER_ID 또는 target_user_id 둘 다 확인
+            targetUserId = getArguments().getString("TARGET_USER_ID");
+            if (targetUserId == null) {
+                targetUserId = getArguments().getString("target_user_id");
+            }
+            
             if (targetUserId != null) {
                 isViewMode = true; // 다른 사용자 프로필 보기 모드
             }

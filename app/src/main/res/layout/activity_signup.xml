@@ -60,7 +60,8 @@
                 <Button
                     android:id="@+id/btn_id_check"
                     android:layout_width="wrap_content"
-                    android:layout_height="48dp"
+                    android:layout_height="52dp"
+                    android:minHeight="52dp"
                     android:text="중복 확인"
                     app:cornerRadius="10dp"
                     android:backgroundTint="@color/black"
@@ -165,7 +166,8 @@
                 <Button
                     android:id="@+id/btn_email_send"
                     android:layout_width="wrap_content"
-                    android:layout_height="48dp"
+                    android:layout_height="52dp"
+                    android:minHeight="52dp"
                     android:text="인증번호 전송"
                     app:cornerRadius="10dp"
                     android:backgroundTint="@color/black"
@@ -202,7 +204,8 @@
                 <Button
                     android:id="@+id/btn_email_verify"
                     android:layout_width="wrap_content"
-                    android:layout_height="48dp"
+                    android:layout_height="52dp"
+                    android:minHeight="52dp"
                     android:backgroundTint="@color/black"
                     android:text="인증 확인"
                     android:textColor="@color/white"
@@ -241,7 +244,8 @@
         <TextView
             android:id="@+id/btn_next"
             android:layout_width="wrap_content"
-            android:layout_height="48dp"
+            android:layout_height="52dp"
+            android:minHeight="52dp"
             android:background="?android:attr/selectableItemBackground"
             android:clickable="true"
             android:focusable="true"

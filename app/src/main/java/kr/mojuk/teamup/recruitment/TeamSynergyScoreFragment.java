@@ -34,7 +34,13 @@ public class TeamSynergyScoreFragment extends Fragment {
     private RecyclerView recyclerView;
     private TeamMemberAdapter adapter;
     private List<TeamMemberData> teamMemberList;
-    private TextView tvSynergyScore;
+    
+    private RecyclerView scoreCardsRecyclerView;
+    private ScoreCardAdapter scoreCardAdapter;
+    private List<ScoreCardData> scoreCardList;
+    
+    private LinearLayout goodPointsContainer;
+    private LinearLayout badPointsContainer;
     private TokenManager tokenManager;
     private int filterId; // filter_id 저장 변수
 
@@ -60,19 +66,28 @@ public class TeamSynergyScoreFragment extends Fragment {
         initViews(view);
         setupRecyclerView();
         setupClickListeners(view);
-        loadDummyData();
+        performSynergyAnalysis();
     }
 
     private void initViews(View view) {
         recyclerView = view.findViewById(R.id.rv_team_members);
-        tvSynergyScore = view.findViewById(R.id.tv_synergy_score);
+        scoreCardsRecyclerView = view.findViewById(R.id.rv_score_cards);
+        goodPointsContainer = view.findViewById(R.id.good_points_container);
+        badPointsContainer = view.findViewById(R.id.bad_points_container);
     }
 
     private void setupRecyclerView() {
+        // Team Members RecyclerView
         teamMemberList = new ArrayList<>();
         adapter = new TeamMemberAdapter(teamMemberList);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
+        
+        // Score Cards RecyclerView
+        scoreCardList = new ArrayList<>();
+        scoreCardAdapter = new ScoreCardAdapter(scoreCardList);
+        scoreCardsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+        scoreCardsRecyclerView.setAdapter(scoreCardAdapter);
     }
 
     private void setupClickListeners(View view) {
@@ -114,32 +129,116 @@ public class TeamSynergyScoreFragment extends Fragment {
     }
 
     /**
-     * 더미 데이터를 로드하는 메서드
+     * UI 업데이트 메서드들
      */
-    private void loadDummyData() {
-        // 팀원 데이터 추가
-        teamMemberList.clear();
-        teamMemberList.add(new TeamMemberData("홍길동", "프론트엔드 개발자", "React, JavaScript, TypeScript", "리더형"));
-        teamMemberList.add(new TeamMemberData("김영희", "백엔드 개발자", "Node.js, Express, MongoDB", "협력형"));
-        teamMemberList.add(new TeamMemberData("이철수", "UI/UX 디자이너", "Figma, Sketch, Adobe XD", "창의형"));
-        teamMemberList.add(new TeamMemberData("박민수", "DevOps 엔지니어", "Docker, AWS, Kubernetes", "분석형"));
-
-        // 팀 시너지 점수 (백엔드에서 받아올 예정)
-        updateSynergyScore(85);
-
-        adapter.notifyDataSetChanged();
-        Log.d("TeamSynergyScore", "더미 데이터 로드 완료 - 팀원 수: " + teamMemberList.size());
-        
-        // 시너지 분석 API 호출
-        performSynergyAnalysis();
+    private void updateScoreCards(double synergyScore, String filterName) {
+        scoreCardList.clear();
+        scoreCardList.add(new ScoreCardData("시너지 점수", String.format("%.0f%%", synergyScore)));
+        scoreCardList.add(new ScoreCardData("공모전 카테고리", filterName != null ? filterName : "아이디어/기획"));
+        scoreCardAdapter.notifyDataSetChanged();
     }
 
     /**
-     * UI 업데이트 메서드들
+     * 좋은 점들을 UI에 표시
      */
-    private void updateSynergyScore(int score) {
-        if (tvSynergyScore != null) {
-            tvSynergyScore.setText(String.valueOf(score));
+    private void updateGoodPoints(List<SynergyAnalysisResponse.Point> goodPoints) {
+        updatePointsContainer(goodPointsContainer, goodPoints, "현재 좋은 점이 없습니다.");
+    }
+
+    /**
+     * 부족한 점들을 UI에 표시
+     */
+    private void updateBadPoints(List<SynergyAnalysisResponse.Point> badPoints) {
+        updatePointsContainer(badPointsContainer, badPoints, "현재 부족한 점이 없습니다.");
+    }
+
+    /**
+     * 점수 컨테이너를 업데이트하는 공통 메서드
+     */
+    private void updatePointsContainer(LinearLayout container, List<SynergyAnalysisResponse.Point> points, String emptyMessage) {
+        if (container == null) return;
+        
+        container.removeAllViews();
+        
+        if (points == null || points.isEmpty()) {
+            // 좋은 점/나쁜 점 없을 때 메시지 표시
+            TextView noPointsText = new TextView(requireContext());
+            noPointsText.setText(emptyMessage);
+            noPointsText.setTextColor(getResources().getColor(android.R.color.darker_gray));
+            noPointsText.setTextSize(16);
+            noPointsText.setPadding(16, 8, 16, 8);
+            container.addView(noPointsText);
+            return;
+        }
+        
+        for (int i = 0; i < points.size(); i++) {
+            SynergyAnalysisResponse.Point point = points.get(i);
+            
+            // 텍스트를 담을 수직 레이아웃
+            LinearLayout pointLayout = new LinearLayout(requireContext());
+            pointLayout.setOrientation(LinearLayout.VERTICAL);
+            pointLayout.setPadding(16, 16, 16, 16);
+            pointLayout.setBackgroundColor(getResources().getColor(android.R.color.white));
+            
+
+            
+            // 메시지를 마침표(.)나 느낌표(!)를 기준으로 분리
+            String message = point.getMessage();
+            String[] sentences = message.split("([.!])");
+            
+            // 첫 번째 문장 (굵게)
+            if (sentences.length > 0 && !sentences[0].trim().isEmpty()) {
+                TextView firstSentenceText = new TextView(requireContext());
+                String firstSentence = sentences[0].trim();
+                if (!firstSentence.endsWith(".") && !firstSentence.endsWith("!")) {
+                    firstSentence += ".";
+                }
+                firstSentenceText.setText(firstSentence);
+                firstSentenceText.setTextColor(getResources().getColor(android.R.color.black));
+                firstSentenceText.setTextSize(16);
+                firstSentenceText.setTypeface(null, android.graphics.Typeface.BOLD);
+                firstSentenceText.setPadding(0, 0, 0, 12);
+                pointLayout.addView(firstSentenceText);
+            }
+            
+            // 나머지 문장들 (일반)
+            if (sentences.length > 1) {
+                TextView remainingText = new TextView(requireContext());
+                StringBuilder remainingSentences = new StringBuilder();
+                for (int j = 1; j < sentences.length; j++) {
+                    String sentence = sentences[j].trim();
+                    if (!sentence.isEmpty()) {
+                        if (remainingSentences.length() > 0) {
+                            remainingSentences.append("\n");
+                        }
+                        remainingSentences.append(sentence);
+                        // 원래 문장이 .이나 !로 끝났다면 추가
+                        if (j < sentences.length - 1 || message.endsWith(".") || message.endsWith("!")) {
+                            remainingSentences.append(message.charAt(message.indexOf(sentence) + sentence.length()));
+                        }
+                    }
+                }
+                if (remainingSentences.length() > 0) {
+                    remainingText.setText(remainingSentences.toString());
+                    remainingText.setTextColor(getResources().getColor(android.R.color.black));
+                    remainingText.setTextSize(16);
+                    remainingText.setPadding(0, 0, 0, 8);
+                    pointLayout.addView(remainingText);
+                }
+            }
+            
+            container.addView(pointLayout);
+            
+            // 구분선 추가 (마지막 항목 제외)
+            if (points.indexOf(point) < points.size() - 1) {
+                View divider = new View(requireContext());
+                divider.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT, 1);
+                params.setMargins(16, 0, 16, 0);
+                divider.setLayoutParams(params);
+                container.addView(divider);
+            }
         }
     }
 
@@ -180,6 +279,70 @@ public class TeamSynergyScoreFragment extends Fragment {
                             
                             Log.d("TeamSynergyScore", "시너지 분석 성공!");
                             
+                            // 필터 이름 저장
+                            String filterName = synergyResponse.getFilterName();
+                            if (filterName != null) {
+                                Log.d("TeamSynergyScore", "필터 이름: " + filterName);
+                            }
+                            
+                            // 시너지 결과 처리
+                            if (synergyResponse.getSynergyResult() != null) {
+                                SynergyAnalysisResponse.SynergyResult result = synergyResponse.getSynergyResult();
+                                Log.d("TeamSynergyScore", "=== 시너지 분석 결과 ===");
+                                Log.d("TeamSynergyScore", "시너지 점수: " + result.getSynergyScore());
+                                
+                                // UI에 시너지 점수와 필터 이름 업데이트
+                                if (getActivity() != null) {
+                                    getActivity().runOnUiThread(() -> {
+                                        updateScoreCards(result.getSynergyScore(), filterName);
+                                    });
+                                }
+                                
+                                // 설명 처리
+                                if (result.getExplanation() != null) {
+                                    SynergyAnalysisResponse.Explanation explanation = result.getExplanation();
+                                    Log.d("TeamSynergyScore", "기준점: " + explanation.getBaseline());
+                                    
+                                    // 좋은 점들 로깅 및 UI 업데이트
+                                    if (explanation.getGoodPoints() != null) {
+                                        Log.d("TeamSynergyScore", "=== 좋은 점들 ===");
+                                        for (SynergyAnalysisResponse.Point point : explanation.getGoodPoints()) {
+                                            Log.d("TeamSynergyScore", "특성: " + point.getFeature());
+                                            Log.d("TeamSynergyScore", "값: " + point.getValue());
+                                            Log.d("TeamSynergyScore", "기여도: " + point.getContribution());
+                                            Log.d("TeamSynergyScore", "메시지: " + point.getMessage());
+                                            Log.d("TeamSynergyScore", "---");
+                                        }
+                                        
+                                        // UI 업데이트
+                                        if (getActivity() != null) {
+                                            getActivity().runOnUiThread(() -> {
+                                                updateGoodPoints(explanation.getGoodPoints());
+                                            });
+                                        }
+                                    }
+                                    
+                                    // 개선점들 로깅 및 UI 업데이트
+                                    if (explanation.getBadPoints() != null) {
+                                        Log.d("TeamSynergyScore", "=== 개선점들 ===");
+                                        for (SynergyAnalysisResponse.Point point : explanation.getBadPoints()) {
+                                            Log.d("TeamSynergyScore", "특성: " + point.getFeature());
+                                            Log.d("TeamSynergyScore", "값: " + point.getValue());
+                                            Log.d("TeamSynergyScore", "기여도: " + point.getContribution());
+                                            Log.d("TeamSynergyScore", "메시지: " + point.getMessage());
+                                            Log.d("TeamSynergyScore", "---");
+                                        }
+                                        
+                                        // UI 업데이트
+                                        if (getActivity() != null) {
+                                            getActivity().runOnUiThread(() -> {
+                                                updateBadPoints(explanation.getBadPoints());
+                                            });
+                                        }
+                                    }
+                                }
+                            }
+                            
                             if (synergyResponse.getUsers() != null) {
                                 Log.d("TeamSynergyScore", "사용자 수: " + synergyResponse.getUsers().size());
                                 
@@ -212,11 +375,11 @@ public class TeamSynergyScoreFragment extends Fragment {
                                         Log.d("TeamSynergyScore", "사용자 역할: " + roleText);
                                     }
                                     
-                                                                         // 성향 정보 구성
-                                     String traitText = "성향 미정";
-                                     if (user.getTraits() != null && user.getTraits().getDisplayName() != null) {
-                                         traitText = user.getTraits().getDisplayName();
-                                     }
+                                    // 성향 정보 구성
+                                    String traitText = "성향 미정";
+                                    if (user.getTraits() != null && user.getTraits().getDisplayName() != null) {
+                                        traitText = user.getTraits().getDisplayName();
+                                    }
                                     
                                     // 팀원 데이터 추가
                                     teamMemberList.add(new TeamMemberData(
@@ -227,22 +390,22 @@ public class TeamSynergyScoreFragment extends Fragment {
                                     ));
                                 }
                                 
-                                                                 // UI 업데이트
-                                 if (getActivity() != null) {
-                                     getActivity().runOnUiThread(() -> {
-                                         adapter.notifyDataSetChanged();
-                                         Log.d("TeamSynergyScore", "UI 업데이트 완료 - 팀원 수: " + teamMemberList.size());
-                                         
-                                         // 각 팀원 데이터 로깅
-                                         for (int i = 0; i < teamMemberList.size(); i++) {
-                                             TeamMemberData member = teamMemberList.get(i);
-                                             Log.d("TeamSynergyScore", "팀원 " + i + ": " + member.getName() + 
-                                                   " | 역할: " + member.getRole() + 
-                                                   " | 스킬: " + member.getSkills() + 
-                                                   " | 성향: " + member.getType());
-                                         }
-                                     });
-                                 }
+                                // UI 업데이트
+                                if (getActivity() != null) {
+                                    getActivity().runOnUiThread(() -> {
+                                        adapter.notifyDataSetChanged();
+                                        Log.d("TeamSynergyScore", "UI 업데이트 완료 - 팀원 수: " + teamMemberList.size());
+                                        
+                                        // 각 팀원 데이터 로깅
+                                        for (int i = 0; i < teamMemberList.size(); i++) {
+                                            TeamMemberData member = teamMemberList.get(i);
+                                            Log.d("TeamSynergyScore", "팀원 " + i + ": " + member.getName() + 
+                                                  " | 역할: " + member.getRole() + 
+                                                  " | 스킬: " + member.getSkills() + 
+                                                  " | 성향: " + member.getType());
+                                        }
+                                    });
+                                }
                             }
                             
                         } else {
@@ -263,10 +426,10 @@ public class TeamSynergyScoreFragment extends Fragment {
                         t.printStackTrace();
                     }
                 });
-         }
-     
-
+    }
+      
  
+  
      // 팀원 데이터 클래스
     public static class TeamMemberData {
         private String name;
@@ -333,6 +496,70 @@ public class TeamSynergyScoreFragment extends Fragment {
                 tvMemberRole = itemView.findViewById(R.id.tv_member_role);
                 tvMemberSkills = itemView.findViewById(R.id.tv_member_skills);
                 tvMemberType = itemView.findViewById(R.id.tv_member_type);
+            }
+        }
+    }
+
+    // 점수 카드 데이터 클래스
+    public static class ScoreCardData {
+        private String title;
+        private String value;
+
+        public ScoreCardData(String title, String value) {
+            this.title = title;
+            this.value = value;
+        }
+
+        public String getTitle() { return title; }
+        public String getValue() { return value; }
+    }
+
+    // 점수 카드 어댑터 클래스
+    public static class ScoreCardAdapter extends RecyclerView.Adapter<ScoreCardAdapter.ViewHolder> {
+        private List<ScoreCardData> dataList;
+
+        public ScoreCardAdapter(List<ScoreCardData> dataList) {
+            this.dataList = dataList;
+        }
+
+        @NonNull
+        @Override
+        public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.item_score_card, parent, false);
+            return new ViewHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+            ScoreCardData data = dataList.get(position);
+            holder.tvCardTitle.setText(data.getTitle());
+            holder.tvCardValue.setText(data.getValue());
+            
+            // 카드 너비 설정 (화면 너비의 절반에서 마진 제외)
+            ViewGroup.LayoutParams params = holder.itemView.getLayoutParams();
+            if (params == null) {
+                params = new ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                );
+            }
+            params.width = (int) (holder.itemView.getContext().getResources().getDisplayMetrics().widthPixels * 0.43);
+            holder.itemView.setLayoutParams(params);
+        }
+
+        @Override
+        public int getItemCount() {
+            return dataList.size();
+        }
+
+        public static class ViewHolder extends RecyclerView.ViewHolder {
+            TextView tvCardTitle, tvCardValue;
+
+            public ViewHolder(@NonNull View itemView) {
+                super(itemView);
+                tvCardTitle = itemView.findViewById(R.id.tv_card_title);
+                tvCardValue = itemView.findViewById(R.id.tv_card_value);
             }
         }
     }

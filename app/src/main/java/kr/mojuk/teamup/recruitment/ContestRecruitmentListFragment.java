@@ -56,15 +56,19 @@ public class ContestRecruitmentListFragment extends Fragment {
 
         apiService = RetrofitClient.getInstance().getApiService();
 
+        // 초기 로딩 상태 설정 - 모든 UI 요소를 숨김
+        showLoading(true);
+        
+        // 드롭다운 필터 박스도 명시적으로 숨김
+        if (binding != null) {
+            binding.layoutCheckboxFilterBox.setVisibility(View.GONE);
+            binding.spinnerSortFilter.setVisibility(View.GONE);
+        }
+        
         setupRecyclerView();
         setupClickListeners();
         loadFilters();
         loadRecruitmentPosts();
-
-        binding.spinnerSortFilter.setVisibility(View.GONE);
-
-        // 초기에는 빈 메시지를 숨김
-        showEmptyMessage(false);
 
         if (lastAppliedFilterIds.isEmpty()) {
             binding.tvFilterTitle.setText("전체 게시글 목록");
@@ -156,6 +160,25 @@ public class ContestRecruitmentListFragment extends Fragment {
         });
     }
 
+    private void showLoading(boolean isLoading) {
+        if (binding == null) return;
+        if (isLoading) {
+            binding.progressBar.setVisibility(View.VISIBLE);
+            binding.recyclerViewBoard.setVisibility(View.GONE);
+            binding.tvNoPosts.setVisibility(View.GONE);
+            binding.tvCategoryFilterTitle.setVisibility(View.GONE); // 필터 제목 숨김
+            binding.layoutCheckboxFilterBox.setVisibility(View.GONE); // 필터 박스 숨김
+            binding.spinnerSortFilter.setVisibility(View.GONE); // 스피너 숨김
+        } else {
+            binding.progressBar.setVisibility(View.GONE);
+            binding.recyclerViewBoard.setVisibility(View.VISIBLE);
+            binding.tvCategoryFilterTitle.setVisibility(View.VISIBLE); // 필터 제목 다시 표시
+            // 필터 박스와 스피너는 조건부로 표시 (기본적으로는 숨김)
+            binding.layoutCheckboxFilterBox.setVisibility(View.GONE); // 기본적으로 숨김
+            binding.spinnerSortFilter.setVisibility(View.GONE); // 기본적으로 숨김
+        }
+    }
+
     private void loadFilters() {
         apiService.getFilters().enqueue(new Callback<List<FilterItem>>() {
             @Override
@@ -179,6 +202,7 @@ public class ContestRecruitmentListFragment extends Fragment {
         apiService.getAllRecruitmentPosts().enqueue(new Callback<List<RecruitmentPostDTO>>() {
             @Override
             public void onResponse(@NonNull Call<List<RecruitmentPostDTO>> call, @NonNull Response<List<RecruitmentPostDTO>> response) {
+                showLoading(false);
                 if (response.isSuccessful() && response.body() != null) {
                     allPosts.clear();
                     allPosts.addAll(response.body());
@@ -199,6 +223,7 @@ public class ContestRecruitmentListFragment extends Fragment {
 
             @Override
             public void onFailure(@NonNull Call<List<RecruitmentPostDTO>> call, @NonNull Throwable t) {
+                showLoading(false);
                 Log.e("RecruitmentListFragment", "API Call Failed: " + t.getMessage());
                 if (isAdded() && getContext() != null) {
                     Toast.makeText(getContext(), "네트워크 오류가 발생했습니다.", Toast.LENGTH_SHORT).show();
