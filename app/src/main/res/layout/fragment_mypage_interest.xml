@@ -108,10 +108,8 @@
             android:id="@+id/btn_indicator_skills_left"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:text="&lt;"
+            android:text="◀"
             android:textSize="16sp"
-            android:textColor="@android:color/white"
-            android:background="@drawable/arrow_button_background"
             android:gravity="center"
             android:clickable="true"
             android:focusable="true"
@@ -119,7 +117,6 @@
             android:visibility="gone"/>
     </LinearLayout>
 
-    <!-- 인디케이터 점들 들어갈 곳 -->
     <LinearLayout
         android:id="@+id/ll_skills_page_indicator"
         android:layout_width="wrap_content"
@@ -139,15 +136,14 @@
             android:id="@+id/btn_indicator_skills_right"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:text="&gt;"
+            android:text="▶"
             android:textSize="16sp"
-            android:textColor="@android:color/white"
-            android:background="@drawable/arrow_button_background"
             android:gravity="center"
             android:clickable="true"
             android:focusable="true"
             android:foreground="?android:attr/selectableItemBackground"/>
     </LinearLayout>
+
 
 </LinearLayout>
 
@@ -204,10 +200,8 @@
             android:id="@+id/btn_indicator_roles_left"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:text="&lt;"
+            android:text="◀"
             android:textSize="16sp"
-            android:textColor="@android:color/white"
-            android:background="@drawable/arrow_button_background"
             android:gravity="center"
             android:clickable="true"
             android:focusable="true"
@@ -235,10 +229,8 @@
             android:id="@+id/btn_indicator_roles_right"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:text="&gt;"
+            android:text="▶"
             android:textSize="16sp"
-            android:textColor="@android:color/white"
-            android:background="@drawable/arrow_button_background"
             android:gravity="center"
             android:clickable="true"
             android:focusable="true"
