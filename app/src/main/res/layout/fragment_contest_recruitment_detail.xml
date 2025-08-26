@@ -52,7 +52,7 @@
             android:backgroundTint="@color/black"
             android:minHeight="48dp"
             android:text="작성"
-            app:cornerRadius="8dp" />
+            app:cornerRadius="10dp" />
     </LinearLayout>
 
     <!-- 2. 스크롤될 모든 콘텐츠를 NestedScrollView에 배치 -->
@@ -91,6 +91,7 @@
                 <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"
+                    android:background="@android:color/white"
                     android:src="@drawable/ic_arrow_left"/>
                 <TextView
                     android:id="@+id/contest_title_text_in_bar"
@@ -123,7 +124,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:scaleType="centerCrop"
-                        android:src="@drawable/poster_sample1" />
+                        android:background="@android:color/white"
+                        android:src="@drawable/ic_placeholder" />
 
                 </androidx.cardview.widget.CardView>
 
@@ -202,6 +204,7 @@
                                 android:id="@+id/iv_apply_arrow_right"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
+                                android:background="@android:color/white"
                                 android:src="@drawable/ic_arrow_right" />
 
                         </LinearLayout>

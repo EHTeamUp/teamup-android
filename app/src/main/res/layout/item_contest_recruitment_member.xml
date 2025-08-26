@@ -30,6 +30,7 @@
         android:id="@+id/img_arrow"
         android:layout_width="20dp"
         android:layout_height="20dp"
+        android:background="@android:color/white"
         android:src="@drawable/ic_arrow_right"
         android:contentDescription="화살표"
         app:layout_constraintEnd_toEndOf="parent"

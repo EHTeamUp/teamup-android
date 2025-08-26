@@ -75,6 +75,9 @@ public class ContestInformationDetailFragment extends Fragment {
 
         apiService = RetrofitClient.getInstance().getApiService();
 
+        // 초기 로딩 상태 설정 - 모든 UI 요소를 숨김
+        showLoading(true);
+
         if (contestId != -1) {
             loadContestDetailsFromApi(contestId);
         } else {
@@ -105,7 +108,6 @@ public class ContestInformationDetailFragment extends Fragment {
         } else {
             binding.progressBar.setVisibility(View.GONE);
             binding.scrollView.setVisibility(View.VISIBLE);
-
         }
     }
 

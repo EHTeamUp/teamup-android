@@ -96,9 +96,6 @@ public class ApplicantListFragment extends Fragment {
         btnSynergyCheck = view.findViewById(R.id.btn_synergy_check);
         btnAcceptSelected = view.findViewById(R.id.btn_accept_selected);
         
-        // 네비게이션 텍스트를 '지원자 리스트'로 설정
-        tvNavigationText.setText("지원자 리스트");
-        
         // API 서비스 초기화
         apiService = RetrofitClient.getInstance().getApiService();
         Log.d(TAG, "initViews 완료");
@@ -251,15 +248,13 @@ public class ApplicantListFragment extends Fragment {
                     // 모집 게시글 정보를 받은 후 공모전 정보 로드
                     loadContestInfo(post.getContestId());
                 } else {
-                    // API 실패시 기본 텍스트 사용
-                    tvNavigationText.setText(" 배리어프리 앱 개발 콘테스트");
+                    // API 실패시 기본값 사용 
                 }
             }
             
             @Override
             public void onFailure(Call<RecruitmentPostResponse> call, Throwable t) {
-                // 네트워크 오류시 기본 텍스트 사용
-                tvNavigationText.setText(" 배리어프리 앱 개발 콘테스트");
+                // 네트워크 오류시 기본값 사용 
             }
         });
     }
@@ -278,25 +273,13 @@ public class ApplicantListFragment extends Fragment {
 //                    Log.d(TAG, "공모전 ID: " + contest.getContestId());
 //                    Log.d(TAG, "공모전 이름: " + contest.getName());
 //                    Log.d(TAG, "공모전 URL: " + contest.getContestUrl());
-                    
-                    // 네비게이션 텍스트에 공모전 이름 설정
-                    if (getActivity() != null) {
-                        getActivity().runOnUiThread(() -> {
-                            tvNavigationText.setText(contest.getName());
-//                            Log.d(TAG, "UI에 설정된 이름: " + contest.getName());
-                        });
-                    }
                 } else {
-                    // API 실패시 기본 텍스트 사용
-                    tvNavigationText.setText(" 배리어프리 앱 개발 콘테스트");
                     Log.d(TAG, "공모전 API 실패: " + response.code());
                 }
             }
             
             @Override
             public void onFailure(Call<ContestInformation> call, Throwable t) {
-                // 네트워크 오류시 기본 텍스트 사용
-                tvNavigationText.setText(" 배리어프리 앱 개발 콘테스트");
                 Log.d(TAG, "공모전 API 네트워크 오류: " + t.getMessage());
             }
         });
@@ -403,7 +386,7 @@ public class ApplicantListFragment extends Fragment {
             getActivity().getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.fragment_container, fragment)
-                .addToBackStack(null)
+                .addToBackStack("applicant_list") // 백스택에 이름을 지정하여 지원자 리스트로 돌아갈 수 있도록 함
                 .commit();
         }
     }

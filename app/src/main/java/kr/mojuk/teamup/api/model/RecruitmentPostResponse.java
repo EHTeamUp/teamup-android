@@ -32,10 +32,13 @@ public class RecruitmentPostResponse {
     
     @SerializedName("filter_id")
     private Integer filterId;
+    
+    @SerializedName("contest_name")
+    private String contestName;
 
     public RecruitmentPostResponse(int recruitmentPostId, String title, String content, 
                                  int recruitmentCount, int contestId, String userId, 
-                                 String createdAt, String dueDate) {
+                                 String createdAt, String dueDate, String contestName) {
         this.recruitmentPostId = recruitmentPostId;
         this.title = title;
         this.content = content;
@@ -44,6 +47,7 @@ public class RecruitmentPostResponse {
         this.userId = userId;
         this.createdAt = createdAt;
         this.dueDate = dueDate;
+        this.contestName = contestName;
     }
 
     public int getRecruitmentPostId() { return recruitmentPostId; }
@@ -72,4 +76,7 @@ public class RecruitmentPostResponse {
     
     public Integer getFilterId() { return filterId; }
     public void setFilterId(Integer filterId) { this.filterId = filterId; }
+    
+    public String getContestName() { return contestName; }
+    public void setContestName(String contestName) { this.contestName = contestName; }
 }

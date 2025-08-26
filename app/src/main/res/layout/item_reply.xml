@@ -20,7 +20,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="12dp"
-        android:background="#F5F5F5">
+        android:background="@drawable/reply_background">
 
         <!-- ==================== 읽기 모드 UI ==================== -->
         <LinearLayout

@@ -4,12 +4,13 @@ import java.util.List;
 
 public class SynergyAnalysisResponse {
     private List<User> users;
+    private SynergyResult synergy_result;
+    private String filter_name;
 
     public static class User {
         private String user_id;
         private List<Skill> skills;
         private List<Role> roles;
-        private List<Experience> experiences;
         private Traits traits;
 
         public String getUserId() {
@@ -36,14 +37,6 @@ public class SynergyAnalysisResponse {
             this.roles = roles;
         }
 
-        public List<Experience> getExperiences() {
-            return experiences;
-        }
-
-        public void setExperiences(List<Experience> experiences) {
-            this.experiences = experiences;
-        }
-
         public Traits getTraits() {
             return traits;
         }
@@ -55,7 +48,6 @@ public class SynergyAnalysisResponse {
 
     public static class Skill {
         private String skill_name;
-        private boolean is_custom;
 
         public String getSkillName() {
             return skill_name;
@@ -64,19 +56,10 @@ public class SynergyAnalysisResponse {
         public void setSkillName(String skill_name) {
             this.skill_name = skill_name;
         }
-
-        public boolean isCustom() {
-            return is_custom;
-        }
-
-        public void setCustom(boolean is_custom) {
-            this.is_custom = is_custom;
-        }
     }
 
     public static class Role {
         private String role_name;
-        private boolean is_custom;
 
         public String getRoleName() {
             return role_name;
@@ -84,35 +67,6 @@ public class SynergyAnalysisResponse {
 
         public void setRoleName(String role_name) {
             this.role_name = role_name;
-        }
-
-        public boolean isCustom() {
-            return is_custom;
-        }
-
-        public void setCustom(boolean is_custom) {
-            this.is_custom = is_custom;
-        }
-    }
-
-    public static class Experience {
-        private String contest_name;
-        private int award_status;
-
-        public String getContestName() {
-            return contest_name;
-        }
-
-        public void setContestName(String contest_name) {
-            this.contest_name = contest_name;
-        }
-
-        public int getAwardStatus() {
-            return award_status;
-        }
-
-        public void setAwardStatus(int award_status) {
-            this.award_status = award_status;
         }
     }
 
@@ -137,12 +91,118 @@ public class SynergyAnalysisResponse {
         }
     }
 
+    public static class SynergyResult {
+        private double synergy_score;
+        private Explanation explanation;
+
+        public double getSynergyScore() {
+            return synergy_score;
+        }
+
+        public void setSynergyScore(double synergy_score) {
+            this.synergy_score = synergy_score;
+        }
+
+        public Explanation getExplanation() {
+            return explanation;
+        }
+
+        public void setExplanation(Explanation explanation) {
+            this.explanation = explanation;
+        }
+    }
+
+    public static class Explanation {
+        private double baseline;
+        private List<Point> good_points;
+        private List<Point> bad_points;
+
+        public double getBaseline() {
+            return baseline;
+        }
+
+        public void setBaseline(double baseline) {
+            this.baseline = baseline;
+        }
+
+        public List<Point> getGoodPoints() {
+            return good_points;
+        }
+
+        public void setGoodPoints(List<Point> good_points) {
+            this.good_points = good_points;
+        }
+
+        public List<Point> getBadPoints() {
+            return bad_points;
+        }
+
+        public void setBadPoints(List<Point> bad_points) {
+            this.bad_points = bad_points;
+        }
+    }
+
+    public static class Point {
+        private String feature;
+        private double value;
+        private double contribution;
+        private String message;
+
+        public String getFeature() {
+            return feature;
+        }
+
+        public void setFeature(String feature) {
+            this.feature = feature;
+        }
+
+        public double getValue() {
+            return value;
+        }
+
+        public void setValue(double value) {
+            this.value = value;
+        }
+
+        public double getContribution() {
+            return contribution;
+        }
+
+        public void setContribution(double contribution) {
+            this.contribution = contribution;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        public void setMessage(String message) {
+            this.message = message;
+        }
+    }
+
     public List<User> getUsers() {
         return users;
     }
 
     public void setUsers(List<User> users) {
         this.users = users;
+    }
+
+    public SynergyResult getSynergyResult() {
+        return synergy_result;
+    }
+
+    public void setSynergyResult(SynergyResult synergy_result) {
+        this.synergy_result = synergy_result;
+    }
+
+    public String getFilterName() {
+        return filter_name;
+    }
+
+    public void setFilterName(String filter_name) {
+        this.filter_name = filter_name;
     }
 }
 

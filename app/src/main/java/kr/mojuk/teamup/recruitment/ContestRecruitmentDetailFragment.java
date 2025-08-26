@@ -100,6 +100,10 @@ public class ContestRecruitmentDetailFragment extends Fragment implements Commen
         }
 
         apiService = RetrofitClient.getInstance().getApiService();
+        
+        // 초기 로딩 상태 설정 - 모든 UI 요소를 숨김
+        showLoading(true);
+        
         setupRecyclerViews();
         setupCommentInput();
         loadAllData(); // ▼▼▼ 수정된 부분 ▼▼▼

@@ -281,17 +281,6 @@ public class MypageInterestFragment extends Fragment {
         llBackNavigation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // 마이페이지 모드에서는 변경사항을 서버에 저장
-                if (SOURCE_MYPAGE.equals(source)) {
-                    Log.d(TAG, "뒤로가기 버튼 클릭 - 변경사항 저장");
-                    Log.d(TAG, "저장할 스킬: " + selectedSkillIds.size() + "개");
-                    Log.d(TAG, "저장할 역할: " + selectedRoleIds.size() + "개");
-                    
-                    // 스킬과 역할 모두 저장
-                    updateUserSkills();
-                    updateUserRoles();
-                }
-                
                 // 마이페이지 프로필로 돌아가기
                 if (getActivity() instanceof MainActivity) {
                     ((MainActivity) getActivity()).showFragment(new MypageProfileFragment());
@@ -979,7 +968,7 @@ public class MypageInterestFragment extends Fragment {
                         getActivity().runOnUiThread(() -> {
                             Log.d(TAG, "✅ 스킬 업데이트 API 성공: " + response.getMessage());
                             // Toast 메시지로 사용자에게 알림
-                            android.widget.Toast.makeText(requireContext(), "스킬이 업데이트되었습니다.", android.widget.Toast.LENGTH_SHORT).show();
+                            android.widget.Toast.makeText(requireContext(), "기술이 업데이트되었습니다.", android.widget.Toast.LENGTH_SHORT).show();
                         });
                     }
                 }
