@@ -117,7 +117,6 @@
             android:visibility="gone"/>
     </LinearLayout>
 
-    <!-- 인디케이터 점들 들어갈 곳 -->
     <LinearLayout
         android:id="@+id/ll_skills_page_indicator"
         android:layout_width="wrap_content"
@@ -144,6 +143,7 @@
             android:focusable="true"
             android:foreground="?android:attr/selectableItemBackground"/>
     </LinearLayout>
+
 
 </LinearLayout>
 
