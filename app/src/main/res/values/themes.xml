@@ -8,7 +8,7 @@
 
 
     <style name="Theme.OneThree.Indicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
-        <item name="android:color">#bbbbbb</item>
+        <item name="android:color">#E0E0E0</item>
     </style>
 
     <style name="Theme.OneThree" parent="Base.Theme.TeamUp" />
