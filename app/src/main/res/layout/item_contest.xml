@@ -22,7 +22,8 @@
             android:id="@+id/ivContestThumbnail"
             android:layout_width="match_parent"
             android:layout_height="140dp"
-            android:scaleType="centerCrop"
+            android:scaleType="fitCenter"
+            android:adjustViewBounds="true"
             android:src="@drawable/ic_placeholder" />
 
         <!-- 제목 -->
