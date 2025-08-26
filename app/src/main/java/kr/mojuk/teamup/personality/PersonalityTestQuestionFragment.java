@@ -367,10 +367,12 @@ public class PersonalityTestQuestionFragment extends Fragment implements Persona
                                 PersonalityTestResultFragment resultFragment = new PersonalityTestResultFragment();
                                 Bundle args = new Bundle();
                                 args.putString("personalityType", profile.getProfileCode());
+                                args.putString("displayName", profile.getDisplayName()); // 한글화된 성향 이름
                                 Gson gson = new Gson();
                                 String traitsJson = gson.toJson(profile.getTraits());
                                 Log.d(TAG, "=== PersonalityTestResultFragment로 전달할 데이터 (마이페이지) ===");
                                 Log.d(TAG, "personalityType: " + profile.getProfileCode());
+                                Log.d(TAG, "displayName: " + profile.getDisplayName());
                                 Log.d(TAG, "traitsJson: " + traitsJson);
                                 args.putString("personalityTraitsJson", traitsJson);
                                 args.putBoolean("isFromSignup", false); // 마이페이지에서 접근
@@ -382,10 +384,12 @@ public class PersonalityTestQuestionFragment extends Fragment implements Persona
                                 PersonalityTestResultFragment resultFragment = new PersonalityTestResultFragment();
                                 Bundle args = new Bundle();
                                 args.putString("personalityType", profile.getProfileCode());
+                                args.putString("displayName", profile.getDisplayName()); // 한글화된 성향 이름
                                 Gson gson = new Gson();
                                 String traitsJson = gson.toJson(profile.getTraits());
                                 Log.d(TAG, "=== PersonalityTestResultFragment로 전달할 데이터 (일반) ===");
                                 Log.d(TAG, "personalityType: " + profile.getProfileCode());
+                                Log.d(TAG, "displayName: " + profile.getDisplayName());
                                 Log.d(TAG, "traitsJson: " + traitsJson);
                                 args.putString("personalityTraitsJson", traitsJson);
                                 args.putBoolean("isFromSignup", false); // 일반적인 경우
@@ -424,6 +428,8 @@ public class PersonalityTestQuestionFragment extends Fragment implements Persona
      * 회원가입 4단계 완료 (성향테스트 답변을 회원가입 세션에 저장)
      */
     private void completeRegistrationStep4(PersonalityTestResponse profile) {
+        Log.d(TAG, "회원가입 4단계 완료 시작: userId=" + userId);
+        Log.d(TAG, "성향 프로필: " + profile.getProfileCode() + ", 한글 이름: " + profile.getDisplayName());
         Log.d(TAG, "회원가입 4단계 완료 시작: userId=" + userId);
         
         // 답변 데이터를 API 형식으로 변환
@@ -466,6 +472,7 @@ public class PersonalityTestQuestionFragment extends Fragment implements Persona
                                 String traitsJson = gson.toJson(profile.getTraits());
                                 ((SignupTestBaseActivity) getActivity()).onPersonalityTestCompleted(
                                     profile.getProfileCode(), 
+                                    profile.getDisplayName(),
                                     traitsJson
                                 );
                             }

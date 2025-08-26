@@ -20,6 +20,7 @@ import com.google.gson.Gson;
 public class PersonalityTestResultFragment extends Fragment {
 
     private String personalityType;
+    private String displayName; 
     private PersonalityTraits personalityTraits;
     private String personalityTraitsJson;
     private boolean isFromSignup = false; // 회원가입 과정에서 호출되었는지 여부
@@ -38,11 +39,11 @@ public class PersonalityTestResultFragment extends Fragment {
         Bundle args = getArguments();
         if (args != null) {
             personalityType = args.getString("personalityType", "CAREFUL_SUPPORTER");
+            displayName = args.getString("displayName", "섬세한 서포터"); 
             personalityTraits = (PersonalityTraits) args.getSerializable("personalityTraits");
             personalityTraitsJson = args.getString("personalityTraitsJson", "");
-            isFromSignup = args.getBoolean("isFromSignup", false); // 회원가입 과정 여부
+            isFromSignup = args.getBoolean("isFromSignup", false); 
             
-            // personalityTraits가 null이고 JSON이 있으면 JSON에서 객체로 변환
             if (personalityTraits == null && personalityTraitsJson != null && !personalityTraitsJson.isEmpty()) {
                 try {
                     Gson gson = new Gson();
@@ -54,6 +55,7 @@ public class PersonalityTestResultFragment extends Fragment {
             }
         } else {
             personalityType = "CAREFUL_SUPPORTER"; // 기본값
+            displayName = "섬세한 서포터"; // 기본값
             personalityTraits = null;
             personalityTraitsJson = "";
             isFromSignup = false;
@@ -77,11 +79,11 @@ public class PersonalityTestResultFragment extends Fragment {
         TextView tvTraitProblem = view.findViewById(R.id.tv_trait_problem);
         TextView tvDescription = view.findViewById(R.id.tv_description);
         
-        // 성향 타입 설정
-        if (personalityType != null && !personalityType.isEmpty()) {
-            tvResultTitle.setText(personalityType);
+        // 성향 타입 설정 (한글화된 이름 사용)
+        if (displayName != null && !displayName.isEmpty()) {
+            tvResultTitle.setText(displayName);
         } else {
-            tvResultTitle.setText("CAREFUL_SUPPORTER");
+            tvResultTitle.setText("신중한 서포터");
         }
         
         // Traits 정보 설정 (API 데이터 사용)
