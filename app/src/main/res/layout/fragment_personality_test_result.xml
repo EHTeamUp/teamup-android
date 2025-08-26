@@ -75,7 +75,7 @@
             <View
                 android:layout_width="match_parent"
                 android:layout_height="2dp"
-                android:background="#4CAF50"
+                android:background="#000000"
                 android:layout_marginBottom="16dp" />
 
             <!-- Personality Type Header -->
@@ -98,7 +98,7 @@
                     android:layout_height="wrap_content"
                     android:text="당신의 성향"
                     android:textSize="18sp"
-                    android:textColor="#4CAF50"
+                    android:textColor="#000000"
                     android:textStyle="bold" />
 
             </LinearLayout>
@@ -110,7 +110,7 @@
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
                 android:textStyle="bold"
-                android:textColor="#4CAF50"
+                android:textColor="#000000"
                 android:gravity="center"
                 android:layout_marginBottom="16dp" />
 
@@ -118,7 +118,7 @@
             <View
                 android:layout_width="match_parent"
                 android:layout_height="2dp"
-                android:background="#4CAF50"
+                android:background="#000000"
                 android:layout_marginBottom="16dp" />
 
             <!-- Traits Section -->
@@ -127,7 +127,7 @@
                 android:layout_height="wrap_content"
                 android:text="Traits"
                 android:textSize="16sp"
-                android:textColor="#4CAF50"
+                android:textColor="#000000"
                 android:textStyle="bold"
                 android:layout_marginBottom="12dp" />
 
@@ -146,7 +146,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textSize="14sp"
-                    android:textColor="#4CAF50"
+                    android:textColor="#000000"
                     android:layout_marginBottom="4dp" />
 
                 <TextView
@@ -154,7 +154,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textSize="14sp"
-                    android:textColor="#4CAF50"
+                    android:textColor="#000000"
                     android:layout_marginBottom="4dp" />
 
                 <TextView
@@ -162,7 +162,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textSize="14sp"
-                    android:textColor="#4CAF50"
+                    android:textColor="#000000"
                     android:layout_marginBottom="4dp" />
 
                 <TextView
@@ -170,7 +170,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textSize="14sp"
-                    android:textColor="#4CAF50" />
+                    android:textColor="#000000" />
 
             </LinearLayout>
 
@@ -178,7 +178,7 @@
             <View
                 android:layout_width="match_parent"
                 android:layout_height="2dp"
-                android:background="#4CAF50"
+                android:background="#000000"
                 android:layout_marginBottom="16dp" />
 
             <!-- Description Section -->
@@ -187,7 +187,7 @@
                 android:layout_height="wrap_content"
                 android:text="설명"
                 android:textSize="16sp"
-                android:textColor="#4CAF50"
+                android:textColor="#000000"
                 android:textStyle="bold"
                 android:layout_marginBottom="12dp" />
 
@@ -205,7 +205,7 @@
             <View
                 android:layout_width="match_parent"
                 android:layout_height="2dp"
-                android:background="#4CAF50"
+                android:background="#000000"
                 android:layout_marginTop="16dp" />
 
 
