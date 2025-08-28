@@ -27,9 +27,7 @@
 - 공모전 경험 및 수상 이력 관리
 
 ## 🛠 기술 스택
-<img src="https://img.shields.io/badge/androidstudio-34A853?style=for-the-badge&logo=android&logoColor=white"> 
-<img src="https://img.shields.io/badge/java-007396?style=for-the-badge&logo=java&logoColor=white"> 
-<br>
+<img src="https://img.shields.io/badge/androidstudio-34A853?style=for-the-badge&logo=android&logoColor=white"> <img src="https://img.shields.io/badge/java-007396?style=for-the-badge&logo=java&logoColor=white"> 
 <img src="https://img.shields.io/badge/firebase-DD2C00?style=for-the-badge&logo=firebase&logoColor=white"> 
 
 ## 🚀 설치 및 실행
