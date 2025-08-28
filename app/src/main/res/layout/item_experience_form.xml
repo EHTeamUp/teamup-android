@@ -67,6 +67,24 @@
         android:padding="12dp"
         android:layout_marginBottom="16dp" />
 
+    <!-- 공모전 주최 기관 입력 필드 -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="주최 기관"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="4dp" />
+
+    <EditText
+        android:id="@+id/et_host_organization"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/edit_text_background"
+        android:hint="주최 기관을 입력하세요"
+        android:padding="12dp"
+        android:layout_marginBottom="16dp" />
+
     <!-- 날짜 입력 필드 (달력형) -->
     <TextView
         android:layout_width="wrap_content"

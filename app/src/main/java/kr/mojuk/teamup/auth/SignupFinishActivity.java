@@ -50,7 +50,7 @@ public class SignupFinishActivity extends AppCompatActivity {
         FcmTokenManager.getInstance(this).clearFcmTokenOnSignup();
         
         btnGoToLogin.setOnClickListener(v -> {
-            Toast.makeText(this, "로그인 화면으로 이동합니다.", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(this, "로그인 화면으로 이동합니다.", Toast.LENGTH_SHORT).show();
             
             // LoginActivity로 이동
             Intent intent = new Intent(SignupFinishActivity.this, LoginActivity.class);
