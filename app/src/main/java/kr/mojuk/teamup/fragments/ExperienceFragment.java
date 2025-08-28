@@ -212,6 +212,7 @@ public class ExperienceFragment extends Fragment {
         // 폼 요소들 찾기
         EditText etContestName = formView.findViewById(R.id.et_contest_name_additional);
         Spinner spinnerCategory = formView.findViewById(R.id.spinner_category);
+        EditText etHostOrganization = formView.findViewById(R.id.et_host_organization);
         EditText etDate = formView.findViewById(R.id.et_date_additional);
         CheckBox cbAwardReceived = formView.findViewById(R.id.cb_award_received);
         EditText etDescription = formView.findViewById(R.id.et_description_additional);
@@ -255,6 +256,9 @@ public class ExperienceFragment extends Fragment {
                     break;
                 }
             }
+            
+            // 주최 기관 설정
+            etHostOrganization.setText(experience.getHostOrganization());
             
             etDate.setText(experience.getAwardDate());
             cbAwardReceived.setChecked(experience.getAwardStatus() == 1); // award_status가 1이면 체크
@@ -313,6 +317,7 @@ public class ExperienceFragment extends Fragment {
     private void setupFormChangeListeners(View formView) {
         EditText etContestName = formView.findViewById(R.id.et_contest_name_additional);
         Spinner spinnerCategory = formView.findViewById(R.id.spinner_category);
+        EditText etHostOrganization = formView.findViewById(R.id.et_host_organization);
         EditText etDate = formView.findViewById(R.id.et_date_additional);
         CheckBox cbAwardReceived = formView.findViewById(R.id.cb_award_received);
         EditText etDescription = formView.findViewById(R.id.et_description_additional);
@@ -332,6 +337,7 @@ public class ExperienceFragment extends Fragment {
         };
         
         etContestName.addTextChangedListener(textWatcher);
+        etHostOrganization.addTextChangedListener(textWatcher);
         etDate.addTextChangedListener(textWatcher);
         etDescription.addTextChangedListener(textWatcher);
         
@@ -361,6 +367,7 @@ public class ExperienceFragment extends Fragment {
         for (View formView : experienceFormViews) {
             EditText etContestName = formView.findViewById(R.id.et_contest_name_additional);
             Spinner spinnerCategory = formView.findViewById(R.id.spinner_category);
+            EditText etHostOrganization = formView.findViewById(R.id.et_host_organization);
             EditText etDate = formView.findViewById(R.id.et_date_additional);
             CheckBox cbAwardReceived = formView.findViewById(R.id.cb_award_received);
             EditText etDescription = formView.findViewById(R.id.et_description_additional);
@@ -368,6 +375,7 @@ public class ExperienceFragment extends Fragment {
             // 하나라도 내용이 있으면 hasContent = true
             if (!etContestName.getText().toString().trim().isEmpty() ||
                 spinnerCategory.getSelectedItemPosition() > 0 || // "카테고리 선택"이 아닌 경우
+                !etHostOrganization.getText().toString().trim().isEmpty() ||
                 !etDate.getText().toString().trim().isEmpty() ||
                 cbAwardReceived.isChecked() ||
                 !etDescription.getText().toString().trim().isEmpty()) {
@@ -409,17 +417,19 @@ public class ExperienceFragment extends Fragment {
             View formView = experienceFormViews.get(i);
             EditText etContestName = formView.findViewById(R.id.et_contest_name_additional);
             Spinner spinnerCategory = formView.findViewById(R.id.spinner_category);
+            EditText etHostOrganization = formView.findViewById(R.id.et_host_organization);
             EditText etDate = formView.findViewById(R.id.et_date_additional);
             CheckBox cbAwardReceived = formView.findViewById(R.id.cb_award_received);
             EditText etDescription = formView.findViewById(R.id.et_description_additional);
             
             String contestName = etContestName.getText().toString().trim();
             String category = spinnerCategory.getSelectedItem().toString();
+            String hostOrganization = etHostOrganization.getText().toString().trim();
             String date = etDate.getText().toString().trim();
             String description = etDescription.getText().toString().trim();
             
             // 필수 필드 검증
-            if (!contestName.isEmpty() || !category.equals("카테고리 선택") || !date.isEmpty()) {
+            if (!contestName.isEmpty() || !category.equals("카테고리 선택") || !hostOrganization.isEmpty() || !date.isEmpty()) {
                 // 하나라도 입력된 경우 모든 필수 필드 검증
                 if (contestName.isEmpty()) {
                     Toast.makeText(requireContext(), (i + 1) + "번째 폼의 공모전명을 입력해주세요.", Toast.LENGTH_SHORT).show();
@@ -429,6 +439,12 @@ public class ExperienceFragment extends Fragment {
                 
                 if (category.equals("카테고리 선택")) {
                     Toast.makeText(requireContext(), (i + 1) + "번째 폼의 카테고리를 선택해주세요.", Toast.LENGTH_SHORT).show();
+                    hasError = true;
+                    break;
+                }
+                
+                if (hostOrganization.isEmpty()) {
+                    Toast.makeText(requireContext(), (i + 1) + "번째 폼의 주최 기관을 입력해주세요.", Toast.LENGTH_SHORT).show();
                     hasError = true;
                     break;
                 }
@@ -443,7 +459,7 @@ public class ExperienceFragment extends Fragment {
                 Experience experience = new Experience();
                 experience.setContestName(contestName);  // contest_name 필드
                 experience.setAwardStatus(cbAwardReceived.isChecked() ? 1 : 0);  // award_status 필드 (수상 여부)
-                experience.setHostOrganization(category); // host_organization 필드
+                experience.setHostOrganization(hostOrganization); // host_organization 필드
                 experience.setAwardDate(date);           // award_date 필드
                 experience.setDescription(description);   // description 필드
                 
@@ -521,12 +537,14 @@ public class ExperienceFragment extends Fragment {
         for (View formView : experienceFormViews) {
             EditText etContestName = formView.findViewById(R.id.et_contest_name_additional);
             Spinner spinnerCategory = formView.findViewById(R.id.spinner_category);
+            EditText etHostOrganization = formView.findViewById(R.id.et_host_organization);
             EditText etDate = formView.findViewById(R.id.et_date_additional);
             CheckBox cbAwardReceived = formView.findViewById(R.id.cb_award_received);
             EditText etDescription = formView.findViewById(R.id.et_description_additional);
             
             String contestName = etContestName.getText().toString().trim();
             String category = spinnerCategory.getSelectedItem().toString();
+            String hostOrganization = etHostOrganization.getText().toString().trim();
             String date = etDate.getText().toString().trim();
             String description = etDescription.getText().toString().trim();
             
@@ -534,13 +552,14 @@ public class ExperienceFragment extends Fragment {
             // "카테고리 선택"은 빈 값으로 처리
             if (!contestName.isEmpty() && 
                 !category.equals("카테고리 선택") && 
+                !hostOrganization.isEmpty() &&
                 !date.isEmpty() && 
                 !description.isEmpty()) {
                 
                 Experience experience = new Experience();
                 experience.setContestName(contestName);  // contest_name 필드에 설정
                 experience.setAwardStatus(cbAwardReceived.isChecked() ? 1 : 0);  // award_status 필드 (수상 여부)
-                experience.setHostOrganization(category);
+                experience.setHostOrganization(hostOrganization);
                 experience.setAwardDate(date);
                 experience.setDescription(description);
                 
@@ -562,18 +581,21 @@ public class ExperienceFragment extends Fragment {
         for (View formView : experienceFormViews) {
             EditText etContestName = formView.findViewById(R.id.et_contest_name_additional);
             Spinner spinnerCategory = formView.findViewById(R.id.spinner_category);
+            EditText etHostOrganization = formView.findViewById(R.id.et_host_organization);
             EditText etDate = formView.findViewById(R.id.et_date_additional);
             CheckBox cbAwardReceived = formView.findViewById(R.id.cb_award_received);
             EditText etDescription = formView.findViewById(R.id.et_description_additional);
             
             String contestName = etContestName.getText().toString().trim();
             String category = spinnerCategory.getSelectedItem().toString();
+            String hostOrganization = etHostOrganization.getText().toString().trim();
             String date = etDate.getText().toString().trim();
             String description = etDescription.getText().toString().trim();
             
             // 하나라도 내용이 있으면 true 반환
             if (!contestName.isEmpty() || 
                 !category.equals("카테고리 선택") || 
+                !hostOrganization.isEmpty() ||
                 !date.isEmpty() || 
                 !description.isEmpty() ||
                 cbAwardReceived.isChecked()) {
