@@ -70,4 +70,30 @@
 | --- | --- | --- |
 | ![로그인](https://github.com/user-attachments/assets/59a4cd65-ca0a-4664-b6e6-b946dcb3c574) | ![회원가입1](https://github.com/user-attachments/assets/ba792547-a14d-4b1f-89b9-f047f7c1a31b) | ![회원가입2](https://github.com/user-attachments/assets/1e75ff8e-e499-45a5-ab75-49ee49ffebdf) |
 
+| 회원가입_경험 작성| 회원가입_성향테스트| 메인 홈 화면|
+| --- | --- | --- |
+| ![회원가입3](https://github.com/user-attachments/assets/edf4422d-2797-461d-a958-4d690d5a54f9) | ![회원가입4](https://github.com/user-attachments/assets/04f7248f-e183-4845-bc8b-9795359a895b) |![메인홈](https://github.com/user-attachments/assets/d4e26f89-f632-4bbc-ab58-6f7021f70626) |
 
+| 마이페이지| 마이페이지_회원정보| 마이페이지_프로필|
+| --- | --- | --- |
+| ![마이페이지](https://github.com/user-attachments/assets/4830dc76-d232-48d3-865b-9b6ca115e1ef) | ![마이페이지회원정보](https://github.com/user-attachments/assets/b112ab25-ff69-4ccb-8e1b-8e732a05714d)| ![마이페이지프로필](https://github.com/user-attachments/assets/3108da14-940b-48cc-b741-ac6c3297f2e7) |
+
+| 마이페이지_기술역할| 마이페이지_경험| 마이페이지_성향테스트|
+| --- | --- | --- |
+| ![마이페이지기술역할](https://github.com/user-attachments/assets/b7406368-5e72-4806-9a1b-bb805de34bb0) | ![마이페이지경험](https://github.com/user-attachments/assets/483c85fb-1759-454b-8957-370036239467) | ![마이페이지성향테스트](https://github.com/user-attachments/assets/8d811f24-e224-4b97-8acd-d9ee4da92b96) |
+
+| 내 참여 공모전 | 공모전 목록| 공모전 상세|
+| --- | --- | --- |
+| ![내참여공모전](https://github.com/user-attachments/assets/5accb7d2-786a-4c04-939c-3d4b331653b5) | ![공모전목록](https://github.com/user-attachments/assets/173257fa-48ce-4833-b0fb-cbc300a8fd9b) | ![공모전상세](https://github.com/user-attachments/assets/a6f130f7-6500-4cea-b1bc-97ab634a222a) |
+
+| 공모전 모집글 작성| 공모전 모집 게시글 목록| 공모전 모집 게시글 상세|
+| --- | --- | --- |
+| ![모집글작성](https://github.com/user-attachments/assets/3e00251b-2fa3-4d36-8657-3538fcb70964) | ![모집게시글목록](https://github.com/user-attachments/assets/1d717637-01b5-4c89-af68-d36f40b1f371) | ![게시글목록상세](https://github.com/user-attachments/assets/0c4b891d-8eb2-4267-bd2b-c970d24e4d3e) |
+
+| 지원자 리스트| 시너지 분석| 시너지 분석2|
+| --- | --- | --- |
+| ![지원자리스트](https://github.com/user-attachments/assets/caf69a91-4935-4f13-8103-c5585f9656c8) | ![시너지분석](https://github.com/user-attachments/assets/a6504ea8-9ef0-429d-91cb-2ef19dd6f9f4) | ![시너지분석2](https://github.com/user-attachments/assets/65ec74df-fecf-41a7-9eb1-96402201e9c5) |
+
+| 알람_지원자 추가| 알람_지원 수락| 알람_댓글 추가|
+| --- | --- | --- |
+| ![지원자추가알람](https://github.com/user-attachments/assets/3df19cfe-05c8-43b1-8950-32e94a3ee426) | ![지원수락알람](https://github.com/user-attachments/assets/e2101947-c00b-4ab2-afbf-3c012908bd29) | ![댓글추가알람](https://github.com/user-attachments/assets/d698a19d-fb46-44f0-824b-61a19c4d8164) |
