@@ -64,5 +64,10 @@
 
 ## 📱 실행 화면
 
-추후 추가
+
+
+| 로그인| 회원가입_개인정보 작성| 회원가입_스킬/역할|
+| --- | --- | --- |
+| ![로그인](https://github.com/user-attachments/assets/59a4cd65-ca0a-4664-b6e6-b946dcb3c574) | ![회원가입1](https://github.com/user-attachments/assets/ba792547-a14d-4b1f-89b9-f047f7c1a31b) | ![회원가입2](https://github.com/user-attachments/assets/1e75ff8e-e499-45a5-ab75-49ee49ffebdf) |
+
 
